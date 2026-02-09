@@ -1,0 +1,231 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+---
+
+<BlogPost
+  title="Karnataka Data Center Power Tariff 2026: Complete Breakdown"
+  description="BESCOM tariff details for Karnataka data centers, including ₹1/unit night rebate, industrial classification benefits, and Bengaluru market dynamics."
+  publishDate="2026-02-05"
+  category="State Guide"
+  readTime="10 min read"
+>
+  <p>
+    Karnataka, home to India's tech capital Bengaluru, offers data center operators a compelling mix
+    of competitive tariffs, strong night-hour incentives, and favorable industrial classification.
+    KERC's tariff structure rewards operators who optimize for off-peak consumption.
+  </p>
+
+  <h2>Quick Reference: Karnataka HT Industrial Tariff</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Component</th>
+        <th>Rate (FY 2025-26)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Base Energy Rate</td>
+        <td>₹6.90/kWh</td>
+      </tr>
+      <tr>
+        <td>Demand Charge</td>
+        <td>₹350/kVA/month</td>
+      </tr>
+      <tr>
+        <td>Fuel Adjustment Charge</td>
+        <td>₹0.10/unit</td>
+      </tr>
+      <tr>
+        <td>Electricity Duty</td>
+        <td>6%</td>
+      </tr>
+      <tr>
+        <td>Power Factor Threshold</td>
+        <td>0.85 (most lenient in India)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="highlight-box">
+    <strong>Key Advantage:</strong> Karnataka's ₹6.90/kWh base rate is 16% lower than Maharashtra
+    and 8% lower than Tamil Nadu. Combined with lower demand charges (₹350 vs ₹608 in TN), Karnataka
+    offers significant cost advantages for power-intensive facilities.
+  </div>
+
+  <h2>Time-of-Day (ToD) Tariff Structure</h2>
+
+  <p>
+    Karnataka's standout feature is its <strong>absolute rebate</strong> for night consumption—₹1/unit
+    off the base rate, rather than a percentage discount.
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Time Slot</th>
+        <th>Hours</th>
+        <th>Adjustment</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Night Incentive</strong></td>
+        <td>22:00 - 06:00</td>
+        <td><strong>-₹1.00/unit</strong> (Effective: ₹5.90/kWh)</td>
+      </tr>
+      <tr>
+        <td>Morning Peak</td>
+        <td>06:00 - 09:00</td>
+        <td>+20% Surcharge (₹8.28/kWh)</td>
+      </tr>
+      <tr>
+        <td>Normal</td>
+        <td>09:00 - 18:00</td>
+        <td>Base Rate (₹6.90/kWh)</td>
+      </tr>
+      <tr>
+        <td>Evening Peak</td>
+        <td>18:00 - 22:00</td>
+        <td>+20% Surcharge (₹8.28/kWh)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="highlight-box">
+    <strong>Night Rate Analysis:</strong> At ₹5.90/kWh effective rate during night hours (22:00-06:00),
+    Karnataka offers the second-lowest off-peak rates in India after Telangana. For workloads that can
+    shift to night hours, this represents a 14.5% savings over the base rate.
+  </div>
+
+  <h2>Industrial Classification Benefit</h2>
+
+  <p>
+    Karnataka explicitly classifies data centers under the HT Industrial category (not Commercial),
+    providing:
+  </p>
+
+  <ul>
+    <li>Lower base energy rates (Commercial would be ₹8.50+/kWh)</li>
+    <li>Industrial power factor threshold (0.85 vs 0.90)</li>
+    <li>Eligibility for industrial incentive schemes</li>
+  </ul>
+
+  <p>
+    This classification is formalized in KERC's tariff order—unlike some states where data centers
+    must negotiate classification on a case-by-case basis.
+  </p>
+
+  <h2>Bengaluru Market Dynamics</h2>
+
+  <p>
+    While Karnataka offers attractive tariffs, Bengaluru-specific challenges include:
+  </p>
+
+  <ul>
+    <li><strong>Land scarcity:</strong> Premium locations in Whitefield, Electronic City command high prices</li>
+    <li><strong>Water availability:</strong> Bengaluru's water crisis affects cooling infrastructure planning</li>
+    <li><strong>Grid reliability:</strong> Some industrial areas experience more outages than Mumbai/Chennai</li>
+    <li><strong>Fiber connectivity:</strong> Strong domestic connectivity, growing international routes</li>
+  </ul>
+
+  <h2>Peak Hour Optimization</h2>
+
+  <p>
+    With 6 hours of peak tariff daily (06:00-09:00 and 18:00-22:00) at +20% surcharge,
+    strategies to minimize peak costs:
+  </p>
+
+  <ol>
+    <li><strong>Cooling pre-charge:</strong> Run chillers harder during 04:00-06:00 night window</li>
+    <li><strong>Workload scheduling:</strong> Defer non-critical batch jobs to post-22:00</li>
+    <li><strong>Battery arbitrage:</strong> Charge during night, discharge during peak (if economics support)</li>
+    <li><strong>Tenant incentives:</strong> Offer lower rates for off-peak consumption commitments</li>
+  </ol>
+
+  <h2>Power Factor Advantage</h2>
+
+  <p>
+    Karnataka's 0.85 power factor threshold (vs 0.90 in other states) provides more flexibility:
+  </p>
+
+  <ul>
+    <li>Lower capacitor bank requirements</li>
+    <li>More tolerance for variable IT loads</li>
+    <li>Reduced penalty exposure during UPS operations</li>
+  </ul>
+
+  <p>
+    However, maintaining 0.90+ PF is still recommended for operational efficiency.
+  </p>
+
+  <h2>Renewable Energy Options</h2>
+
+  <p>
+    Karnataka is a leader in solar deployment, offering:
+  </p>
+
+  <ul>
+    <li><strong>Open access solar:</strong> Competitive wheeling charges</li>
+    <li><strong>Captive solar:</strong> Land available in peripheral areas</li>
+    <li><strong>Rooftop solar:</strong> Net metering available for smaller installations</li>
+    <li><strong>Wind power:</strong> Group captive arrangements available</li>
+  </ul>
+
+  <h2>Sample Cost Comparison</h2>
+
+  <p>
+    100 MWh monthly consumption, 30% peak, 40% normal, 30% off-peak:
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>State</th>
+        <th>Energy Cost</th>
+        <th>Demand (200 kVA)</th>
+        <th>Monthly Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Karnataka</td>
+        <td>₹6,77,400</td>
+        <td>₹70,000</td>
+        <td><strong>₹7,47,400</strong></td>
+      </tr>
+      <tr>
+        <td>Maharashtra</td>
+        <td>₹8,20,000</td>
+        <td>₹80,000</td>
+        <td>₹9,00,000</td>
+      </tr>
+      <tr>
+        <td>Tamil Nadu</td>
+        <td>₹7,50,000</td>
+        <td>₹1,21,600</td>
+        <td>₹8,71,600</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>
+    <em>Note: Simplified comparison excluding taxes and fuel charges.</em>
+  </p>
+
+  <h2>Try Our Calculator</h2>
+
+  <p>
+    Use our <a href="/calculator">ToD Power Tariff Calculator</a> to estimate your Karnataka
+    data center electricity costs with your specific consumption pattern.
+  </p>
+
+  <h2>Sources</h2>
+
+  <ul>
+    <li>KERC Tariff Order FY 2025-26</li>
+    <li>BESCOM HT Industrial Schedule</li>
+    <li>Karnataka Electricity Duty Act</li>
+  </ul>
+</BlogPost>

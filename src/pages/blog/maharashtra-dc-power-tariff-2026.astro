@@ -1,0 +1,178 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+---
+
+<BlogPost
+  title="Maharashtra Data Center Power Tariff 2026: Complete Breakdown"
+  description="Everything you need to know about MERC/MSEDCL tariffs for data centers in Maharashtra, including ToD peak hours, surcharges, solar rebates, and demand charges."
+  publishDate="2026-02-10"
+  category="State Guide"
+  readTime="10 min read"
+>
+  <p>
+    Maharashtra is India's largest data center market, with Mumbai alone hosting over 40% of the country's
+    installed capacity. Understanding MERC (Maharashtra Electricity Regulatory Commission) tariffs is
+    essential for any colocation operator or enterprise running facilities in the state.
+  </p>
+
+  <h2>Quick Reference: Maharashtra HT Industrial Tariff</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Component</th>
+        <th>Rate (FY 2025-26)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Base Energy Rate</td>
+        <td>₹8.20/kVAh</td>
+      </tr>
+      <tr>
+        <td>Demand Charge</td>
+        <td>₹400/kVA/month</td>
+      </tr>
+      <tr>
+        <td>Fuel Adjustment Charge</td>
+        <td>₹0.15/unit</td>
+      </tr>
+      <tr>
+        <td>Electricity Duty</td>
+        <td>16%</td>
+      </tr>
+      <tr>
+        <td>Power Factor Threshold</td>
+        <td>0.90</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Time-of-Day (ToD) Tariff Structure</h2>
+
+  <p>
+    Maharashtra's ToD structure is relatively straightforward compared to other states, with a single
+    peak window in the evening hours.
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Time Slot</th>
+        <th>Hours</th>
+        <th>Adjustment</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Off-Peak (Night)</td>
+        <td>00:00 - 06:00</td>
+        <td>Base Rate</td>
+      </tr>
+      <tr>
+        <td>Normal</td>
+        <td>06:00 - 09:00</td>
+        <td>Base Rate</td>
+      </tr>
+      <tr>
+        <td>Solar Hours</td>
+        <td>09:00 - 17:00</td>
+        <td><strong>-15% Rebate</strong></td>
+      </tr>
+      <tr>
+        <td>Peak</td>
+        <td>17:00 - 24:00</td>
+        <td><strong>+25% Surcharge</strong></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="highlight-box">
+    <strong>Key Insight:</strong> Maharashtra's solar hour rebate (09:00-17:00) is unique among Indian states.
+    Data centers that can shift workloads to daytime hours can save up to 15% on energy charges during
+    these periods.
+  </div>
+
+  <h2>Peak Hour Impact Analysis</h2>
+
+  <p>
+    The +25% surcharge during peak hours (17:00-24:00) significantly impacts data center operating costs.
+    For a typical 100-rack facility consuming 180 MWh/month:
+  </p>
+
+  <ul>
+    <li><strong>40% peak consumption:</strong> Additional cost of ~₹3.6 lakhs/month</li>
+    <li><strong>25% peak consumption:</strong> Additional cost of ~₹2.25 lakhs/month</li>
+    <li><strong>Optimized (15% peak):</strong> Additional cost of ~₹1.35 lakhs/month</li>
+  </ul>
+
+  <h2>Demand Charges Explained</h2>
+
+  <p>
+    Maharashtra charges ₹400/kVA/month based on the higher of:
+  </p>
+
+  <ol>
+    <li>Contracted demand (what you agreed to in your connection)</li>
+    <li>Recorded maximum demand (highest 15-minute average in the billing period)</li>
+  </ol>
+
+  <div class="warning-box">
+    <strong>Warning:</strong> Exceeding contracted demand can trigger penalty charges. Ensure your
+    contracted demand has adequate headroom for peak operations and UPS charging cycles.
+  </div>
+
+  <h2>Green Energy Benefits</h2>
+
+  <p>
+    Data centers in Maharashtra using 100% green energy (through open access or captive solar)
+    receive additional benefits:
+  </p>
+
+  <ul>
+    <li>10% wheeling charge discount</li>
+    <li>Exemption from cross-subsidy surcharge for RE</li>
+    <li>Banking facility for solar power (limited)</li>
+  </ul>
+
+  <h2>DG Power Considerations</h2>
+
+  <p>
+    Typical diesel generator costs in Maharashtra range from ₹20-24/kWh, approximately 2.5-3x the
+    grid rate. Key factors affecting DG costs:
+  </p>
+
+  <ul>
+    <li>Diesel price: Currently ~₹90/litre</li>
+    <li>Generator efficiency: 3-4 units/litre for large sets</li>
+    <li>Maintenance overhead: ₹0.50-1.00/unit</li>
+  </ul>
+
+  <h2>Billing Best Practices</h2>
+
+  <p>
+    For colocation operators billing tenants in Maharashtra:
+  </p>
+
+  <ol>
+    <li><strong>Meter at rack level:</strong> Install smart PDUs to capture per-tenant consumption by time slot</li>
+    <li><strong>Separate DG billing:</strong> Track grid vs DG consumption separately for accurate pass-through</li>
+    <li><strong>Include all components:</strong> Energy + Demand + FAC + Duty + GST for full cost recovery</li>
+    <li><strong>ToD transparency:</strong> Show tenants their peak vs off-peak consumption split</li>
+  </ol>
+
+  <h2>Try Our Calculator</h2>
+
+  <p>
+    Use our <a href="/calculator">ToD Power Tariff Calculator</a> to estimate your Maharashtra
+    data center electricity costs based on your specific consumption pattern.
+  </p>
+
+  <h2>Sources</h2>
+
+  <ul>
+    <li>MERC Tariff Order FY 2025-26</li>
+    <li>MSEDCL HT Industrial Category Schedule</li>
+    <li>Maharashtra Electricity Duty Act</li>
+  </ul>
+</BlogPost>

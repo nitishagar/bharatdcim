@@ -1,0 +1,171 @@
+---
+import Layout from './Layout.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  publishDate: string;
+  category: string;
+  readTime?: string;
+}
+
+const { title, description, publishDate, category, readTime = '8 min read' } = Astro.props;
+const formattedDate = new Date(publishDate).toLocaleDateString('en-IN', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+---
+
+<Layout title={title} description={description}>
+  <article>
+    <!-- Hero -->
+    <header class="py-16 bg-gradient-to-b from-gray-50 to-white">
+      <div class="container">
+        <div class="max-w-3xl mx-auto">
+          <div class="flex items-center gap-4 text-sm text-gray-500 mb-4">
+            <span class="text-[--color-accent] font-medium uppercase tracking-wider text-xs">{category}</span>
+            <span>•</span>
+            <time datetime={publishDate}>{formattedDate}</time>
+            <span>•</span>
+            <span>{readTime}</span>
+          </div>
+          <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-6 leading-tight">
+            {title}
+          </h1>
+          <p class="text-xl text-gray-600">
+            {description}
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <div class="section pt-0">
+      <div class="container">
+        <div class="max-w-3xl mx-auto prose prose-lg prose-gray">
+          <slot />
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <section class="section bg-gray-50">
+      <div class="container">
+        <div class="max-w-3xl mx-auto text-center">
+          <h2 class="text-2xl font-bold text-gray-900 mb-4">
+            Automate Your Power Billing
+          </h2>
+          <p class="text-gray-600 mb-8">
+            BharatDCIM automatically calculates ToD tariffs, tracks DG consumption,
+            and generates GST-compliant invoices for your tenants.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="/calculator" class="btn-secondary">Try ToD Calculator</a>
+            <a href="/contact" class="btn-primary">Get Demo</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </article>
+</Layout>
+
+<style is:global>
+  .prose {
+    --tw-prose-body: #374151;
+    --tw-prose-headings: #1a1a1a;
+    --tw-prose-links: #1e3a5f;
+    --tw-prose-bold: #1a1a1a;
+    --tw-prose-counters: #6b7280;
+    --tw-prose-bullets: #6b7280;
+    --tw-prose-hr: #e5e7eb;
+    --tw-prose-quotes: #374151;
+    --tw-prose-quote-borders: #8b2e3e;
+    --tw-prose-captions: #6b7280;
+    --tw-prose-code: #1a1a1a;
+    --tw-prose-pre-code: #f3f4f6;
+    --tw-prose-pre-bg: #1a1a1a;
+    --tw-prose-th-borders: #e5e7eb;
+    --tw-prose-td-borders: #f3f4f6;
+  }
+
+  .prose h2 {
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    font-size: 1.75rem;
+    font-weight: 700;
+  }
+
+  .prose h3 {
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  .prose p {
+    margin-bottom: 1.25rem;
+  }
+
+  .prose a {
+    color: var(--tw-prose-links);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .prose a:hover {
+    color: var(--color-accent);
+  }
+
+  .prose ul, .prose ol {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+  }
+
+  .prose li {
+    margin-bottom: 0.5rem;
+  }
+
+  .prose blockquote {
+    border-left: 4px solid var(--tw-prose-quote-borders);
+    padding-left: 1rem;
+    font-style: italic;
+    color: var(--tw-prose-quotes);
+  }
+
+  .prose table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+  }
+
+  .prose th {
+    background: #f9fafb;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid var(--tw-prose-th-borders);
+  }
+
+  .prose td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--tw-prose-td-borders);
+  }
+
+  .prose .highlight-box {
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .prose .warning-box {
+    background: #fef3c7;
+    border: 1px solid #fcd34d;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+</style>
