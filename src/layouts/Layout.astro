@@ -1,0 +1,140 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'BharatDCIM - India\'s first DCIM with native ToD tariff billing. Automate data center power billing with state-wise tariff intelligence for Maharashtra, Tamil Nadu, Karnataka & Telangana.' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <title>{title} | BharatDCIM</title>
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={`${title} | BharatDCIM`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="BharatDCIM" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={`${title} | BharatDCIM`} />
+    <meta name="twitter:description" content={description} />
+  </head>
+  <body class="antialiased">
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100">
+      <div class="container">
+        <div class="flex items-center justify-between h-16 lg:h-20">
+          <!-- Logo -->
+          <a href="/" class="flex items-center gap-2">
+            <span class="text-xl font-bold text-[--color-primary]">Bharat</span>
+            <span class="text-xl font-bold text-[--color-accent]">DCIM</span>
+          </a>
+
+          <!-- Desktop Navigation -->
+          <div class="hidden md:flex items-center gap-8">
+            <a href="/product" class="text-gray-600 hover:text-[--color-primary] transition-colors">Product</a>
+            <a href="/pricing" class="text-gray-600 hover:text-[--color-primary] transition-colors">Pricing</a>
+            <a href="/calculator" class="text-gray-600 hover:text-[--color-primary] transition-colors">ToD Calculator</a>
+            <a href="/blog" class="text-gray-600 hover:text-[--color-primary] transition-colors">Resources</a>
+            <a href="/contact" class="btn-primary text-sm py-2 px-4">Get Demo</a>
+          </div>
+
+          <!-- Mobile Menu Button -->
+          <button class="md:hidden p-2" id="mobile-menu-btn" aria-label="Toggle menu">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div class="hidden md:hidden pb-4" id="mobile-menu">
+          <div class="flex flex-col gap-4">
+            <a href="/product" class="text-gray-600 hover:text-[--color-primary] transition-colors py-2">Product</a>
+            <a href="/pricing" class="text-gray-600 hover:text-[--color-primary] transition-colors py-2">Pricing</a>
+            <a href="/calculator" class="text-gray-600 hover:text-[--color-primary] transition-colors py-2">ToD Calculator</a>
+            <a href="/blog" class="text-gray-600 hover:text-[--color-primary] transition-colors py-2">Resources</a>
+            <a href="/contact" class="btn-primary text-center py-3">Get Demo</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-16 lg:pt-20">
+      <slot />
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[--color-primary] text-white">
+      <div class="container py-20">
+        <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+          <!-- CTA Section -->
+          <div>
+            <span class="text-xs uppercase tracking-wider text-white/60 mb-4 block">Get Started</span>
+            <h2 class="text-3xl lg:text-4xl font-bold mb-6 leading-tight">
+              Ready to automate your<br />data center billing?
+            </h2>
+            <a href="/contact" class="btn-light">Schedule Demo</a>
+          </div>
+
+          <!-- Links -->
+          <div class="grid grid-cols-2 gap-8">
+            <div>
+              <h4 class="text-sm font-semibold text-white/60 uppercase tracking-wider mb-4">Product</h4>
+              <ul class="space-y-3">
+                <li><a href="/product" class="text-white/80 hover:text-white transition-colors">Features</a></li>
+                <li><a href="/pricing" class="text-white/80 hover:text-white transition-colors">Pricing</a></li>
+                <li><a href="/calculator" class="text-white/80 hover:text-white transition-colors">ToD Calculator</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 class="text-sm font-semibold text-white/60 uppercase tracking-wider mb-4">Resources</h4>
+              <ul class="space-y-3">
+                <li><a href="/blog" class="text-white/80 hover:text-white transition-colors">Blog</a></li>
+                <li><a href="/about" class="text-white/80 hover:text-white transition-colors">About Us</a></li>
+                <li><a href="/contact" class="text-white/80 hover:text-white transition-colors">Contact</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Bar -->
+      <div class="border-t border-white/10">
+        <div class="container py-6">
+          <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-white/60 text-sm">&copy; 2026 BharatDCIM. All rights reserved.</p>
+            <div class="flex gap-6 text-sm">
+              <a href="/privacy" class="text-white/60 hover:text-white transition-colors">Privacy Policy</a>
+              <a href="/terms" class="text-white/60 hover:text-white transition-colors">Terms of Service</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Mobile Menu Script -->
+    <script>
+      const menuBtn = document.getElementById('mobile-menu-btn');
+      const mobileMenu = document.getElementById('mobile-menu');
+
+      menuBtn?.addEventListener('click', () => {
+        mobileMenu?.classList.toggle('hidden');
+      });
+    </script>
+  </body>
+</html>

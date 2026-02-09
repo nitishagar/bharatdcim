@@ -1,0 +1,331 @@
+@import "tailwindcss";
+
+/* BharatDCIM Design System - Pearl Template Aesthetic with India Colors */
+
+@theme {
+  /* Primary Palette - India-inspired professional */
+  --color-primary: #1e3a5f;           /* Navy blue - trust, professionalism */
+  --color-primary-dark: #162d4a;      /* Darker navy for footer */
+  --color-accent: #8b2e3e;            /* Burgundy - warmth, energy */
+  --color-accent-dark: #6d2331;       /* Darker burgundy for hover */
+  --color-bronze: #a67c52;            /* Bronze - subtle accent */
+  --color-gold: #d4af37;              /* Gold - premium feel */
+
+  /* Neutral Palette */
+  --color-text-dark: #1a1a1a;         /* Near black for headings */
+  --color-text-body: #374151;         /* Dark gray for body */
+  --color-text-muted: #6b7280;        /* Muted gray for secondary */
+  --color-text-light: #9ca3af;        /* Light gray for labels */
+
+  /* Backgrounds */
+  --color-bg-white: #ffffff;
+  --color-bg-light: #fafafa;
+  --color-bg-subtle: #f3f4f6;
+
+  /* Borders */
+  --color-border: #e5e7eb;
+  --color-border-light: #f3f4f6;
+
+  /* Typography Scale - Pearl template large sizes */
+  --font-size-hero: 4.5rem;           /* 72px */
+  --font-size-section: 3.5rem;        /* 56px */
+  --font-size-subsection: 2.5rem;     /* 40px */
+  --font-size-card-title: 1.5rem;     /* 24px */
+  --font-size-body-lg: 1.125rem;      /* 18px */
+  --font-size-body: 1rem;             /* 16px */
+  --font-size-small: 0.875rem;        /* 14px */
+  --font-size-label: 0.75rem;         /* 12px */
+
+  /* Spacing Scale - Generous white space */
+  --spacing-section: 140px;
+  --spacing-section-mobile: 80px;
+  --spacing-xl: 5rem;
+  --spacing-lg: 3rem;
+  --spacing-md: 2rem;
+  --spacing-sm: 1rem;
+
+  /* Border Radius - Modern rounded */
+  --radius-pill: 50px;
+  --radius-lg: 20px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+}
+
+/* Base styles */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--color-text-body);
+  background: var(--color-bg-white);
+  line-height: 1.6;
+}
+
+/* Section Label - Small uppercase label above headings */
+.section-label {
+  font-size: var(--font-size-label);
+  font-weight: 500;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+/* Section Title - Large headings */
+.section-title {
+  font-size: var(--font-size-section);
+  font-weight: 700;
+  color: var(--color-text-dark);
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+}
+
+.section-title .accent {
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+/* Hero Title */
+.hero-title {
+  font-size: var(--font-size-hero);
+  font-weight: 700;
+  color: var(--color-text-dark);
+  line-height: 1.05;
+}
+
+/* Pill Button with Arrow */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  background: var(--color-accent);
+  color: white;
+  border-radius: var(--radius-pill);
+  font-weight: 500;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: var(--color-accent-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(139, 46, 62, 0.25);
+}
+
+.btn-primary::after {
+  content: '\2192';
+  transition: transform 0.3s ease;
+}
+
+.btn-primary:hover::after {
+  transform: translateX(4px);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  background: transparent;
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-pill);
+  font-weight: 500;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background: var(--color-primary);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.btn-secondary::after {
+  content: '\2192';
+  transition: transform 0.3s ease;
+}
+
+.btn-secondary:hover::after {
+  transform: translateX(4px);
+}
+
+/* Inverted button for dark backgrounds */
+.btn-light {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  background: white;
+  color: var(--color-primary);
+  border-radius: var(--radius-pill);
+  font-weight: 500;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.btn-light:hover {
+  background: var(--color-accent);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.btn-light::after {
+  content: '\2192';
+  transition: transform 0.3s ease;
+}
+
+/* Card styles */
+.card {
+  background: var(--color-bg-white);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--color-border-light);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  transform: translateY(-4px);
+}
+
+/* Container */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* Section padding */
+.section {
+  padding: var(--spacing-section) 0;
+}
+
+/* Responsive typography */
+@media (max-width: 1024px) {
+  .hero-title {
+    font-size: 3.5rem;
+  }
+  .section-title {
+    font-size: 2.75rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.5rem;
+  }
+  .section-title {
+    font-size: 2rem;
+  }
+  .section {
+    padding: var(--spacing-section-mobile) 0;
+  }
+  .card {
+    padding: 1.5rem;
+  }
+}
+
+/* Animation utilities */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* Calculator specific styles */
+.calculator-container {
+  background: linear-gradient(135deg, var(--color-bg-subtle) 0%, var(--color-bg-white) 100%);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  border: 1px solid var(--color-border);
+}
+
+.calculator-input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.calculator-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
+}
+
+.calculator-select {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  background: white;
+  cursor: pointer;
+}
+
+.calculator-select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
+}
+
+/* Result card styling */
+.result-card {
+  background: var(--color-primary);
+  color: white;
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+}
+
+.result-card .label {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: var(--font-size-small);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.result-card .value {
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+/* Time slot breakdown */
+.time-slot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.time-slot:last-child {
+  border-bottom: none;
+}
+
+.time-slot.peak {
+  background: rgba(139, 46, 62, 0.05);
+}
+
+.time-slot.off-peak {
+  background: rgba(30, 58, 95, 0.05);
+}

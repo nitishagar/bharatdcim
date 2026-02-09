@@ -1,0 +1,167 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+// Blog posts will be added here as the content strategy develops
+const posts = [
+  {
+    title: 'Understanding Time-of-Day Tariffs for Indian Data Centers',
+    description: 'A comprehensive guide to ToD tariffs and how they impact data center electricity costs across different Indian states.',
+    date: '2026-02-15',
+    category: 'Guide',
+    slug: 'understanding-tod-tariffs-india',
+    featured: true
+  },
+  {
+    title: 'Maharashtra Data Center Power Tariff 2026: Complete Breakdown',
+    description: 'Everything you need to know about MERC tariffs for data centers in Maharashtra, including peak hours, surcharges, and solar rebates.',
+    date: '2026-02-10',
+    category: 'State Guide',
+    slug: 'maharashtra-dc-power-tariff-2026'
+  },
+  {
+    title: 'Tamil Nadu Data Center Power Tariff 2026: Complete Breakdown',
+    description: 'TANGEDCO tariff structure for data centers in Tamil Nadu, including dual peak windows and demand charges.',
+    date: '2026-02-08',
+    category: 'State Guide',
+    slug: 'tamil-nadu-dc-power-tariff-2026'
+  },
+  {
+    title: 'Karnataka Data Center Power Tariff 2026: Complete Breakdown',
+    description: 'BESCOM tariff details for Karnataka data centers, including night consumption incentives and industrial classification benefits.',
+    date: '2026-02-05',
+    category: 'State Guide',
+    slug: 'karnataka-dc-power-tariff-2026'
+  },
+  {
+    title: 'Telangana Data Center Power Tariff 2026: Complete Breakdown',
+    description: 'Why Hyderabad offers India\'s lowest data center power costs and how TSDISCOM tariffs work.',
+    date: '2026-02-03',
+    category: 'State Guide',
+    slug: 'telangana-dc-power-tariff-2026'
+  }
+];
+---
+
+<Layout
+  title="Resources & Blog"
+  description="Guides, insights, and resources for Indian data center operators. Learn about ToD tariffs, state-wise power costs, and billing best practices."
+>
+  <!-- Hero -->
+  <section class="py-20 bg-gradient-to-b from-gray-50 to-white">
+    <div class="container">
+      <div class="max-w-3xl mx-auto text-center">
+        <span class="section-label">Resources</span>
+        <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+          Insights for Indian<br />
+          <span class="text-[--color-accent]">Data Center Operators</span>
+        </h1>
+        <p class="text-xl text-gray-600">
+          Guides, analysis, and resources to help you navigate Indian data center
+          operations, power tariffs, and billing complexity.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Post -->
+  <section class="section pt-0">
+    <div class="container">
+      {posts.filter(p => p.featured).map(post => (
+        <a href={`/blog/${post.slug}`} class="block bg-[--color-primary] rounded-2xl overflow-hidden hover:shadow-xl transition-shadow">
+          <div class="grid lg:grid-cols-2 gap-8">
+            <div class="aspect-video lg:aspect-auto bg-[--color-primary-dark] flex items-center justify-center">
+              <span class="text-8xl opacity-50">📊</span>
+            </div>
+            <div class="p-8 lg:py-12 text-white">
+              <span class="text-xs uppercase tracking-wider text-white/60 mb-4 block">Featured Guide</span>
+              <h2 class="text-2xl lg:text-3xl font-bold mb-4">{post.title}</h2>
+              <p class="text-white/80 mb-6">{post.description}</p>
+              <span class="inline-flex items-center gap-2 text-white/90 hover:text-white">
+                Read Guide <span>→</span>
+              </span>
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- State Guides -->
+  <section class="section bg-gray-50">
+    <div class="container">
+      <div class="text-center mb-12">
+        <span class="section-label">State Guides</span>
+        <h2 class="section-title">
+          State-wise Power<br />
+          <span class="accent">Tariff Guides</span>
+        </h2>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        {posts.filter(p => p.category === 'State Guide').map(post => (
+          <a href={`/blog/${post.slug}`} class="card group">
+            <span class="text-xs uppercase tracking-wider text-[--color-accent] mb-2 block">{post.category}</span>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2 group-hover:text-[--color-primary] transition-colors">
+              {post.title}
+            </h3>
+            <p class="text-gray-600 text-sm mb-4">{post.description}</p>
+            <span class="text-sm text-[--color-primary] inline-flex items-center gap-1">
+              Read More <span class="group-hover:translate-x-1 transition-transform">→</span>
+            </span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Coming Soon Topics -->
+  <section class="section">
+    <div class="container">
+      <div class="text-center mb-12">
+        <span class="section-label">Coming Soon</span>
+        <h2 class="section-title">
+          More Resources<br />
+          <span class="accent">On the Way</span>
+        </h2>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+        <div class="p-6 bg-gray-50 rounded-xl">
+          <span class="text-2xl mb-3 block">🏙️</span>
+          <h3 class="font-semibold text-gray-900 mb-1">City Market Guides</h3>
+          <p class="text-sm text-gray-600">Mumbai, Chennai, Hyderabad, Bengaluru data center market analysis</p>
+        </div>
+        <div class="p-6 bg-gray-50 rounded-xl">
+          <span class="text-2xl mb-3 block">📖</span>
+          <h3 class="font-semibold text-gray-900 mb-1">Complete Billing Guide</h3>
+          <p class="text-sm text-gray-600">End-to-end guide to data center billing in India</p>
+        </div>
+        <div class="p-6 bg-gray-50 rounded-xl">
+          <span class="text-2xl mb-3 block">⚖️</span>
+          <h3 class="font-semibold text-gray-900 mb-1">Vendor Comparisons</h3>
+          <p class="text-sm text-gray-600">BharatDCIM vs Nlyte, Sunbird, Device42 for Indian operators</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Newsletter -->
+  <section class="section bg-[--color-primary] text-white">
+    <div class="container">
+      <div class="max-w-2xl mx-auto text-center">
+        <h2 class="text-3xl font-bold mb-4">Stay Updated</h2>
+        <p class="text-white/80 mb-8">
+          Get notified when we publish new guides and resources for Indian data center operators.
+        </p>
+        <form class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+          <input
+            type="email"
+            placeholder="you@company.com"
+            class="flex-1 px-4 py-3 rounded-full text-gray-900 focus:outline-none focus:ring-2 focus:ring-white/50"
+          />
+          <button type="submit" class="btn-light whitespace-nowrap">Subscribe</button>
+        </form>
+      </div>
+    </div>
+  </section>
+</Layout>

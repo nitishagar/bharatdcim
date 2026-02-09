@@ -1,0 +1,160 @@
+---
+import Layout from '../layouts/Layout.astro';
+import TodCalculator from '../components/TodCalculator';
+---
+
+<Layout
+  title="Indian ToD Power Tariff Calculator"
+  description="Free calculator to estimate data center electricity costs with Time-of-Day tariffs. Compare power costs across Maharashtra, Tamil Nadu, Karnataka, and Telangana."
+>
+  <!-- Hero -->
+  <section class="py-20 bg-gradient-to-b from-gray-50 to-white">
+    <div class="container">
+      <div class="max-w-3xl mx-auto text-center">
+        <span class="section-label">Free Tool</span>
+        <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+          Indian ToD Power<br />
+          <span class="text-[--color-accent]">Tariff Calculator</span>
+        </h1>
+        <p class="text-xl text-gray-600">
+          Estimate your data center electricity costs with Time-of-Day tariff intelligence.
+          See how consumption patterns impact your monthly bill across Indian states.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Calculator -->
+  <section class="section pt-0">
+    <div class="container">
+      <div class="calculator-container">
+        <TodCalculator client:load />
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="section bg-gray-50">
+    <div class="container">
+      <div class="text-center mb-16">
+        <span class="section-label">Understanding ToD Tariffs</span>
+        <h2 class="section-title">
+          How Time-of-Day<br />
+          <span class="accent">Pricing Works</span>
+        </h2>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+        <div class="card text-center">
+          <div class="w-12 h-12 bg-[--color-accent]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="text-2xl">🌅</span>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Peak Hours</h3>
+          <p class="text-gray-600 text-sm">
+            Higher rates during high-demand periods (typically evening hours).
+            Surcharges range from +20% to +25% depending on state.
+          </p>
+        </div>
+
+        <div class="card text-center">
+          <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="text-2xl">☀️</span>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Normal Hours</h3>
+          <p class="text-gray-600 text-sm">
+            Standard rates during regular business hours.
+            Base energy charge applies without surcharges or rebates.
+          </p>
+        </div>
+
+        <div class="card text-center">
+          <div class="w-12 h-12 bg-[--color-primary]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="text-2xl">🌙</span>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Off-Peak Hours</h3>
+          <p class="text-gray-600 text-sm">
+            Reduced rates during low-demand periods (night hours).
+            Rebates range from 5% to ₹1.50/unit depending on state.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- State Comparison -->
+  <section class="section">
+    <div class="container">
+      <div class="text-center mb-16">
+        <span class="section-label">Comparison</span>
+        <h2 class="section-title">
+          State-wise Tariff<br />
+          <span class="accent">Quick Reference</span>
+        </h2>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full max-w-4xl mx-auto bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
+          <thead class="bg-[--color-primary] text-white">
+            <tr>
+              <th class="px-6 py-4 text-left font-semibold">State</th>
+              <th class="px-6 py-4 text-left font-semibold">Base Rate</th>
+              <th class="px-6 py-4 text-left font-semibold">Demand Charge</th>
+              <th class="px-6 py-4 text-left font-semibold">Peak Surcharge</th>
+              <th class="px-6 py-4 text-left font-semibold">Off-Peak Rebate</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 font-medium">Maharashtra</td>
+              <td class="px-6 py-4">₹8.20/kWh</td>
+              <td class="px-6 py-4">₹400/kVA</td>
+              <td class="px-6 py-4 text-[--color-accent]">+25%</td>
+              <td class="px-6 py-4 text-[--color-primary]">15% (Solar)</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 font-medium">Tamil Nadu</td>
+              <td class="px-6 py-4">₹7.50/kWh</td>
+              <td class="px-6 py-4">₹608/kVA</td>
+              <td class="px-6 py-4 text-[--color-accent]">+25%</td>
+              <td class="px-6 py-4 text-[--color-primary]">5% (Night)</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 font-medium">Karnataka</td>
+              <td class="px-6 py-4">₹6.90/kWh</td>
+              <td class="px-6 py-4">₹350/kVA</td>
+              <td class="px-6 py-4 text-[--color-accent]">+20%</td>
+              <td class="px-6 py-4 text-[--color-primary]">₹1/unit</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 font-medium">Telangana</td>
+              <td class="px-6 py-4">₹6.60/kWh</td>
+              <td class="px-6 py-4">₹320/kVA</td>
+              <td class="px-6 py-4 text-[--color-accent]">+₹1/unit</td>
+              <td class="px-6 py-4 text-[--color-primary]">₹1.50/unit</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="text-center text-sm text-gray-500 mt-6">
+        * Rates are indicative for HT Industrial category (FY 2025-26). Actual rates may vary based on specific tariff orders.
+      </p>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section bg-[--color-primary] text-white">
+    <div class="container">
+      <div class="max-w-3xl mx-auto text-center">
+        <h2 class="text-3xl lg:text-4xl font-bold mb-6">
+          Want Automated ToD Billing?
+        </h2>
+        <p class="text-xl text-white/80 mb-10">
+          BharatDCIM automates the entire billing process with real-time meter integration,
+          automatic ToD classification, and GST-compliant invoicing.
+        </p>
+        <a href="/contact" class="btn-light text-lg px-8 py-4">Request Demo</a>
+      </div>
+    </div>
+  </section>
+</Layout>
