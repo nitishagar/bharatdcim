@@ -1,46 +1,70 @@
-# Astro Starter Kit: Basics
+# BharatDCIM
 
-```sh
-npm create astro@latest -- --template basics
+India's first DCIM with native Time-of-Day tariff billing for data centers.
+
+## Features
+
+- **ToD Power Tariff Calculator** - Interactive calculator with state-wise tariff data
+- **State Coverage** - Maharashtra, Tamil Nadu, Karnataka, Telangana
+- **Full Bill Breakdown** - Energy charges, demand charges, GST, PF penalties
+- **Example Scenarios** - Pre-built configurations for quick estimation
+
+## Tech Stack
+
+- [Astro](https://astro.build) 5.0
+- [Tailwind CSS](https://tailwindcss.com) 4.x
+- [React](https://react.dev) 19.x (for interactive components)
+- TypeScript
+
+## Development
+
+```bash
+# Install dependencies
+npm install
+
+# Start dev server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Project Structure
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
+```
 /
 ├── public/
 │   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
+├── src/
+│   ├── components/
+│   │   └── TodCalculator.tsx    # Interactive ToD calculator
+│   ├── data/
+│   │   └── tariffs.ts           # State-wise tariff data
+│   ├── layouts/
+│   │   └── Layout.astro         # Main layout with nav/footer
+│   ├── pages/
+│   │   ├── index.astro          # Homepage
+│   │   ├── calculator.astro     # ToD Calculator page
+│   │   ├── product.astro        # Product features
+│   │   ├── pricing.astro        # Pricing plans
+│   │   ├── about.astro          # About us
+│   │   ├── contact.astro        # Contact form
+│   │   └── blog/
+│   │       └── index.astro      # Blog/Resources index
+│   └── styles/
+│       └── global.css           # Design system & Tailwind
 └── package.json
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+## Deployment
 
-## 🧞 Commands
+Configured for Cloudflare Pages:
+- Build command: `npm run build`
+- Output directory: `dist`
 
-All commands are run from the root of the project, from a terminal:
+## License
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Proprietary - BharatDCIM
