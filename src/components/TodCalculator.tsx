@@ -36,11 +36,11 @@ export default function TodCalculator() {
     monthlyConsumption: 100000,
     contractedDemand: 250,
     recordedDemand: 240,
-    powerFactor: 0.92,
+    powerFactor: 0.95,
     pue: 1.6,
     dgConsumption: 2000,
-    peakPercent: 40,
-    normalPercent: 35,
+    peakPercent: 35,
+    normalPercent: 40,
     offPeakPercent: 25
   });
 
@@ -167,6 +167,19 @@ export default function TodCalculator() {
                 </option>
               ))}
             </select>
+            {/* Billing unit & regulatory status indicator */}
+            <div className="mt-2 flex items-center gap-3">
+              <span className="text-xs px-2 py-0.5 rounded bg-gray-100 text-gray-600 font-medium">
+                {selectedTariff.billingUnit} billing
+              </span>
+              <span className={`text-xs px-2 py-0.5 rounded font-medium ${
+                selectedTariff.regulatoryStatus.startsWith('Litigation') || selectedTariff.regulatoryStatus.startsWith('Amendment')
+                  ? 'bg-amber-50 text-amber-700'
+                  : 'bg-green-50 text-green-700'
+              }`}>
+                {selectedTariff.regulatoryStatus.split(' - ')[0]}
+              </span>
+            </div>
           </div>
 
           {/* Monthly Consumption */}
@@ -184,6 +197,9 @@ export default function TodCalculator() {
             />
             <p className="text-xs text-gray-500 mt-1">
               After PUE ({inputs.pue}): {formatNumber(Math.round(inputs.monthlyConsumption * inputs.pue))} kWh
+              {selectedTariff.billingUnit === 'kVAh' && (
+                <> | Billed: {formatNumber(Math.round(inputs.monthlyConsumption * inputs.pue / inputs.powerFactor))} kVAh (at PF {inputs.powerFactor})</>
+              )}
             </p>
           </div>
 
@@ -230,6 +246,9 @@ export default function TodCalculator() {
               />
             </div>
           </div>
+          <p className="text-xs text-gray-500 -mt-4">
+            {selectedTariff.demandBillingRule}
+          </p>
 
           {/* Power Factor */}
           <div>
@@ -248,6 +267,11 @@ export default function TodCalculator() {
             {inputs.powerFactor < selectedTariff.powerFactorPenaltyThreshold && (
               <p className="text-xs text-[--color-accent] mt-1">
                 Below {selectedTariff.powerFactorPenaltyThreshold} threshold - penalty applies
+              </p>
+            )}
+            {selectedTariff.billingUnit === 'kVAh' && inputs.powerFactor < 1 && (
+              <p className="text-xs text-amber-600 mt-1">
+                kVAh billing: PF of {inputs.powerFactor} increases billed units by {((1/inputs.powerFactor - 1) * 100).toFixed(1)}%
               </p>
             )}
           </div>
@@ -341,7 +365,10 @@ export default function TodCalculator() {
               {/* Energy Charges */}
               <div className="p-4">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="font-medium text-gray-900">Energy Charges</span>
+                  <span className="font-medium text-gray-900">
+                    Energy Charges
+                    <span className="text-xs text-gray-500 ml-1">({selectedTariff.billingUnit})</span>
+                  </span>
                   <span className="font-semibold">{formatINR(billBreakdown.energyCharges.total)}</span>
                 </div>
                 <div className="space-y-1 text-sm">
@@ -360,15 +387,28 @@ export default function TodCalculator() {
                 </div>
               </div>
 
+              {/* Wheeling Charges */}
+              {billBreakdown.wheelingCharges > 0 && (
+                <div className="p-4 flex justify-between">
+                  <span className="text-gray-700">Wheeling Charges (₹{selectedTariff.wheelingCharge}/{selectedTariff.billingUnit})</span>
+                  <span className="font-medium">{formatINR(billBreakdown.wheelingCharges)}</span>
+                </div>
+              )}
+
               {/* Demand Charges */}
               <div className="p-4 flex justify-between">
-                <span className="text-gray-700">Demand Charges ({Math.max(inputs.contractedDemand, inputs.recordedDemand)} kVA)</span>
+                <span className="text-gray-700">Demand Charges ({Math.max(inputs.contractedDemand, inputs.recordedDemand)} kVA × ₹{selectedTariff.demandCharge})</span>
                 <span className="font-medium">{formatINR(billBreakdown.demandCharges)}</span>
               </div>
 
               {/* FAC */}
               <div className="p-4 flex justify-between">
-                <span className="text-gray-700">Fuel Adjustment Charge</span>
+                <span className="text-gray-700">
+                  {selectedTariff.fuelAdjustmentType === 'percentage'
+                    ? `FPPCA (${selectedTariff.fuelAdjustmentCharge}% of energy)`
+                    : `Fuel Adjustment (₹${selectedTariff.fuelAdjustmentCharge}/${selectedTariff.billingUnit})`
+                  }
+                </span>
                 <span className="font-medium">{formatINR(billBreakdown.fuelAdjustment)}</span>
               </div>
 
@@ -420,14 +460,27 @@ export default function TodCalculator() {
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-600">Base Energy Rate</span>
-                <span>₹{selectedTariff.baseEnergyRate}/kWh</span>
+                <span>₹{selectedTariff.baseEnergyRate}/{selectedTariff.billingUnit}</span>
               </div>
+              {selectedTariff.wheelingCharge > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Wheeling Charge</span>
+                  <span>₹{selectedTariff.wheelingCharge}/{selectedTariff.billingUnit}</span>
+                </div>
+              )}
               <div className="flex justify-between">
                 <span className="text-gray-600">Demand Charge</span>
                 <span>₹{selectedTariff.demandCharge}/kVA/month</span>
               </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Category</span>
+                <span className="text-right text-xs">{selectedTariff.category}</span>
+              </div>
               <div className="mt-3 pt-3 border-t border-gray-200">
                 <p className="text-xs text-gray-500">{selectedTariff.notes}</p>
+              </div>
+              <div className="mt-2 pt-2 border-t border-gray-200">
+                <p className="text-xs text-amber-600">{selectedTariff.regulatoryStatus}</p>
               </div>
             </div>
           </div>
@@ -467,6 +520,11 @@ export default function TodCalculator() {
                 </div>
               ))}
             </div>
+          </div>
+
+          {/* Source Attribution */}
+          <div className="text-xs text-gray-400 text-center">
+            Sources: MERC Case 75/2025, TNERC Order 6/2025, KERC MYT 2025, TSERC RST 2025-26
           </div>
         </div>
       </div>
