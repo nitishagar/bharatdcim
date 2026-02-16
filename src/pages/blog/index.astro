@@ -34,7 +34,7 @@ const posts = [
   },
   {
     title: 'Telangana Data Center Power Tariff 2026: Complete Breakdown',
-    description: 'Why Hyderabad offers India\'s lowest data center power costs and how TSDISCOM tariffs work.',
+    description: 'Why Hyderabad offers India\'s lowest data center power costs and how TGSPDCL tariffs work.',
     date: '2026-02-03',
     category: 'State Guide',
     slug: 'telangana-dc-power-tariff-2026'
@@ -69,8 +69,10 @@ const posts = [
       {posts.filter(p => p.featured).map(post => (
         <a href={`/blog/${post.slug}`} class="block bg-[--color-primary] rounded-2xl overflow-hidden hover:shadow-xl transition-shadow">
           <div class="grid lg:grid-cols-2 gap-8">
-            <div class="aspect-video lg:aspect-auto bg-[--color-primary-dark] flex items-center justify-center">
-              <span class="text-8xl opacity-50">📊</span>
+            <div class="aspect-video lg:aspect-auto bg-[--color-primary-dark] flex items-center justify-center p-12">
+              <svg class="w-32 h-32 text-white/20" fill="none" viewBox="0 0 24 24" stroke-width="0.75" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
+              </svg>
             </div>
             <div class="p-8 lg:py-12 text-white">
               <span class="text-xs uppercase tracking-wider text-white/60 mb-4 block">Featured Guide</span>
@@ -127,17 +129,29 @@ const posts = [
 
       <div class="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
         <div class="p-6 bg-gray-50 rounded-xl">
-          <span class="text-2xl mb-3 block">🏙️</span>
+          <div class="w-10 h-10 bg-[--color-primary]/10 rounded-lg flex items-center justify-center mb-3">
+            <svg class="w-5 h-5 text-[--color-primary]" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5M3.75 3v18m4.5-18v18m4.5-18v18m4.5-18v18m4.5-18v18M6 6.75h1.5M6 9.75h1.5m-1.5 3h1.5m3-6H12m-1.5 3H12m-1.5 3H12m3-6h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H21m-1.5 3H21m-1.5 3H21" />
+            </svg>
+          </div>
           <h3 class="font-semibold text-gray-900 mb-1">City Market Guides</h3>
           <p class="text-sm text-gray-600">Mumbai, Chennai, Hyderabad, Bengaluru data center market analysis</p>
         </div>
         <div class="p-6 bg-gray-50 rounded-xl">
-          <span class="text-2xl mb-3 block">📖</span>
+          <div class="w-10 h-10 bg-[--color-accent]/10 rounded-lg flex items-center justify-center mb-3">
+            <svg class="w-5 h-5 text-[--color-accent]" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+            </svg>
+          </div>
           <h3 class="font-semibold text-gray-900 mb-1">Complete Billing Guide</h3>
           <p class="text-sm text-gray-600">End-to-end guide to data center billing in India</p>
         </div>
         <div class="p-6 bg-gray-50 rounded-xl">
-          <span class="text-2xl mb-3 block">⚖️</span>
+          <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mb-3">
+            <svg class="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v17.25m0 0c-1.472 0-2.882.265-4.185.75M12 20.25c1.472 0 2.882.265 4.185.75M18.75 4.97A48.416 48.416 0 0 0 12 4.5c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52m-3-.52 2.62 10.726c.122.499-.106 1.028-.589 1.202a5.988 5.988 0 0 1-2.031.352 5.988 5.988 0 0 1-2.031-.352c-.483-.174-.711-.703-.59-1.202L18.75 4.971Zm-16.5.52c.99-.203 1.99-.377 3-.52m0 0 2.62 10.726c.122.499-.106 1.028-.589 1.202a5.989 5.989 0 0 1-2.031.352 5.989 5.989 0 0 1-2.031-.352c-.483-.174-.711-.703-.59-1.202L5.25 4.971Z" />
+            </svg>
+          </div>
           <h3 class="font-semibold text-gray-900 mb-1">Vendor Comparisons</h3>
           <p class="text-sm text-gray-600">BharatDCIM vs Nlyte, Sunbird, Device42 for Indian operators</p>
         </div>
@@ -153,9 +167,12 @@ const posts = [
         <p class="text-white/80 mb-8">
           Get notified when we publish new guides and resources for Indian data center operators.
         </p>
-        <form class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+        <form class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto" action="https://formspree.io/f/maqdnopv" method="POST">
+          <input type="hidden" name="_subject" value="Newsletter Subscription" />
           <input
             type="email"
+            name="email"
+            required
             placeholder="you@company.com"
             class="flex-1 px-4 py-3 rounded-full text-gray-900 focus:outline-none focus:ring-2 focus:ring-white/50"
           />

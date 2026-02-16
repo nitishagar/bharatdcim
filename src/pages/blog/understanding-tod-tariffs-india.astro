@@ -1,0 +1,316 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+---
+
+<BlogPost
+  title="Understanding Time-of-Day Tariffs for Indian Data Centers"
+  description="A comprehensive guide to ToD tariffs and how they impact data center electricity costs across different Indian states."
+  publishDate="2026-02-15"
+  category="Guide"
+  readTime="15 min read"
+>
+
+<div class="highlight-box">
+  <strong>Key Takeaway:</strong> Since April 2024, Time-of-Day (ToD) tariffs are mandatory for all commercial consumers above 10kW in India. For data centers, understanding ToD structures across states can mean the difference between overpaying by 15-25% or optimizing to save lakhs per month.
+</div>
+
+<h2>What Are Time-of-Day Tariffs?</h2>
+
+<p>
+  Time-of-Day (ToD) tariffs are electricity pricing structures where the rate per unit (kWh or kVAh) varies based on when you consume power. Unlike flat-rate tariffs where every unit costs the same, ToD tariffs divide the day into time slots — <strong>peak</strong>, <strong>normal</strong>, and <strong>off-peak</strong> — each with different pricing.
+</p>
+
+<p>
+  The Central Electricity Regulatory Commission (CERC) directed all State Electricity Regulatory Commissions (SERCs) to implement mandatory ToD tariffs for commercial consumers above 10kW, effective April 2024. This affects every data center in India, regardless of size.
+</p>
+
+<h2>Why ToD Tariffs Exist</h2>
+
+<p>
+  India's power grid faces significant demand variation throughout the day. ToD tariffs are a demand-side management tool designed to:
+</p>
+
+<ul>
+  <li><strong>Flatten the demand curve:</strong> Incentivize consumption during low-demand periods (typically night hours) and discourage consumption during peak demand</li>
+  <li><strong>Reduce peak infrastructure costs:</strong> Less peak demand means fewer peaking power plants needed</li>
+  <li><strong>Integrate renewable energy:</strong> Some states offer lower rates during solar hours (12:00-18:00) when solar generation is abundant</li>
+  <li><strong>Improve grid stability:</strong> More predictable and distributed demand patterns help grid operators</li>
+</ul>
+
+<h2>How ToD Tariffs Are Structured</h2>
+
+<p>
+  Each SERC defines its own ToD structure. There are two main approaches used across Indian states:
+</p>
+
+<h3>Percentage-Based (Used by Tamil Nadu)</h3>
+
+<p>
+  A surcharge or rebate is applied as a percentage of the base energy rate. For example, Tamil Nadu's TANGEDCO charges:
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Time Slot</th>
+      <th>Hours</th>
+      <th>Multiplier</th>
+      <th>Effective Rate</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Morning Peak</td>
+      <td>06:00 - 10:00</td>
+      <td>+25% surcharge</td>
+      <td>Rs. 9.38/kWh</td>
+    </tr>
+    <tr>
+      <td>Normal</td>
+      <td>10:00 - 18:00</td>
+      <td>Base rate</td>
+      <td>Rs. 7.50/kWh</td>
+    </tr>
+    <tr>
+      <td>Evening Peak</td>
+      <td>18:00 - 22:00</td>
+      <td>+25% surcharge</td>
+      <td>Rs. 9.38/kWh</td>
+    </tr>
+    <tr>
+      <td>Night Off-Peak</td>
+      <td>22:00 - 05:00</td>
+      <td>-5% rebate</td>
+      <td>Rs. 7.13/kWh</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Absolute Adder (Used by Maharashtra, Karnataka, Telangana)</h3>
+
+<p>
+  A fixed amount (Rs./unit) is added to or subtracted from the base rate. For example, Karnataka's BESCOM uses:
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Time Slot</th>
+      <th>Hours</th>
+      <th>Adder</th>
+      <th>Effective Rate</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Normal (Day)</td>
+      <td>06:00 - 18:00</td>
+      <td>Rs. 0</td>
+      <td>Rs. 6.60/kWh</td>
+    </tr>
+    <tr>
+      <td>Evening Peak</td>
+      <td>18:00 - 22:00</td>
+      <td>+Rs. 1.00</td>
+      <td>Rs. 7.60/kWh</td>
+    </tr>
+    <tr>
+      <td>Night Off-Peak</td>
+      <td>22:00 - 06:00</td>
+      <td>-Rs. 1.00</td>
+      <td>Rs. 5.60/kWh</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>State-by-State Comparison</h2>
+
+<p>
+  Here's how the four major data center states compare on key ToD parameters as of February 2026:
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Maharashtra</th>
+      <th>Tamil Nadu</th>
+      <th>Karnataka</th>
+      <th>Telangana</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>DISCOM</td>
+      <td>MSEDCL</td>
+      <td>TANGEDCO</td>
+      <td>BESCOM</td>
+      <td>TGSPDCL</td>
+    </tr>
+    <tr>
+      <td>Base Rate</td>
+      <td>Rs. 7.45/kVAh</td>
+      <td>Rs. 7.50/kWh</td>
+      <td>Rs. 6.60/kWh</td>
+      <td>Rs. 7.65/kVAh</td>
+    </tr>
+    <tr>
+      <td>Billing Unit</td>
+      <td>kVAh</td>
+      <td>kWh</td>
+      <td>kWh</td>
+      <td>kVAh</td>
+    </tr>
+    <tr>
+      <td>Demand Charge</td>
+      <td>Rs. 750/kVA</td>
+      <td>Rs. 608/kVA</td>
+      <td>Rs. 350/kVA</td>
+      <td>Rs. 500/kVA</td>
+    </tr>
+    <tr>
+      <td>Peak Surcharge</td>
+      <td>+Rs. 0.80-1.10</td>
+      <td>+25%</td>
+      <td>+Rs. 1.00</td>
+      <td>+Rs. 1.00</td>
+    </tr>
+    <tr>
+      <td>Night Rebate</td>
+      <td>-Rs. 1.50</td>
+      <td>-5%</td>
+      <td>-Rs. 1.00</td>
+      <td>Suspended</td>
+    </tr>
+    <tr>
+      <td>Effective Rate*</td>
+      <td>~Rs. 10.50</td>
+      <td>~Rs. 11.26</td>
+      <td>~Rs. 8.50</td>
+      <td>~Rs. 10.16</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><em>*Effective rate for a 1,000 kVA, 300 MWh/month load at PF 0.98, including all charges, taxes, and duties.</em></p>
+
+<h2>kWh vs kVAh Billing: A Critical Distinction</h2>
+
+<p>
+  Two of the four major DC states — <strong>Maharashtra</strong> and <strong>Telangana</strong> — use <strong>kVAh (apparent energy)</strong> billing instead of kWh (active energy). This is a significant distinction that affects how you manage costs.
+</p>
+
+<p>
+  With kVAh billing, your power factor (PF) directly impacts how many units you're billed for:
+</p>
+
+<ul>
+  <li><strong>PF 1.00:</strong> kVAh = kWh (no penalty)</li>
+  <li><strong>PF 0.95:</strong> kVAh = kWh / 0.95 = 5.3% more units billed</li>
+  <li><strong>PF 0.90:</strong> kVAh = kWh / 0.90 = 11.1% more units billed</li>
+  <li><strong>PF 0.85:</strong> kVAh = kWh / 0.85 = 17.6% more units billed</li>
+</ul>
+
+<p>
+  In kWh-billing states (Tamil Nadu, Karnataka), power factor is penalized separately if it drops below the threshold (0.90 for TN, 0.85 for KA). The economic impact is typically smaller than kVAh billing.
+</p>
+
+<div class="warning-box">
+  <strong>Watch Out:</strong> Telangana's night rebate (-Rs. 1.50/kVAh) has been <strong>suspended from December 2025 through March 2026</strong> due to thermal backing-down costs in winter. This increases night-time costs by 24.4% temporarily. The rebate is expected to resume in April 2026.
+</div>
+
+<h2>Impact on Data Center Operations</h2>
+
+<p>
+  Data centers are unique electricity consumers because they operate 24/7 with relatively flat load profiles. This gives them a structural advantage under ToD tariffs — if managed correctly:
+</p>
+
+<h3>Opportunities</h3>
+
+<ul>
+  <li><strong>Night-heavy workloads:</strong> Batch processing, backups, and non-latency-sensitive workloads can be scheduled during off-peak hours for significant savings</li>
+  <li><strong>Pre-cooling:</strong> Run cooling systems harder during off-peak hours and coast through peak periods</li>
+  <li><strong>Battery energy storage:</strong> Charge during off-peak, discharge during peak to shift apparent consumption patterns</li>
+  <li><strong>UPS cycling:</strong> Stagger UPS charging schedules to avoid peak-hour charging</li>
+</ul>
+
+<h3>Challenges</h3>
+
+<ul>
+  <li><strong>24/7 operations:</strong> Unlike manufacturing, data centers can't simply shut down during peak hours</li>
+  <li><strong>SLA obligations:</strong> Tenants expect consistent power regardless of time of day</li>
+  <li><strong>Cooling loads:</strong> Peak cooling demand often coincides with peak tariff hours (afternoon/evening)</li>
+  <li><strong>DG backup:</strong> Grid outages during peak hours force DG usage at Rs. 18-28/kWh on top of already-high peak rates</li>
+</ul>
+
+<h2>Monthly Cost Impact: A Real Example</h2>
+
+<p>
+  Consider a 100-rack data center in Bangalore consuming 100,000 kWh/month with a PUE of 1.6 (total facility consumption: 160,000 kWh):
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Scenario</th>
+      <th>Monthly Bill</th>
+      <th>Savings</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>No ToD optimization (flat consumption)</td>
+      <td>Rs. 12.8 L</td>
+      <td>Baseline</td>
+    </tr>
+    <tr>
+      <td>Shift 10% from peak to off-peak</td>
+      <td>Rs. 12.5 L</td>
+      <td>Rs. 32,000/month</td>
+    </tr>
+    <tr>
+      <td>Shift 20% from peak to off-peak</td>
+      <td>Rs. 12.1 L</td>
+      <td>Rs. 64,000/month</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  At 20% load shifting, that's <strong>Rs. 7.7 lakhs per year</strong> in savings for a single 100-rack facility. For larger operations, the numbers scale proportionally.
+</p>
+
+<h2>How BharatDCIM Helps</h2>
+
+<p>
+  BharatDCIM is built from the ground up to handle Indian ToD tariff complexity:
+</p>
+
+<ul>
+  <li><strong>Automatic time-slot classification:</strong> Every unit of consumption is automatically tagged to the correct ToD slot based on state-specific schedules</li>
+  <li><strong>State-specific tariff engine:</strong> Pre-loaded with verified tariff data from MERC, TNERC, KERC, and TSERC orders, updated regularly</li>
+  <li><strong>kWh and kVAh billing support:</strong> Handles both billing units with automatic PF-based conversion</li>
+  <li><strong>Optimization insights:</strong> Shows exactly how much you'd save by shifting load between ToD periods</li>
+  <li><strong>GST-compliant invoicing:</strong> Generates tenant invoices with proper ToD breakdowns, SAC codes, and e-invoice format</li>
+</ul>
+
+<h2>Getting Started</h2>
+
+<p>
+  Try our free <a href="/calculator">ToD Tariff Calculator</a> to see how ToD tariffs impact your specific data center configuration. Select your state, enter your consumption parameters, and get an instant bill breakdown with ToD analysis.
+</p>
+
+<p>
+  For detailed state-specific guides, see our series:
+</p>
+
+<ul>
+  <li><a href="/blog/maharashtra-dc-power-tariff-2026">Maharashtra (MSEDCL) Tariff Guide</a></li>
+  <li><a href="/blog/tamil-nadu-dc-power-tariff-2026">Tamil Nadu (TANGEDCO) Tariff Guide</a></li>
+  <li><a href="/blog/karnataka-dc-power-tariff-2026">Karnataka (BESCOM) Tariff Guide</a></li>
+  <li><a href="/blog/telangana-dc-power-tariff-2026">Telangana (TGSPDCL) Tariff Guide</a></li>
+</ul>
+
+<p><em>Sources: CERC ToD Tariff Directive 2024, MERC Case 75/2025, TNERC Order 6/2025, KERC MYT Tariff Order 2025, TSERC RST Order FY 2025-26 + ToD Amendment.</em></p>
+
+</BlogPost>

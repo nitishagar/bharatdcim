@@ -5,7 +5,6 @@ import Layout from '../layouts/Layout.astro';
 <Layout title="India's First DCIM with Native ToD Tariff Billing">
   <!-- Hero Section -->
   <section class="relative overflow-hidden">
-    <!-- Background Pattern -->
     <div class="absolute inset-0 bg-gradient-to-br from-[--color-primary]/5 via-white to-[--color-accent]/5"></div>
     <div class="absolute inset-0 opacity-30" style="background-image: radial-gradient(circle at 1px 1px, rgba(30,58,95,0.15) 1px, transparent 0); background-size: 40px 40px;"></div>
 
@@ -56,7 +55,6 @@ import Layout from '../layouts/Layout.astro';
 
   <!-- Problem Section -->
   <section class="section relative">
-    <!-- Subtle background -->
     <div class="absolute inset-0 bg-gradient-to-b from-white via-gray-50/50 to-white"></div>
 
     <div class="container relative">
@@ -75,7 +73,9 @@ import Layout from '../layouts/Layout.astro';
       <div class="grid md:grid-cols-3 gap-8">
         <div class="card bg-gradient-to-br from-white to-gray-50">
           <div class="w-14 h-14 bg-[--color-accent]/10 rounded-2xl flex items-center justify-center mb-4">
-            <span class="text-2xl">⏰</span>
+            <svg class="w-7 h-7 text-[--color-accent]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+            </svg>
           </div>
           <h3 class="text-xl font-semibold mb-3 text-gray-900">Time-of-Day Tariffs</h3>
           <p class="text-gray-600">
@@ -86,18 +86,22 @@ import Layout from '../layouts/Layout.astro';
 
         <div class="card bg-gradient-to-br from-white to-gray-50">
           <div class="w-14 h-14 bg-[--color-primary]/10 rounded-2xl flex items-center justify-center mb-4">
-            <span class="text-2xl">⚡</span>
+            <svg class="w-7 h-7 text-[--color-primary]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
+            </svg>
           </div>
           <h3 class="text-xl font-semibold mb-3 text-gray-900">DG vs Grid Metering</h3>
           <p class="text-gray-600">
-            80% of backup power is diesel. DG runs at ₹18-28/kWh—2.5-4x grid cost.
+            80% of backup power is diesel. DG runs at Rs.18-28/kWh—2.5-4x grid cost.
             Accurate source-level metering is critical for tenant billing.
           </p>
         </div>
 
         <div class="card bg-gradient-to-br from-white to-gray-50">
           <div class="w-14 h-14 bg-green-100 rounded-2xl flex items-center justify-center mb-4">
-            <span class="text-2xl">🗺️</span>
+            <svg class="w-7 h-7 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498 4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 0 0-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0Z" />
+            </svg>
           </div>
           <h3 class="text-xl font-semibold mb-3 text-gray-900">State-wise Complexity</h3>
           <p class="text-gray-600">
@@ -109,9 +113,8 @@ import Layout from '../layouts/Layout.astro';
     </div>
   </section>
 
-  <!-- Solution Section -->
+  <!-- Solution Section with Dashboard Mock -->
   <section class="section relative overflow-hidden">
-    <!-- Background gradient -->
     <div class="absolute inset-0 bg-gradient-to-br from-[--color-primary]/5 via-[--color-accent]/5 to-[--color-primary]/5"></div>
     <div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[--color-primary]/10 to-transparent"></div>
 
@@ -130,7 +133,9 @@ import Layout from '../layouts/Layout.astro';
           <ul class="space-y-4">
             <li class="flex items-start gap-3">
               <div class="w-8 h-8 bg-[--color-accent] rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                <span class="text-white text-sm">✓</span>
+                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                </svg>
               </div>
               <div>
                 <strong class="text-gray-900">ToD-Aware Billing Engine</strong>
@@ -139,7 +144,9 @@ import Layout from '../layouts/Layout.astro';
             </li>
             <li class="flex items-start gap-3">
               <div class="w-8 h-8 bg-[--color-accent] rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                <span class="text-white text-sm">✓</span>
+                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                </svg>
               </div>
               <div>
                 <strong class="text-gray-900">DG Power Tracking</strong>
@@ -148,7 +155,9 @@ import Layout from '../layouts/Layout.astro';
             </li>
             <li class="flex items-start gap-3">
               <div class="w-8 h-8 bg-[--color-accent] rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                <span class="text-white text-sm">✓</span>
+                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                </svg>
               </div>
               <div>
                 <strong class="text-gray-900">GST-Compliant Invoicing</strong>
@@ -157,7 +166,9 @@ import Layout from '../layouts/Layout.astro';
             </li>
             <li class="flex items-start gap-3">
               <div class="w-8 h-8 bg-[--color-accent] rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                <span class="text-white text-sm">✓</span>
+                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                </svg>
               </div>
               <div>
                 <strong class="text-gray-900">Tenant Transparency Portal</strong>
@@ -166,27 +177,103 @@ import Layout from '../layouts/Layout.astro';
             </li>
           </ul>
         </div>
+        <!-- Dashboard Mockup -->
         <div class="relative">
           <div class="absolute inset-0 bg-gradient-to-br from-[--color-primary]/20 to-[--color-accent]/20 rounded-3xl blur-3xl"></div>
-          <div class="relative bg-white rounded-2xl shadow-2xl p-8 border border-gray-100">
-            <div class="aspect-video bg-gradient-to-br from-[--color-primary] to-[--color-primary-dark] rounded-xl flex items-center justify-center">
-              <div class="text-center text-white">
-                <span class="text-6xl block mb-4">📊</span>
-                <span class="text-sm opacity-80">Dashboard Preview</span>
+          <div class="relative bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+            <!-- Mock Titlebar -->
+            <div class="bg-gray-50 border-b border-gray-200 px-4 py-2.5 flex items-center gap-2">
+              <div class="flex gap-1.5">
+                <div class="w-3 h-3 rounded-full bg-red-400"></div>
+                <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+                <div class="w-3 h-3 rounded-full bg-green-400"></div>
+              </div>
+              <div class="flex-1 text-center">
+                <span class="text-xs text-gray-400">app.bharatdcim.com</span>
               </div>
             </div>
-            <div class="mt-6 grid grid-cols-3 gap-4">
-              <div class="bg-gray-50 rounded-lg p-3 text-center">
-                <div class="text-lg font-bold text-[--color-primary]">₹8.2</div>
-                <div class="text-xs text-gray-500">Avg Rate/kWh</div>
+            <!-- Mock Dashboard Content -->
+            <div class="p-5">
+              <!-- Mock Nav -->
+              <div class="flex items-center justify-between mb-5">
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-bold text-[--color-primary]">Bharat</span><span class="text-sm font-bold text-[--color-accent]">DCIM</span>
+                </div>
+                <div class="flex gap-3">
+                  <div class="w-16 h-2 bg-gray-200 rounded"></div>
+                  <div class="w-16 h-2 bg-gray-200 rounded"></div>
+                  <div class="w-12 h-2 bg-gray-200 rounded"></div>
+                </div>
               </div>
-              <div class="bg-gray-50 rounded-lg p-3 text-center">
-                <div class="text-lg font-bold text-[--color-accent]">+25%</div>
-                <div class="text-xs text-gray-500">Peak Surcharge</div>
+              <!-- Mock Stats Row -->
+              <div class="grid grid-cols-3 gap-3 mb-4">
+                <div class="bg-[--color-primary] rounded-lg p-3 text-white">
+                  <div class="text-[10px] text-white/60 mb-1">Monthly Bill</div>
+                  <div class="text-lg font-bold">Rs.25.5L</div>
+                  <div class="text-[10px] text-green-300">-4.2% vs last month</div>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-3">
+                  <div class="text-[10px] text-gray-400 mb-1">Effective Rate</div>
+                  <div class="text-lg font-bold text-gray-900">Rs.8.50</div>
+                  <div class="text-[10px] text-gray-400">/kWh</div>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-3">
+                  <div class="text-[10px] text-gray-400 mb-1">PUE</div>
+                  <div class="text-lg font-bold text-gray-900">1.58</div>
+                  <div class="text-[10px] text-green-600">Good</div>
+                </div>
               </div>
-              <div class="bg-gray-50 rounded-lg p-3 text-center">
-                <div class="text-lg font-bold text-green-600">-15%</div>
-                <div class="text-xs text-gray-500">Solar Rebate</div>
+              <!-- Mock ToD Chart -->
+              <div class="bg-gray-50 rounded-lg p-3 mb-4">
+                <div class="text-[10px] font-medium text-gray-500 mb-3">ToD Consumption Breakdown - Karnataka (BESCOM)</div>
+                <div class="flex items-end gap-1 h-20">
+                  <div class="flex-1 bg-[--color-primary]/20 rounded-t" style="height: 40%"></div>
+                  <div class="flex-1 bg-[--color-primary]/30 rounded-t" style="height: 55%"></div>
+                  <div class="flex-1 bg-[--color-primary]/40 rounded-t" style="height: 70%"></div>
+                  <div class="flex-1 bg-[--color-primary]/50 rounded-t" style="height: 85%"></div>
+                  <div class="flex-1 bg-[--color-accent]/60 rounded-t" style="height: 100%"></div>
+                  <div class="flex-1 bg-[--color-accent]/70 rounded-t" style="height: 95%"></div>
+                  <div class="flex-1 bg-[--color-accent]/60 rounded-t" style="height: 80%"></div>
+                  <div class="flex-1 bg-[--color-primary]/50 rounded-t" style="height: 65%"></div>
+                  <div class="flex-1 bg-[--color-primary]/40 rounded-t" style="height: 50%"></div>
+                  <div class="flex-1 bg-[--color-primary]/30 rounded-t" style="height: 60%"></div>
+                  <div class="flex-1 bg-[--color-primary]/20 rounded-t" style="height: 45%"></div>
+                  <div class="flex-1 bg-[--color-primary]/10 rounded-t" style="height: 30%"></div>
+                </div>
+                <div class="flex justify-between mt-1">
+                  <span class="text-[8px] text-gray-400">00:00</span>
+                  <span class="text-[8px] text-gray-400">06:00</span>
+                  <span class="text-[8px] text-gray-400">12:00</span>
+                  <span class="text-[8px] text-gray-400">18:00</span>
+                  <span class="text-[8px] text-gray-400">24:00</span>
+                </div>
+              </div>
+              <!-- Mock Table -->
+              <div class="rounded-lg border border-gray-200 overflow-hidden">
+                <div class="bg-gray-50 px-3 py-1.5 text-[10px] font-medium text-gray-500 grid grid-cols-4">
+                  <span>Tenant</span>
+                  <span>Consumption</span>
+                  <span>Rate</span>
+                  <span>Amount</span>
+                </div>
+                <div class="px-3 py-1.5 text-[10px] text-gray-700 grid grid-cols-4 border-t border-gray-100">
+                  <span>CloudServe</span>
+                  <span>42,300 kWh</span>
+                  <span>Rs.8.52</span>
+                  <span class="font-medium">Rs.3.6L</span>
+                </div>
+                <div class="px-3 py-1.5 text-[10px] text-gray-700 grid grid-cols-4 border-t border-gray-100">
+                  <span>DataFlow Inc</span>
+                  <span>28,100 kWh</span>
+                  <span>Rs.8.48</span>
+                  <span class="font-medium">Rs.2.4L</span>
+                </div>
+                <div class="px-3 py-1.5 text-[10px] text-gray-700 grid grid-cols-4 border-t border-gray-100">
+                  <span>NetPrime</span>
+                  <span>18,600 kWh</span>
+                  <span>Rs.8.55</span>
+                  <span class="font-medium">Rs.1.6L</span>
+                </div>
               </div>
             </div>
           </div>
@@ -209,49 +296,49 @@ import Layout from '../layouts/Layout.astro';
       </div>
 
       <div class="grid md:grid-cols-4 gap-6">
-        <div class="group card text-center bg-gradient-to-br from-white to-[--color-primary]/5 hover:to-[--color-primary]/10 transition-all">
+        <a href="/blog/maharashtra-dc-power-tariff-2026" class="group card text-center bg-gradient-to-br from-white to-[--color-primary]/5 hover:to-[--color-primary]/10 transition-all">
           <div class="w-16 h-16 bg-[--color-primary]/10 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
             <span class="text-2xl font-bold text-[--color-primary]">MH</span>
           </div>
           <h3 class="font-semibold text-gray-900 mb-1">Maharashtra</h3>
           <p class="text-sm text-gray-600">MERC / MSEDCL</p>
           <div class="mt-3 pt-3 border-t border-gray-100">
-            <p class="text-xs text-[--color-accent] font-medium">+25% Peak Surcharge</p>
+            <p class="text-xs text-[--color-accent] font-medium">Rs.750/kVA Demand Charge</p>
           </div>
-        </div>
+        </a>
 
-        <div class="group card text-center bg-gradient-to-br from-white to-[--color-primary]/5 hover:to-[--color-primary]/10 transition-all">
+        <a href="/blog/tamil-nadu-dc-power-tariff-2026" class="group card text-center bg-gradient-to-br from-white to-[--color-primary]/5 hover:to-[--color-primary]/10 transition-all">
           <div class="w-16 h-16 bg-[--color-primary]/10 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
             <span class="text-2xl font-bold text-[--color-primary]">TN</span>
           </div>
           <h3 class="font-semibold text-gray-900 mb-1">Tamil Nadu</h3>
           <p class="text-sm text-gray-600">TANGEDCO / TNERC</p>
           <div class="mt-3 pt-3 border-t border-gray-100">
-            <p class="text-xs text-[--color-accent] font-medium">Dual Peak Windows</p>
+            <p class="text-xs text-[--color-accent] font-medium">Dual Peak Windows (+25%)</p>
           </div>
-        </div>
+        </a>
 
-        <div class="group card text-center bg-gradient-to-br from-white to-[--color-primary]/5 hover:to-[--color-primary]/10 transition-all">
+        <a href="/blog/karnataka-dc-power-tariff-2026" class="group card text-center bg-gradient-to-br from-white to-[--color-primary]/5 hover:to-[--color-primary]/10 transition-all">
           <div class="w-16 h-16 bg-[--color-primary]/10 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
             <span class="text-2xl font-bold text-[--color-primary]">KA</span>
           </div>
           <h3 class="font-semibold text-gray-900 mb-1">Karnataka</h3>
           <p class="text-sm text-gray-600">BESCOM / KERC</p>
           <div class="mt-3 pt-3 border-t border-gray-100">
-            <p class="text-xs text-[--color-accent] font-medium">₹1/unit Night Rebate</p>
+            <p class="text-xs text-green-600 font-medium">Lowest Rates (~Rs.8.50/unit)</p>
           </div>
-        </div>
+        </a>
 
-        <div class="group card text-center bg-gradient-to-br from-white to-[--color-primary]/5 hover:to-[--color-primary]/10 transition-all">
+        <a href="/blog/telangana-dc-power-tariff-2026" class="group card text-center bg-gradient-to-br from-white to-[--color-primary]/5 hover:to-[--color-primary]/10 transition-all">
           <div class="w-16 h-16 bg-[--color-primary]/10 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
             <span class="text-2xl font-bold text-[--color-primary]">TS</span>
           </div>
           <h3 class="font-semibold text-gray-900 mb-1">Telangana</h3>
-          <p class="text-sm text-gray-600">TSDISCOM / TSERC</p>
+          <p class="text-sm text-gray-600">TGSPDCL / TSERC</p>
           <div class="mt-3 pt-3 border-t border-gray-100">
-            <p class="text-xs text-[--color-accent] font-medium">Lowest Rates in India</p>
+            <p class="text-xs text-amber-600 font-medium">Night Rebate Suspended</p>
           </div>
-        </div>
+        </a>
       </div>
     </div>
   </section>
@@ -292,7 +379,9 @@ import Layout from '../layouts/Layout.astro';
       <div class="grid md:grid-cols-3 gap-8">
         <div class="text-center">
           <div class="w-20 h-20 bg-gradient-to-br from-[--color-primary] to-[--color-primary-dark] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-            <span class="text-3xl">🇮🇳</span>
+            <svg class="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418" />
+            </svg>
           </div>
           <h3 class="text-xl font-semibold text-gray-900 mb-3">India-First</h3>
           <p class="text-gray-600">
@@ -303,7 +392,10 @@ import Layout from '../layouts/Layout.astro';
 
         <div class="text-center">
           <div class="w-20 h-20 bg-gradient-to-br from-[--color-accent] to-[--color-accent-dark] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-            <span class="text-3xl">⚙️</span>
+            <svg class="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+            </svg>
           </div>
           <h3 class="text-xl font-semibold text-gray-900 mb-3">Simple Setup</h3>
           <p class="text-gray-600">
@@ -314,7 +406,9 @@ import Layout from '../layouts/Layout.astro';
 
         <div class="text-center">
           <div class="w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-            <span class="text-3xl">📈</span>
+            <svg class="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
+            </svg>
           </div>
           <h3 class="text-xl font-semibold text-gray-900 mb-3">Transparent</h3>
           <p class="text-gray-600">
