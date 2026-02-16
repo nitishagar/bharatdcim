@@ -47,7 +47,8 @@ const posts = [
   description="Guides, insights, and resources for Indian data center operators. Learn about ToD tariffs, state-wise power costs, and billing best practices."
 >
   <!-- Hero -->
-  <section class="py-20 bg-gradient-to-b from-gray-50 to-white">
+  <section class="relative overflow-hidden bg-mesh-strong py-20">
+    <div class="glow-orb glow-orb-primary w-72 h-72 -top-36 -right-36"></div>
     <div class="container">
       <div class="max-w-3xl mx-auto text-center">
         <span class="section-label">Resources</span>
@@ -89,7 +90,8 @@ const posts = [
   </section>
 
   <!-- State Guides -->
-  <section class="section bg-gray-50">
+  <section class="section relative overflow-hidden bg-mesh-cool">
+    <div class="glow-orb glow-orb-accent w-64 h-64 -bottom-32 -left-32"></div>
     <div class="container">
       <div class="text-center mb-12">
         <span class="section-label">State Guides</span>
@@ -117,7 +119,7 @@ const posts = [
   </section>
 
   <!-- Coming Soon Topics -->
-  <section class="section">
+  <section class="section bg-mesh">
     <div class="container">
       <div class="text-center mb-12">
         <span class="section-label">Coming Soon</span>
@@ -160,8 +162,10 @@ const posts = [
   </section>
 
   <!-- Newsletter -->
-  <section class="section bg-[--color-primary] text-white">
-    <div class="container">
+  <section class="relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-[--color-primary] via-[--color-primary-dark] to-[--color-primary]"></div>
+    <div class="absolute inset-0 dot-grid opacity-10"></div>
+    <div class="container relative py-20">
       <div class="max-w-2xl mx-auto text-center">
         <h2 class="text-3xl font-bold mb-4">Stay Updated</h2>
         <p class="text-white/80 mb-8">

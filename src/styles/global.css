@@ -63,15 +63,69 @@ body {
   line-height: 1.6;
 }
 
-/* Section Label - Small uppercase label above headings */
+/* ─── Gradient Mesh Backgrounds ─── */
+
+/* Subtle warm mesh for light sections */
+.bg-mesh {
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 40%, rgba(139, 46, 62, 0.04), transparent),
+    radial-gradient(ellipse 60% 80% at 80% 20%, rgba(30, 58, 95, 0.05), transparent),
+    radial-gradient(ellipse 50% 60% at 50% 80%, rgba(139, 46, 62, 0.03), transparent),
+    #ffffff;
+}
+
+/* Stronger mesh for hero/feature sections */
+.bg-mesh-strong {
+  background:
+    radial-gradient(ellipse 80% 50% at 10% 50%, rgba(139, 46, 62, 0.07), transparent),
+    radial-gradient(ellipse 60% 80% at 90% 20%, rgba(30, 58, 95, 0.08), transparent),
+    radial-gradient(ellipse 70% 50% at 50% 90%, rgba(30, 58, 95, 0.04), transparent),
+    #ffffff;
+}
+
+/* Cool mesh for alternate sections */
+.bg-mesh-cool {
+  background:
+    radial-gradient(ellipse 80% 60% at 70% 30%, rgba(30, 58, 95, 0.06), transparent),
+    radial-gradient(ellipse 50% 70% at 20% 70%, rgba(139, 46, 62, 0.04), transparent),
+    linear-gradient(180deg, #fafafa, #ffffff);
+}
+
+/* Decorative gradient orb */
+.glow-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.glow-orb-primary {
+  background: rgba(30, 58, 95, 0.12);
+}
+
+.glow-orb-accent {
+  background: rgba(139, 46, 62, 0.10);
+}
+
+/* Dot grid overlay - subtle texture */
+.dot-grid {
+  background-image: radial-gradient(circle at 1px 1px, rgba(30, 58, 95, 0.08) 1px, transparent 0);
+  background-size: 32px 32px;
+}
+
+/* ─── Section Label ─── */
 .section-label {
   font-size: var(--font-size-label);
-  font-weight: 500;
+  font-weight: 600;
   color: var(--color-accent);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   margin-bottom: 0.75rem;
-  display: block;
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: rgba(139, 46, 62, 0.06);
+  border-radius: var(--radius-pill);
 }
 
 /* Section Title - Large headings */
@@ -96,7 +150,7 @@ body {
   line-height: 1.05;
 }
 
-/* Pill Button with Arrow */
+/* ─── Buttons ─── */
 .btn-primary {
   display: inline-flex;
   align-items: center;
@@ -182,18 +236,52 @@ body {
   transition: transform 0.3s ease;
 }
 
-/* Card styles */
+/* ─── Cards ─── */
 .card {
-  background: var(--color-bg-white);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
   border-radius: var(--radius-lg);
   padding: 2.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid var(--color-border-light);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.6);
   transition: all 0.3s ease;
 }
 
 .card:hover {
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  transform: translateY(-4px);
+  border-color: rgba(139, 46, 62, 0.12);
+}
+
+/* Gradient-bordered card variant */
+.card-glow {
+  position: relative;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  transition: all 0.3s ease;
+}
+
+.card-glow::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: calc(var(--radius-lg) + 1px);
+  background: linear-gradient(135deg, rgba(30, 58, 95, 0.15), rgba(139, 46, 62, 0.15));
+  z-index: -1;
+  transition: opacity 0.3s ease;
+  opacity: 0.5;
+}
+
+.card-glow:hover::before {
+  opacity: 1;
+}
+
+.card-glow:hover {
+  box-shadow: 0 8px 30px rgba(30, 58, 95, 0.1);
   transform: translateY(-4px);
 }
 
@@ -229,7 +317,7 @@ body {
   .section {
     padding: var(--spacing-section-mobile) 0;
   }
-  .card {
+  .card, .card-glow {
     padding: 1.5rem;
   }
 }
@@ -250,7 +338,7 @@ body {
   animation: fadeInUp 0.6s ease-out forwards;
 }
 
-/* Calculator specific styles */
+/* ─── Calculator specific styles ─── */
 .calculator-container {
   background: linear-gradient(135deg, var(--color-bg-subtle) 0%, var(--color-bg-white) 100%);
   border-radius: var(--radius-lg);
