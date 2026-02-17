@@ -1,0 +1,369 @@
+---
+import Layout from '../layouts/Layout.astro';
+import IntegrationFlowWidget from '../components/IntegrationFlowWidget';
+---
+
+<Layout
+  title="DCIM Integration - Connect Nlyte, Sunbird & Schneider to Indian Billing"
+  description="Add Indian billing intelligence to your existing DCIM. BharatDCIM integrates with Nlyte Software, Sunbird dcTrack, and Schneider EcoStruxure IT for ToD tariff billing, DG metering, and GST invoicing."
+>
+  <!-- Hero -->
+  <section class="relative overflow-hidden bg-mesh-strong section-xl">
+    <div class="glow-orb glow-orb-primary w-[28rem] h-[28rem] -top-40 -right-40"></div>
+    <div class="glow-orb glow-orb-accent w-96 h-96 top-16 -left-52"></div>
+    <div class="container relative">
+      <div class="max-w-3xl mx-auto text-center">
+        <span class="section-label">Enterprise Integration</span>
+        <h1 class="hero-title mb-6">
+          Add Indian Billing Intelligence
+          <span class="block text-[#8b2e3e]">to Your Existing DCIM</span>
+        </h1>
+        <p class="text-lg sm:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+          BharatDCIM connects to Nlyte Software, Sunbird dcTrack, and Schneider EcoStruxure IT in minutes. Turn raw power data into ToD-aware, GST-compliant tenant invoices.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 mb-8 justify-center">
+          <a href="/contact" class="btn-primary text-lg px-8 py-4">Book Integration Demo</a>
+          <a href="#how-it-works" class="btn-secondary text-lg px-8 py-4">See How It Works</a>
+        </div>
+        <div class="flex flex-wrap gap-2 justify-center">
+          <span class="badge-chip">One-touch setup</span>
+          <span class="badge-chip">API + SNMP + CSV</span>
+          <span class="badge-chip">No rip and replace</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust Strip -->
+  <section class="section-tight">
+    <div class="container">
+      <div class="trust-strip max-w-5xl mx-auto">
+        <div class="trust-logo-pill">Works with Nlyte Software</div>
+        <div class="trust-logo-pill">Works with Sunbird dcTrack</div>
+        <div class="trust-logo-pill">Works with EcoStruxure IT</div>
+        <div class="trust-logo-pill">Works with any DCIM via API</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- The Gap -->
+  <section class="section relative">
+    <div class="absolute inset-0 bg-gradient-to-b from-white via-gray-50/50 to-white"></div>
+    <div class="container relative">
+      <div class="max-w-3xl mx-auto text-center mb-16">
+        <span class="section-label">The Gap</span>
+        <h2 class="section-title">
+          Your DCIM Knows the Power.
+          <span class="block accent">Not the Price.</span>
+        </h2>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="card bg-gradient-to-br from-white to-gray-50 hover-lift">
+          <div class="w-14 h-14 bg-[#1e3a5f]/10 rounded-2xl flex items-center justify-center mb-4">
+            <svg class="w-7 h-7 text-[#1e3a5f]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-3 text-gray-900">Global DCIM Tracks Consumption</h3>
+          <p class="text-gray-600">
+            Nlyte Software, Sunbird dcTrack, and EcoStruxure IT excel at asset management, capacity planning, and power monitoring. They tell you Rack A7 consumed 850 kWh this month.
+          </p>
+        </div>
+
+        <div class="card bg-gradient-to-br from-white to-gray-50 hover-lift">
+          <div class="w-14 h-14 bg-[#8b2e3e]/10 rounded-2xl flex items-center justify-center mb-4">
+            <svg class="w-7 h-7 text-[#8b2e3e]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-3 text-gray-900">But Not Indian Billing Logic</h3>
+          <p class="text-gray-600">
+            They can't tell you that 300 kWh was during MSEDCL evening peak at +Rs.1.10/kVAh, or that 50 kWh came from DG at Rs.22/kWh.
+          </p>
+        </div>
+
+        <div class="card bg-gradient-to-br from-white to-gray-50 hover-lift">
+          <div class="w-14 h-14 bg-amber-100 rounded-2xl flex items-center justify-center mb-4">
+            <svg class="w-7 h-7 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-3 text-gray-900">The Result: Excel Fills the Gap</h3>
+          <p class="text-gray-600">
+            Operations teams manually export data, apply ToD rates in spreadsheets, and generate invoices by hand. Every month.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Integration Widget -->
+  <section id="how-it-works" class="section-tight bg-mesh">
+    <div class="container">
+      <div class="text-center mb-10">
+        <span class="section-label">How It Works</span>
+        <h2 class="text-3xl lg:text-4xl font-bold text-gray-900">
+          One-Touch Integration
+        </h2>
+      </div>
+      <div class="max-w-6xl mx-auto">
+        <IntegrationFlowWidget client:load />
+        <p class="text-center text-gray-500 text-sm mt-6 max-w-2xl mx-auto">
+          BharatDCIM ingests power readings from your existing DCIM and applies Indian billing intelligence automatically.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Better Together Comparison -->
+  <section class="section relative overflow-hidden bg-mesh-cool">
+    <div class="container relative">
+      <div class="text-center mb-16">
+        <span class="section-label">Better Together</span>
+        <h2 class="section-title">
+          Complete Indian
+          <span class="block accent">DC Operations</span>
+        </h2>
+      </div>
+
+      <div class="max-w-4xl mx-auto overflow-x-auto">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr>
+              <th class="bg-[#1e3a5f] text-white text-left px-6 py-4 rounded-tl-xl text-sm font-semibold">Your Existing DCIM Handles</th>
+              <th class="bg-[#8b2e3e] text-white text-left px-6 py-4 rounded-tr-xl text-sm font-semibold">BharatDCIM Adds</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            <tr class="border-b border-gray-100">
+              <td class="px-6 py-4 text-gray-600 bg-white">Asset Lifecycle Management</td>
+              <td class="px-6 py-4 text-gray-900 font-medium bg-[#8b2e3e]/[0.03]">ToD Tariff Billing</td>
+            </tr>
+            <tr class="border-b border-gray-100">
+              <td class="px-6 py-4 text-gray-600 bg-white">Capacity Planning</td>
+              <td class="px-6 py-4 text-gray-900 font-medium bg-[#8b2e3e]/[0.03]">DG vs Grid Metering</td>
+            </tr>
+            <tr class="border-b border-gray-100">
+              <td class="px-6 py-4 text-gray-600 bg-white">Power Monitoring</td>
+              <td class="px-6 py-4 text-gray-900 font-medium bg-[#8b2e3e]/[0.03]">GST Invoice Generation</td>
+            </tr>
+            <tr class="border-b border-gray-100">
+              <td class="px-6 py-4 text-gray-600 bg-white">3D Visualization</td>
+              <td class="px-6 py-4 text-gray-900 font-medium bg-[#8b2e3e]/[0.03]">State-wise Compliance</td>
+            </tr>
+            <tr class="border-b border-gray-100">
+              <td class="px-6 py-4 text-gray-600 bg-white">Change Management</td>
+              <td class="px-6 py-4 text-gray-900 font-medium bg-[#8b2e3e]/[0.03]">Tenant Billing Portal</td>
+            </tr>
+            <tr>
+              <td class="px-6 py-4 text-gray-600 bg-white rounded-bl-xl">CMDB Integration</td>
+              <td class="px-6 py-4 text-gray-900 font-medium bg-[#8b2e3e]/[0.03] rounded-br-xl">e-Invoice (IRP) Export</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Setup Steps -->
+  <section class="section-tight bg-mesh">
+    <div class="container">
+      <div class="text-center mb-10">
+        <span class="section-label">Setup</span>
+        <h2 class="text-3xl lg:text-4xl font-bold text-gray-900">
+          Live in Under a Week
+        </h2>
+      </div>
+      <div class="grid md:grid-cols-3 gap-5 max-w-5xl mx-auto">
+        <div class="process-step">
+          <span class="process-step-number mb-4">01</span>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Connect</h3>
+          <p class="text-gray-600 text-sm">Point BharatDCIM at your DCIM's API endpoint or SNMP interface. We support REST, SNMP v2/v3, Modbus TCP, and CSV import.</p>
+        </div>
+        <div class="process-step">
+          <span class="process-step-number mb-4">02</span>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Configure</h3>
+          <p class="text-gray-600 text-sm">Select your states and tariff profiles. We pre-load official rates from MERC, TNERC, KERC, and TSERC.</p>
+        </div>
+        <div class="process-step">
+          <span class="process-step-number mb-4">03</span>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Go Live</h3>
+          <p class="text-gray-600 text-sm">BharatDCIM starts classifying consumption by ToD slot and generating GST-compliant invoices automatically.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Enterprise Social Proof -->
+  <section class="section relative bg-mesh-cool">
+    <div class="container relative">
+      <div class="text-center mb-16">
+        <span class="section-label">Built For Enterprise</span>
+        <h2 class="section-title">
+          Trusted by Teams Running
+          <span class="block accent">Multi-State Operations</span>
+        </h2>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div class="card bg-gradient-to-br from-white to-gray-50">
+          <div class="mb-4">
+            <svg class="w-8 h-8 text-[#8b2e3e]/30" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+          </div>
+          <p class="text-gray-700 mb-6">We kept Nlyte for asset tracking and added BharatDCIM for billing. Our finance team no longer spends a week on invoices.</p>
+          <div class="border-t border-gray-100 pt-4">
+            <p class="text-sm font-semibold text-gray-900">VP Operations</p>
+            <p class="text-xs text-gray-500">Multi-state DC Operator</p>
+          </div>
+        </div>
+
+        <div class="card bg-gradient-to-br from-white to-gray-50">
+          <div class="mb-4">
+            <svg class="w-8 h-8 text-[#8b2e3e]/30" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+          </div>
+          <p class="text-gray-700 mb-6">The API integration took two days. The first automated invoice run caught three ToD classification errors we'd been making in Excel for months.</p>
+          <div class="border-t border-gray-100 pt-4">
+            <p class="text-sm font-semibold text-gray-900">Head of IT</p>
+            <p class="text-xs text-gray-500">Mumbai Colocation</p>
+          </div>
+        </div>
+
+        <div class="card bg-gradient-to-br from-white to-gray-50">
+          <div class="mb-4">
+            <svg class="w-8 h-8 text-[#8b2e3e]/30" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+          </div>
+          <p class="text-gray-700 mb-6">Finally, a tool that understands Indian tariff complexity without us having to explain MERC vs TNERC differences.</p>
+          <div class="border-t border-gray-100 pt-4">
+            <p class="text-sm font-semibold text-gray-900">CFO</p>
+            <p class="text-xs text-gray-500">Southern India DC Group</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-[#1e3a5f] via-[#162d4a] to-[#1e3a5f]"></div>
+    <div class="absolute inset-0 dot-grid opacity-10"></div>
+    <div class="container relative py-20">
+      <div class="max-w-3xl mx-auto text-center text-white">
+        <span class="text-xs uppercase tracking-wider text-white/60 mb-4 block">Next Step</span>
+        <h2 class="text-4xl lg:text-5xl font-bold mb-6">
+          Connect Your DCIM This Week
+        </h2>
+        <p class="text-xl text-white/80 mb-8">
+          Schedule a 30-minute integration assessment. We'll map your current DCIM setup and show you exactly how BharatDCIM plugs in.
+        </p>
+        <a href="/contact" class="btn-light text-lg px-8 py-4">Book Integration Demo</a>
+        <p class="text-xs text-white/60 mt-6">No rip-and-replace. No vendor lock-in. Just Indian billing intelligence.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section relative overflow-hidden bg-mesh-cool">
+    <div class="glow-orb glow-orb-accent w-72 h-72 -bottom-36 right-10"></div>
+    <div class="container relative">
+      <div class="text-center mb-16">
+        <span class="section-label">FAQ</span>
+        <h2 class="section-title">
+          Integration<br />
+          <span class="accent">Questions</span>
+        </h2>
+      </div>
+
+      <div class="max-w-3xl mx-auto space-y-4">
+        <details class="faq-item" open>
+          <summary>How long does integration take?</summary>
+          <p class="text-gray-600 text-sm mt-3">
+            Most integrations are live within 3-5 business days. API-based connections (Nlyte, Sunbird) typically take 1-2 days. SNMP and Modbus integrations take 2-3 days for discovery and mapping. CSV import can start on day one.
+          </p>
+        </details>
+        <details class="faq-item">
+          <summary>Do I need to replace my existing DCIM?</summary>
+          <p class="text-gray-600 text-sm mt-3">
+            No. BharatDCIM is designed to complement your existing DCIM, not replace it. Your Nlyte, Sunbird, or Schneider installation continues handling asset management, capacity planning, and infrastructure monitoring. BharatDCIM adds the Indian billing layer on top.
+          </p>
+        </details>
+        <details class="faq-item">
+          <summary>Which DCIM platforms do you support?</summary>
+          <p class="text-gray-600 text-sm mt-3">
+            We integrate with Nlyte Software (REST API v2), Sunbird dcTrack (REST API), and Schneider EcoStruxure IT (SNMP v3). We also support any DCIM that exposes power data via REST API, SNMP v2/v3, Modbus TCP, or CSV export.
+          </p>
+        </details>
+        <details class="faq-item">
+          <summary>What if my DCIM isn't listed?</summary>
+          <p class="text-gray-600 text-sm mt-3">
+            Any system that exposes power data via API, SNMP, or CSV export can integrate with BharatDCIM. We've worked with custom and in-house DCIM solutions. Our team will map your data model during the integration assessment.
+          </p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- Structured Data -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How long does DCIM integration take?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Most integrations are live within 3-5 business days. API-based connections (Nlyte, Sunbird) typically take 1-2 days. SNMP and Modbus integrations take 2-3 days for discovery and mapping. CSV import can start on day one."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Do I need to replace my existing DCIM?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. BharatDCIM is designed to complement your existing DCIM, not replace it. Your Nlyte, Sunbird, or Schneider installation continues handling asset management, capacity planning, and infrastructure monitoring. BharatDCIM adds the Indian billing layer on top."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Which DCIM platforms does BharatDCIM support?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "We integrate with Nlyte Software (REST API v2), Sunbird dcTrack (REST API), and Schneider EcoStruxure IT (SNMP v3). We also support any DCIM that exposes power data via REST API, SNMP v2/v3, Modbus TCP, or CSV export."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What if my DCIM platform isn't listed?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Any system that exposes power data via API, SNMP, or CSV export can integrate with BharatDCIM. We've worked with custom and in-house DCIM solutions. Our team will map your data model during the integration assessment."
+        }
+      }
+    ]
+  })} />
+
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "BharatDCIM",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "description": "Add Indian billing intelligence to your existing DCIM. BharatDCIM integrates with Nlyte Software, Sunbird dcTrack, and Schneider EcoStruxure IT for ToD tariff billing, DG metering, and GST invoicing.",
+    "featureList": [
+      "Nlyte Software REST API Integration",
+      "Sunbird dcTrack REST API Integration",
+      "Schneider EcoStruxure IT SNMP Integration",
+      "SNMP v2/v3 & Modbus TCP Support",
+      "CSV Import Pipeline",
+      "ToD-Aware Billing Engine",
+      "GST-Compliant Invoice Generation",
+      "Multi-State Tariff Support"
+    ],
+    "provider": {
+      "@type": "Organization",
+      "name": "BharatDCIM",
+      "url": "https://bharatdcim.com"
+    }
+  })} />
+</Layout>
