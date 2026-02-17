@@ -488,6 +488,82 @@ import Layout from '../layouts/Layout.astro';
     </div>
   </section>
 
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Which states does BharatDCIM support?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "We currently support Maharashtra (MSEDCL/MERC), Tamil Nadu (TANGEDCO/TNERC), Karnataka (BESCOM/KERC), and Telangana (TGSPDCL/TSERC). These cover the four largest data center markets in India. Additional states are on our roadmap."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do you handle kWh vs kVAh billing?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "BharatDCIM automatically detects the billing unit based on the state. Maharashtra and Telangana use kVAh (apparent energy), while Tamil Nadu and Karnataka use kWh (active energy). For kVAh states, we apply power factor conversion automatically to show accurate billing."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How current is the tariff data?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Tariff data is sourced from official State Electricity Regulatory Commission orders and updated when new orders are published. Current data is verified from MERC Case 75/2025, TNERC Order 6/2025, KERC MYT 2025, and TSERC RST Order 2025-26. Monthly FAC/FPPCA charges are updated regularly."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I integrate with my existing metering infrastructure?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. BharatDCIM supports SNMP and Modbus for direct meter integration, works with major smart PDU vendors (Schneider, Raritan, Server Technology, Vertiv), and offers a REST API and CSV import for custom integrations. You can start with manual data entry and add automated integration over time."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is the e-invoice integration mandatory?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "E-invoicing is currently mandatory for businesses with annual turnover exceeding Rs. 5 crore (Notification 10/2023-CT). BharatDCIM generates invoices in the IRP-compatible JSON schema (v1.03) so you're ready when you cross the threshold. For smaller operators, standard GST-compliant PDF invoices are generated."
+        }
+      }
+    ]
+  })} />
+
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "BharatDCIM",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "description": "India's first DCIM with native Time-of-Day tariff billing. Automate data center power billing with state-wise tariff intelligence for Maharashtra, Tamil Nadu, Karnataka & Telangana.",
+    "offers": {
+      "@type": "Offer",
+      "availability": "https://schema.org/InStock",
+      "price": "0",
+      "priceCurrency": "INR",
+      "description": "Contact for pricing"
+    },
+    "featureList": [
+      "ToD-Aware Billing Engine",
+      "DG Power Tracking",
+      "GST-Compliant Invoicing",
+      "Tenant Self-Service Portal",
+      "Multi-State Tariff Support",
+      "SNMP & Modbus Integration"
+    ],
+    "provider": {
+      "@type": "Organization",
+      "name": "BharatDCIM",
+      "url": "https://bharatdcim.com"
+    }
+  })} />
+
   <!-- CTA -->
   <section class="relative overflow-hidden">
     <div class="absolute inset-0 bg-gradient-to-br from-[#1e3a5f] via-[#162d4a] to-[#1e3a5f]"></div>

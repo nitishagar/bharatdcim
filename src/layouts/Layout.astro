@@ -4,9 +4,10 @@ import '../styles/global.css';
 interface Props {
   title: string;
   description?: string;
+  ogType?: string;
 }
 
-const { title, description = 'BharatDCIM - India\'s first DCIM with native ToD tariff billing. Automate data center power billing with state-wise tariff intelligence for Maharashtra, Tamil Nadu, Karnataka & Telangana.' } = Astro.props;
+const { title, description = 'BharatDCIM - India\'s first DCIM with native ToD tariff billing. Automate data center power billing with state-wise tariff intelligence for Maharashtra, Tamil Nadu, Karnataka & Telangana.', ogType = 'website' } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const currentPath = Astro.url.pathname;
@@ -18,10 +19,36 @@ const navItems = [
 ];
 
 const isActive = (href: string) => currentPath === href || (href !== '/' && currentPath.startsWith(`${href}/`));
+
+const segmentLabels: Record<string, string> = {
+  'product': 'Product Features',
+  'calculator': 'ToD Calculator',
+  'blog': 'Resources',
+  'about': 'About',
+  'contact': 'Contact',
+  'privacy': 'Privacy Policy',
+  'terms': 'Terms of Service',
+};
+
+const pathSegments = Astro.url.pathname.split('/').filter(Boolean);
+const isHomePage = pathSegments.length === 0;
+
+const breadcrumbs = [
+  { name: 'Home', url: new URL('/', Astro.site).toString() },
+  ...pathSegments.map((segment, index) => {
+    const isLast = index === pathSegments.length - 1;
+    return {
+      name: isLast && pathSegments.length > 1
+        ? title
+        : (segmentLabels[segment] || segment.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')),
+      url: new URL('/' + pathSegments.slice(0, index + 1).join('/') + '/', Astro.site).toString()
+    };
+  })
+];
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en-IN">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -36,7 +63,7 @@ const isActive = (href: string) => currentPath === href || (href !== '/' && curr
     <!-- Open Graph -->
     <meta property="og:title" content={`${title} | BharatDCIM`} />
     <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content="BharatDCIM" />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:image" content={new URL('/og-image.svg', Astro.site)} />
@@ -47,6 +74,10 @@ const isActive = (href: string) => currentPath === href || (href !== '/' && curr
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={new URL('/og-image.svg', Astro.site)} />
 
+    <!-- Locale & Theme -->
+    <meta property="og:locale" content="en_IN" />
+    <meta name="theme-color" content="#1e3a5f" />
+
     <!-- Structured Data -->
     <script type="application/ld+json" set:html={JSON.stringify({
       "@context": "https://schema.org",
@@ -55,12 +86,30 @@ const isActive = (href: string) => currentPath === href || (href !== '/' && curr
       "url": "https://bharatdcim.com",
       "logo": "https://bharatdcim.com/favicon.svg",
       "description": "India's first DCIM with native Time-of-Day tariff billing for data centers.",
+      "sameAs": [
+        "https://www.linkedin.com/company/bharatdcim"
+      ],
       "contactPoint": {
         "@type": "ContactPoint",
         "email": "hello@bharatdcim.com",
         "contactType": "sales"
       }
     })} />
+
+    {!isHomePage && (
+      <script type="application/ld+json" set:html={JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": breadcrumbs.map((crumb, i) => ({
+          "@type": "ListItem",
+          "position": i + 1,
+          "name": crumb.name,
+          "item": crumb.url
+        }))
+      })} />
+    )}
+
+    <slot name="head" />
   </head>
   <body class="antialiased">
     <!-- Navigation -->
