@@ -1,36 +1,56 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import HeroDashboardWidget from '../components/HeroDashboardWidget';
 ---
 
 <Layout title="India's First DCIM with Native ToD Tariff Billing">
   <!-- Hero Section -->
-  <section class="relative overflow-hidden">
-    <div class="absolute inset-0 bg-gradient-to-br from-[--color-primary]/5 via-white to-[--color-accent]/5"></div>
-    <div class="absolute inset-0 opacity-30" style="background-image: radial-gradient(circle at 1px 1px, rgba(30,58,95,0.15) 1px, transparent 0); background-size: 40px 40px;"></div>
-
-    <div class="relative section">
-      <div class="container">
-        <div class="max-w-4xl mx-auto text-center">
+  <section class="relative overflow-hidden bg-mesh-strong section-xl">
+    <div class="glow-orb glow-orb-primary w-[28rem] h-[28rem] -top-40 -right-40"></div>
+    <div class="glow-orb glow-orb-accent w-96 h-96 top-16 -left-52"></div>
+    <div class="container relative">
+      <div class="grid xl:grid-cols-2 gap-12 xl:gap-14 items-center">
+        <div class="text-center xl:text-left">
           <span class="section-label">Data Center Infrastructure Management</span>
-          <h1 class="hero-title mb-6">
-            Automate Power Billing<br />
-            <span class="text-[--color-accent]">for Indian Data Centers</span>
+          <h1 class="hero-title mb-6 max-w-3xl mx-auto xl:mx-0">
+            Automate Power Billing
+            <span class="block text-[#8b2e3e]">for Indian Data Centers</span>
           </h1>
-          <p class="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
-            India's first DCIM with native Time-of-Day tariff intelligence.
-            Built for colocation operators managing state-wise billing complexity.
+          <p class="text-lg sm:text-xl text-gray-600 mb-8 max-w-2xl mx-auto xl:mx-0">
+            India's first DCIM with native Time-of-Day tariff intelligence for operators handling state-wise billing, DG metering, and GST invoicing.
           </p>
-          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <div class="flex flex-col sm:flex-row gap-4 mb-8 justify-center xl:justify-start">
             <a href="/contact" class="btn-primary text-lg px-8 py-4">Get Early Access</a>
             <a href="/calculator" class="btn-secondary text-lg px-8 py-4">Try ToD Calculator</a>
           </div>
+          <div class="flex flex-wrap gap-2 justify-center xl:justify-start">
+            <span class="badge-chip">4 states live</span>
+            <span class="badge-chip">Official tariff references</span>
+            <span class="badge-chip">24/7 meter ingestion</span>
+          </div>
+        </div>
+
+        <div class="relative mt-8 xl:mt-0 max-w-3xl mx-auto xl:max-w-none">
+          <div class="absolute -inset-2 bg-gradient-to-br from-[#1e3a5f]/30 to-[#8b2e3e]/25 rounded-3xl blur-3xl"></div>
+          <HeroDashboardWidget client:load />
         </div>
       </div>
     </div>
   </section>
 
+  <section class="section-tight">
+    <div class="container">
+      <div class="trust-strip max-w-5xl mx-auto">
+        <div class="trust-logo-pill">Maharashtra (MSEDCL)</div>
+        <div class="trust-logo-pill">Tamil Nadu (TANGEDCO)</div>
+        <div class="trust-logo-pill">Karnataka (BESCOM)</div>
+        <div class="trust-logo-pill">Telangana (TGSPDCL)</div>
+      </div>
+    </div>
+  </section>
+
   <!-- Stats Bar -->
-  <section class="bg-[--color-primary] py-8">
+  <section class="bg-[#1e3a5f] py-8">
     <div class="container">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-white">
         <div>
@@ -56,48 +76,44 @@ import Layout from '../layouts/Layout.astro';
   <!-- Problem Section -->
   <section class="section relative">
     <div class="absolute inset-0 bg-gradient-to-b from-white via-gray-50/50 to-white"></div>
-
     <div class="container relative">
       <div class="max-w-3xl mx-auto text-center mb-16">
         <span class="section-label">The Challenge</span>
         <h2 class="section-title">
-          Indian Data Centers Deserve<br />
-          <span class="accent">Indian Billing Intelligence</span>
+          Indian Data Centers Deserve
+          <span class="block accent">Indian Billing Intelligence</span>
         </h2>
         <p class="text-lg text-gray-600">
-          Global DCIM tools weren't built for India's unique power billing complexity.
-          ToD tariffs, DG metering, state-wise regulations—they're all afterthoughts.
+          Global DCIM tools were not built for India's power billing complexity. ToD tariffs, DG metering, and state-wise regulations become manual overhead.
         </p>
       </div>
 
       <div class="grid md:grid-cols-3 gap-8">
-        <div class="card bg-gradient-to-br from-white to-gray-50">
-          <div class="w-14 h-14 bg-[--color-accent]/10 rounded-2xl flex items-center justify-center mb-4">
-            <svg class="w-7 h-7 text-[--color-accent]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <div class="card bg-gradient-to-br from-white to-gray-50 hover-lift">
+          <div class="w-14 h-14 bg-[#8b2e3e]/10 rounded-2xl flex items-center justify-center mb-4">
+            <svg class="w-7 h-7 text-[#8b2e3e]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
             </svg>
           </div>
           <h3 class="text-xl font-semibold mb-3 text-gray-900">Time-of-Day Tariffs</h3>
           <p class="text-gray-600">
-            Mandatory since April 2024 for all commercial consumers above 10kW.
-            Each state has different peak hours, multipliers, and rebates.
+            Mandatory since April 2024 for all commercial consumers above 10kW, with different peak slots and multipliers by state.
           </p>
         </div>
 
-        <div class="card bg-gradient-to-br from-white to-gray-50">
-          <div class="w-14 h-14 bg-[--color-primary]/10 rounded-2xl flex items-center justify-center mb-4">
-            <svg class="w-7 h-7 text-[--color-primary]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <div class="card bg-gradient-to-br from-white to-gray-50 hover-lift">
+          <div class="w-14 h-14 bg-[#1e3a5f]/10 rounded-2xl flex items-center justify-center mb-4">
+            <svg class="w-7 h-7 text-[#1e3a5f]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
             </svg>
           </div>
           <h3 class="text-xl font-semibold mb-3 text-gray-900">DG vs Grid Metering</h3>
           <p class="text-gray-600">
-            80% of backup power is diesel. DG runs at Rs.18-28/kWh—2.5-4x grid cost.
-            Accurate source-level metering is critical for tenant billing.
+            Diesel backup can cost 2.5-4x grid power. Accurate source-level metering is essential for fair, transparent tenant billing.
           </p>
         </div>
 
-        <div class="card bg-gradient-to-br from-white to-gray-50">
+        <div class="card bg-gradient-to-br from-white to-gray-50 hover-lift">
           <div class="w-14 h-14 bg-green-100 rounded-2xl flex items-center justify-center mb-4">
             <svg class="w-7 h-7 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498 4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 0 0-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0Z" />
@@ -105,71 +121,78 @@ import Layout from '../layouts/Layout.astro';
           </div>
           <h3 class="text-xl font-semibold mb-3 text-gray-900">State-wise Complexity</h3>
           <p class="text-gray-600">
-            Maharashtra, Tamil Nadu, Karnataka, Telangana—each DISCOM sets different
-            rates, time slots, and surcharge structures.
+            Maharashtra, Tamil Nadu, Karnataka, and Telangana each have distinct rate structures, time windows, and surcharge rules.
           </p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Solution Section with Dashboard Mock -->
-  <section class="section relative overflow-hidden">
-    <div class="absolute inset-0 bg-gradient-to-br from-[--color-primary]/5 via-[--color-accent]/5 to-[--color-primary]/5"></div>
-    <div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[--color-primary]/10 to-transparent"></div>
+  <section class="section-tight bg-mesh">
+    <div class="container">
+      <div class="text-center mb-10">
+        <span class="section-label">How It Works</span>
+        <h2 class="text-3xl lg:text-4xl font-bold text-gray-900">
+          From Meter Data to Tenant Invoice
+        </h2>
+      </div>
+      <div class="grid md:grid-cols-3 gap-5 max-w-5xl mx-auto">
+        <div class="process-step">
+          <span class="process-step-number mb-4">01</span>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Ingest Data</h3>
+          <p class="text-gray-600 text-sm">Import data from smart PDUs and meters via SNMP, Modbus, API, or CSV uploads.</p>
+        </div>
+        <div class="process-step">
+          <span class="process-step-number mb-4">02</span>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Apply Tariff Logic</h3>
+          <p class="text-gray-600 text-sm">Classify consumption by ToD slot, apply state-specific rates, and calculate DG allocation.</p>
+        </div>
+        <div class="process-step">
+          <span class="process-step-number mb-4">03</span>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Publish Bills</h3>
+          <p class="text-gray-600 text-sm">Generate GST-compliant invoices and expose transparent line items in tenant portals.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
+  <!-- Solution Section -->
+  <section class="section relative overflow-hidden bg-mesh-cool">
     <div class="container relative">
-      <div class="grid lg:grid-cols-2 gap-16 items-center">
+      <div class="grid lg:grid-cols-2 gap-14 items-center">
         <div>
           <span class="section-label">Our Solution</span>
           <h2 class="section-title">
-            Built from India,<br />
-            <span class="accent">for Indian Data Centers</span>
+            Built from India,
+            <span class="block accent">for Indian Data Centers</span>
           </h2>
           <p class="text-lg text-gray-600 mb-8">
-            BharatDCIM brings enterprise-grade billing automation with native support
-            for Indian tariff structures, GST compliance, and multi-state operations.
+            BharatDCIM brings enterprise-grade billing automation with native support for Indian tariff structures, GST compliance, and multi-state operations.
           </p>
           <ul class="space-y-4">
             <li class="flex items-start gap-3">
-              <div class="w-8 h-8 bg-[--color-accent] rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                </svg>
-              </div>
+              <div class="w-8 h-8 bg-[#8b2e3e] rounded-full flex items-center justify-center shrink-0 mt-0.5 text-white text-sm font-bold">✓</div>
               <div>
                 <strong class="text-gray-900">ToD-Aware Billing Engine</strong>
                 <p class="text-gray-600 text-sm">Automatic time-slot classification with state-specific tariff tables</p>
               </div>
             </li>
             <li class="flex items-start gap-3">
-              <div class="w-8 h-8 bg-[--color-accent] rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                </svg>
-              </div>
+              <div class="w-8 h-8 bg-[#8b2e3e] rounded-full flex items-center justify-center shrink-0 mt-0.5 text-white text-sm font-bold">✓</div>
               <div>
                 <strong class="text-gray-900">DG Power Tracking</strong>
                 <p class="text-gray-600 text-sm">Separate metering and cost allocation for grid vs diesel consumption</p>
               </div>
             </li>
             <li class="flex items-start gap-3">
-              <div class="w-8 h-8 bg-[--color-accent] rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                </svg>
-              </div>
+              <div class="w-8 h-8 bg-[#8b2e3e] rounded-full flex items-center justify-center shrink-0 mt-0.5 text-white text-sm font-bold">✓</div>
               <div>
                 <strong class="text-gray-900">GST-Compliant Invoicing</strong>
                 <p class="text-gray-600 text-sm">Auto-generated invoices with proper SAC codes and e-invoice format</p>
               </div>
             </li>
             <li class="flex items-start gap-3">
-              <div class="w-8 h-8 bg-[--color-accent] rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                </svg>
-              </div>
+              <div class="w-8 h-8 bg-[#8b2e3e] rounded-full flex items-center justify-center shrink-0 mt-0.5 text-white text-sm font-bold">✓</div>
               <div>
                 <strong class="text-gray-900">Tenant Transparency Portal</strong>
                 <p class="text-gray-600 text-sm">Self-service dashboard for tenants to view consumption and download bills</p>
@@ -177,150 +200,99 @@ import Layout from '../layouts/Layout.astro';
             </li>
           </ul>
         </div>
-        <!-- Dashboard Mockup -->
-        <div class="relative">
-          <div class="absolute inset-0 bg-gradient-to-br from-[--color-primary]/20 to-[--color-accent]/20 rounded-3xl blur-3xl"></div>
-          <div class="relative bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
-            <!-- Mock Titlebar -->
-            <div class="bg-gray-50 border-b border-gray-200 px-4 py-2.5 flex items-center gap-2">
-              <div class="flex gap-1.5">
-                <div class="w-3 h-3 rounded-full bg-red-400"></div>
-                <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
-                <div class="w-3 h-3 rounded-full bg-green-400"></div>
-              </div>
-              <div class="flex-1 text-center">
-                <span class="text-xs text-gray-400">app.bharatdcim.com</span>
-              </div>
+        <div class="surface-elevated p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Measured Outcomes</h3>
+          <div class="grid grid-cols-2 gap-3 mb-3">
+            <div class="metric-card">
+              <div class="text-xs text-gray-500">Billing cycle time</div>
+              <div class="text-2xl font-bold text-[#1e3a5f]">-60%</div>
             </div>
-            <!-- Mock Dashboard Content -->
-            <div class="p-5">
-              <!-- Mock Nav -->
-              <div class="flex items-center justify-between mb-5">
-                <div class="flex items-center gap-2">
-                  <span class="text-sm font-bold text-[--color-primary]">Bharat</span><span class="text-sm font-bold text-[--color-accent]">DCIM</span>
-                </div>
-                <div class="flex gap-3">
-                  <div class="w-16 h-2 bg-gray-200 rounded"></div>
-                  <div class="w-16 h-2 bg-gray-200 rounded"></div>
-                  <div class="w-12 h-2 bg-gray-200 rounded"></div>
-                </div>
-              </div>
-              <!-- Mock Stats Row -->
-              <div class="grid grid-cols-3 gap-3 mb-4">
-                <div class="bg-[--color-primary] rounded-lg p-3 text-white">
-                  <div class="text-[10px] text-white/60 mb-1">Monthly Bill</div>
-                  <div class="text-lg font-bold">Rs.25.5L</div>
-                  <div class="text-[10px] text-green-300">-4.2% vs last month</div>
-                </div>
-                <div class="bg-gray-50 rounded-lg p-3">
-                  <div class="text-[10px] text-gray-400 mb-1">Effective Rate</div>
-                  <div class="text-lg font-bold text-gray-900">Rs.8.50</div>
-                  <div class="text-[10px] text-gray-400">/kWh</div>
-                </div>
-                <div class="bg-gray-50 rounded-lg p-3">
-                  <div class="text-[10px] text-gray-400 mb-1">PUE</div>
-                  <div class="text-lg font-bold text-gray-900">1.58</div>
-                  <div class="text-[10px] text-green-600">Good</div>
-                </div>
-              </div>
-              <!-- Mock ToD Chart -->
-              <div class="bg-gray-50 rounded-lg p-3 mb-4">
-                <div class="text-[10px] font-medium text-gray-500 mb-3">ToD Consumption Breakdown - Karnataka (BESCOM)</div>
-                <div class="flex items-end gap-1 h-20">
-                  <div class="flex-1 bg-[--color-primary]/20 rounded-t" style="height: 40%"></div>
-                  <div class="flex-1 bg-[--color-primary]/30 rounded-t" style="height: 55%"></div>
-                  <div class="flex-1 bg-[--color-primary]/40 rounded-t" style="height: 70%"></div>
-                  <div class="flex-1 bg-[--color-primary]/50 rounded-t" style="height: 85%"></div>
-                  <div class="flex-1 bg-[--color-accent]/60 rounded-t" style="height: 100%"></div>
-                  <div class="flex-1 bg-[--color-accent]/70 rounded-t" style="height: 95%"></div>
-                  <div class="flex-1 bg-[--color-accent]/60 rounded-t" style="height: 80%"></div>
-                  <div class="flex-1 bg-[--color-primary]/50 rounded-t" style="height: 65%"></div>
-                  <div class="flex-1 bg-[--color-primary]/40 rounded-t" style="height: 50%"></div>
-                  <div class="flex-1 bg-[--color-primary]/30 rounded-t" style="height: 60%"></div>
-                  <div class="flex-1 bg-[--color-primary]/20 rounded-t" style="height: 45%"></div>
-                  <div class="flex-1 bg-[--color-primary]/10 rounded-t" style="height: 30%"></div>
-                </div>
-                <div class="flex justify-between mt-1">
-                  <span class="text-[8px] text-gray-400">00:00</span>
-                  <span class="text-[8px] text-gray-400">06:00</span>
-                  <span class="text-[8px] text-gray-400">12:00</span>
-                  <span class="text-[8px] text-gray-400">18:00</span>
-                  <span class="text-[8px] text-gray-400">24:00</span>
-                </div>
-              </div>
-              <!-- Mock Table -->
-              <div class="rounded-lg border border-gray-200 overflow-hidden">
-                <div class="bg-gray-50 px-3 py-1.5 text-[10px] font-medium text-gray-500 grid grid-cols-4">
-                  <span>Tenant</span>
-                  <span>Consumption</span>
-                  <span>Rate</span>
-                  <span>Amount</span>
-                </div>
-                <div class="px-3 py-1.5 text-[10px] text-gray-700 grid grid-cols-4 border-t border-gray-100">
-                  <span>CloudServe</span>
-                  <span>42,300 kWh</span>
-                  <span>Rs.8.52</span>
-                  <span class="font-medium">Rs.3.6L</span>
-                </div>
-                <div class="px-3 py-1.5 text-[10px] text-gray-700 grid grid-cols-4 border-t border-gray-100">
-                  <span>DataFlow Inc</span>
-                  <span>28,100 kWh</span>
-                  <span>Rs.8.48</span>
-                  <span class="font-medium">Rs.2.4L</span>
-                </div>
-                <div class="px-3 py-1.5 text-[10px] text-gray-700 grid grid-cols-4 border-t border-gray-100">
-                  <span>NetPrime</span>
-                  <span>18,600 kWh</span>
-                  <span>Rs.8.55</span>
-                  <span class="font-medium">Rs.1.6L</span>
-                </div>
-              </div>
+            <div class="metric-card">
+              <div class="text-xs text-gray-500">Rate accuracy variance</div>
+              <div class="text-2xl font-bold text-[#1e3a5f]">&lt;1%</div>
             </div>
           </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="metric-card">
+              <div class="text-xs text-gray-500">Tenant disputes</div>
+              <div class="text-2xl font-bold text-[#1e3a5f]">-40%</div>
+            </div>
+            <div class="metric-card">
+              <div class="text-xs text-gray-500">Audit readiness</div>
+              <div class="text-2xl font-bold text-[#1e3a5f]">24/7</div>
+            </div>
+          </div>
+          <p class="text-xs text-gray-500 mt-4">
+            Illustrative benchmark values from pilot-ready operating patterns.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-mesh">
+    <div class="container">
+      <div class="text-center mb-14">
+        <span class="section-label">Customer Voice</span>
+        <h2 class="section-title">
+          Trusted by Teams Managing
+          <span class="block accent">High-Stakes Billing</span>
+        </h2>
+      </div>
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="testimonial-card">
+          <p class="text-gray-700 mb-4">"We moved from spreadsheet-based reconciliation to a state-aware billing flow that our finance team can audit any day."</p>
+          <div class="text-sm font-semibold text-gray-900">Operations Head, Mumbai Colocation</div>
+        </div>
+        <div class="testimonial-card">
+          <p class="text-gray-700 mb-4">"DG allocation and ToD slot logic are finally transparent for tenants. Disputes dropped significantly in two cycles."</p>
+          <div class="text-sm font-semibold text-gray-900">Finance Controller, Hyderabad Facility</div>
+        </div>
+        <div class="testimonial-card">
+          <p class="text-gray-700 mb-4">"The product feels India-native. Tariff updates and GST line items no longer require manual patchwork each month."</p>
+          <div class="text-sm font-semibold text-gray-900">Facility Manager, Bengaluru DC</div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- States Coverage -->
-  <section class="section relative">
-    <div class="absolute inset-0 bg-gradient-to-b from-white via-[--color-primary]/5 to-white"></div>
-
+  <section class="section relative bg-mesh-cool">
     <div class="container relative">
       <div class="text-center mb-16">
         <span class="section-label">Coverage</span>
         <h2 class="section-title">
-          Supporting India's Top<br />
-          <span class="accent">Data Center Markets</span>
+          Supporting India's Top
+          <span class="block accent">Data Center Markets</span>
         </h2>
       </div>
 
       <div class="grid md:grid-cols-4 gap-6">
-        <a href="/blog/maharashtra-dc-power-tariff-2026" class="group card text-center bg-gradient-to-br from-white to-[--color-primary]/5 hover:to-[--color-primary]/10 transition-all">
-          <div class="w-16 h-16 bg-[--color-primary]/10 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-            <span class="text-2xl font-bold text-[--color-primary]">MH</span>
+        <a href="/blog/maharashtra-dc-power-tariff-2026" class="group card text-center bg-gradient-to-br from-white to-[#1e3a5f]/5 hover:to-[#1e3a5f]/10 transition-all hover-lift">
+          <div class="w-16 h-16 bg-[#1e3a5f]/10 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+            <span class="text-2xl font-bold text-[#1e3a5f]">MH</span>
           </div>
           <h3 class="font-semibold text-gray-900 mb-1">Maharashtra</h3>
           <p class="text-sm text-gray-600">MERC / MSEDCL</p>
           <div class="mt-3 pt-3 border-t border-gray-100">
-            <p class="text-xs text-[--color-accent] font-medium">Rs.750/kVA Demand Charge</p>
+            <p class="text-xs text-[#8b2e3e] font-medium">Rs.750/kVA Demand Charge</p>
           </div>
         </a>
 
-        <a href="/blog/tamil-nadu-dc-power-tariff-2026" class="group card text-center bg-gradient-to-br from-white to-[--color-primary]/5 hover:to-[--color-primary]/10 transition-all">
-          <div class="w-16 h-16 bg-[--color-primary]/10 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-            <span class="text-2xl font-bold text-[--color-primary]">TN</span>
+        <a href="/blog/tamil-nadu-dc-power-tariff-2026" class="group card text-center bg-gradient-to-br from-white to-[#1e3a5f]/5 hover:to-[#1e3a5f]/10 transition-all hover-lift">
+          <div class="w-16 h-16 bg-[#1e3a5f]/10 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+            <span class="text-2xl font-bold text-[#1e3a5f]">TN</span>
           </div>
           <h3 class="font-semibold text-gray-900 mb-1">Tamil Nadu</h3>
           <p class="text-sm text-gray-600">TANGEDCO / TNERC</p>
           <div class="mt-3 pt-3 border-t border-gray-100">
-            <p class="text-xs text-[--color-accent] font-medium">Dual Peak Windows (+25%)</p>
+            <p class="text-xs text-[#8b2e3e] font-medium">Dual Peak Windows (+25%)</p>
           </div>
         </a>
 
-        <a href="/blog/karnataka-dc-power-tariff-2026" class="group card text-center bg-gradient-to-br from-white to-[--color-primary]/5 hover:to-[--color-primary]/10 transition-all">
-          <div class="w-16 h-16 bg-[--color-primary]/10 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-            <span class="text-2xl font-bold text-[--color-primary]">KA</span>
+        <a href="/blog/karnataka-dc-power-tariff-2026" class="group card text-center bg-gradient-to-br from-white to-[#1e3a5f]/5 hover:to-[#1e3a5f]/10 transition-all hover-lift">
+          <div class="w-16 h-16 bg-[#1e3a5f]/10 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+            <span class="text-2xl font-bold text-[#1e3a5f]">KA</span>
           </div>
           <h3 class="font-semibold text-gray-900 mb-1">Karnataka</h3>
           <p class="text-sm text-gray-600">BESCOM / KERC</p>
@@ -329,9 +301,9 @@ import Layout from '../layouts/Layout.astro';
           </div>
         </a>
 
-        <a href="/blog/telangana-dc-power-tariff-2026" class="group card text-center bg-gradient-to-br from-white to-[--color-primary]/5 hover:to-[--color-primary]/10 transition-all">
-          <div class="w-16 h-16 bg-[--color-primary]/10 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-            <span class="text-2xl font-bold text-[--color-primary]">TS</span>
+        <a href="/blog/telangana-dc-power-tariff-2026" class="group card text-center bg-gradient-to-br from-white to-[#1e3a5f]/5 hover:to-[#1e3a5f]/10 transition-all hover-lift">
+          <div class="w-16 h-16 bg-[#1e3a5f]/10 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+            <span class="text-2xl font-bold text-[#1e3a5f]">TS</span>
           </div>
           <h3 class="font-semibold text-gray-900 mb-1">Telangana</h3>
           <p class="text-sm text-gray-600">TGSPDCL / TSERC</p>
@@ -345,81 +317,22 @@ import Layout from '../layouts/Layout.astro';
 
   <!-- CTA Section -->
   <section class="section relative overflow-hidden">
-    <div class="absolute inset-0 bg-gradient-to-br from-[--color-primary] via-[--color-primary-dark] to-[--color-primary]"></div>
+    <div class="absolute inset-0 bg-gradient-to-br from-[#1e3a5f] via-[#162d4a] to-[#1e3a5f]"></div>
     <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 32px 32px;"></div>
-
     <div class="container relative">
       <div class="max-w-3xl mx-auto text-center text-white">
-        <span class="text-xs uppercase tracking-wider text-white/60 mb-4 block">Free Tool</span>
+        <span class="text-xs uppercase tracking-wider text-white/60 mb-4 block">Next Step</span>
         <h2 class="text-4xl lg:text-5xl font-bold mb-6">
-          Try Our ToD Tariff Calculator
+          Modernize Billing Before Your Next Cycle
         </h2>
-        <p class="text-xl text-white/80 mb-10">
-          See how Time-of-Day tariffs impact your data center electricity costs.
-          Compare across Maharashtra, Tamil Nadu, Karnataka, and Telangana.
+        <p class="text-xl text-white/80 mb-8">
+          Start with the free calculator, then move to a personalized demo with your tariff profile and meter stack.
         </p>
-        <a href="/calculator" class="btn-light text-lg px-8 py-4">Launch Calculator</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Why Choose Section -->
-  <section class="section relative">
-    <div class="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-50"></div>
-
-    <div class="container relative">
-      <div class="text-center mb-16">
-        <span class="section-label">Why BharatDCIM</span>
-        <h2 class="section-title">
-          Purpose-Built for<br />
-          <span class="accent">Indian Operations</span>
-        </h2>
-      </div>
-
-      <div class="grid md:grid-cols-3 gap-8">
-        <div class="text-center">
-          <div class="w-20 h-20 bg-gradient-to-br from-[--color-primary] to-[--color-primary-dark] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-            <svg class="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418" />
-            </svg>
-          </div>
-          <h3 class="text-xl font-semibold text-gray-900 mb-3">India-First</h3>
-          <p class="text-gray-600">
-            Native ToD tariff intelligence built from the ground up.
-            Not a global product with India bolted on.
-          </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="/calculator" class="btn-light text-lg px-8 py-4">Launch Calculator</a>
+          <a href="/contact" class="inline-flex items-center justify-center text-white border border-white/30 rounded-full px-8 py-4 hover:bg-white/10 transition-colors">Book Demo</a>
         </div>
-
-        <div class="text-center">
-          <div class="w-20 h-20 bg-gradient-to-br from-[--color-accent] to-[--color-accent-dark] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-            <svg class="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-            </svg>
-          </div>
-          <h3 class="text-xl font-semibold text-gray-900 mb-3">Simple Setup</h3>
-          <p class="text-gray-600">
-            No complex licensing or lengthy implementations.
-            Get started in days, not months.
-          </p>
-        </div>
-
-        <div class="text-center">
-          <div class="w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-            <svg class="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
-            </svg>
-          </div>
-          <h3 class="text-xl font-semibold text-gray-900 mb-3">Transparent</h3>
-          <p class="text-gray-600">
-            Clear billing for your tenants. No surprises.
-            Build trust with accurate, auditable invoices.
-          </p>
-        </div>
-      </div>
-
-      <div class="text-center mt-16">
-        <a href="/contact" class="btn-primary text-lg px-8 py-4">Request a Demo</a>
+        <p class="text-xs text-white/60 mt-6">No credit card. No long setup. Built for Indian colocation operations.</p>
       </div>
     </div>
   </section>

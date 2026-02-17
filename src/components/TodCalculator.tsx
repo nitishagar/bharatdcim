@@ -124,7 +124,7 @@ export default function TodCalculator() {
         <h3 className="text-lg font-semibold text-gray-900">Configure Your Facility</h3>
         <button
           onClick={() => setShowExamples(!showExamples)}
-          className="text-sm text-[--color-accent] hover:text-[--color-accent-dark] font-medium"
+          className="text-sm text-[#8b2e3e] hover:text-[#6d2331] font-medium"
         >
           {showExamples ? 'Hide Examples' : 'Load Example Scenario'}
         </button>
@@ -137,7 +137,7 @@ export default function TodCalculator() {
             <button
               key={index}
               onClick={() => loadExample(scenario)}
-              className="text-left p-4 rounded-lg border border-gray-200 hover:border-[--color-primary] hover:bg-gray-50 transition-all"
+              className="text-left p-4 rounded-lg border border-gray-200 hover:border-[#1e3a5f] hover:bg-gray-50 transition-all"
             >
               <h4 className="font-semibold text-gray-900 mb-1">{scenario.name}</h4>
               <p className="text-sm text-gray-600 mb-2">{scenario.description}</p>
@@ -265,7 +265,7 @@ export default function TodCalculator() {
               step="0.01"
             />
             {inputs.powerFactor < selectedTariff.powerFactorPenaltyThreshold && (
-              <p className="text-xs text-[--color-accent] mt-1">
+              <p className="text-xs text-[#8b2e3e] mt-1">
                 Below {selectedTariff.powerFactorPenaltyThreshold} threshold - penalty applies
               </p>
             )}
@@ -301,14 +301,14 @@ export default function TodCalculator() {
             <div className="space-y-3">
               <div>
                 <div className="flex justify-between text-sm mb-1">
-                  <span className="text-[--color-accent]">Peak Hours</span>
+                  <span className="text-[#8b2e3e]">Peak Hours</span>
                   <span>{inputs.peakPercent}%</span>
                 </div>
                 <input
                   type="range"
                   value={inputs.peakPercent}
                   onChange={(e) => handlePatternChange('peakPercent', parseInt(e.target.value))}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[--color-accent]"
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#8b2e3e]"
                   min="0"
                   max="100"
                 />
@@ -329,14 +329,14 @@ export default function TodCalculator() {
               </div>
               <div>
                 <div className="flex justify-between text-sm mb-1">
-                  <span className="text-[--color-primary]">Off-Peak Hours</span>
+                  <span className="text-[#1e3a5f]">Off-Peak Hours</span>
                   <span>{inputs.offPeakPercent}%</span>
                 </div>
                 <input
                   type="range"
                   value={inputs.offPeakPercent}
                   onChange={(e) => handlePatternChange('offPeakPercent', parseInt(e.target.value))}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[--color-primary]"
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#1e3a5f]"
                   min="0"
                   max="100"
                 />
@@ -372,7 +372,7 @@ export default function TodCalculator() {
                   <span className="font-semibold">{formatINR(billBreakdown.energyCharges.total)}</span>
                 </div>
                 <div className="space-y-1 text-sm">
-                  <div className="flex justify-between text-[--color-accent]">
+                  <div className="flex justify-between text-[#8b2e3e]">
                     <span>Peak ({inputs.peakPercent}%)</span>
                     <span>{formatINR(billBreakdown.energyCharges.peak)}</span>
                   </div>
@@ -380,7 +380,7 @@ export default function TodCalculator() {
                     <span>Normal ({inputs.normalPercent}%)</span>
                     <span>{formatINR(billBreakdown.energyCharges.normal)}</span>
                   </div>
-                  <div className="flex justify-between text-[--color-primary]">
+                  <div className="flex justify-between text-[#1e3a5f]">
                     <span>Off-Peak ({inputs.offPeakPercent}%)</span>
                     <span>{formatINR(billBreakdown.energyCharges.offPeak)}</span>
                   </div>
@@ -422,7 +422,7 @@ export default function TodCalculator() {
 
               {/* PF Penalty */}
               {billBreakdown.powerFactorPenalty > 0 && (
-                <div className="p-4 flex justify-between text-[--color-accent]">
+                <div className="p-4 flex justify-between text-[#8b2e3e]">
                   <span>Power Factor Penalty</span>
                   <span className="font-medium">{formatINR(billBreakdown.powerFactorPenalty)}</span>
                 </div>
@@ -447,7 +447,7 @@ export default function TodCalculator() {
               </div>
 
               {/* Total */}
-              <div className="p-4 flex justify-between bg-[--color-primary] text-white">
+              <div className="p-4 flex justify-between bg-[#1e3a5f] text-white">
                 <span className="font-semibold">Total Bill</span>
                 <span className="font-bold text-lg">{formatINR(billBreakdown.totalBill)}</span>
               </div>
@@ -504,12 +504,12 @@ export default function TodCalculator() {
                   </div>
                   <div className="text-right">
                     {slot.multiplier !== 1 && (
-                      <span className={slot.multiplier > 1 ? 'text-[--color-accent]' : 'text-[--color-primary]'}>
+                      <span className={slot.multiplier > 1 ? 'text-[#8b2e3e]' : 'text-[#1e3a5f]'}>
                         {slot.multiplier > 1 ? '+' : ''}{((slot.multiplier - 1) * 100).toFixed(0)}%
                       </span>
                     )}
                     {slot.adder !== 0 && (
-                      <span className={slot.adder > 0 ? 'text-[--color-accent]' : 'text-[--color-primary]'}>
+                      <span className={slot.adder > 0 ? 'text-[#8b2e3e]' : 'text-[#1e3a5f]'}>
                         {slot.adder > 0 ? '+' : ''}₹{slot.adder.toFixed(2)}/unit
                       </span>
                     )}

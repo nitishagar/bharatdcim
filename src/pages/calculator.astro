@@ -14,7 +14,7 @@ import TodCalculator from '../components/TodCalculator';
         <span class="section-label">Free Tool</span>
         <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
           Indian ToD Power<br />
-          <span class="text-[--color-accent]">Tariff Calculator</span>
+          <span class="text-[#8b2e3e]">Tariff Calculator</span>
         </h1>
         <p class="text-xl text-gray-600">
           Estimate your data center electricity costs with Time-of-Day tariff intelligence.
@@ -24,11 +24,46 @@ import TodCalculator from '../components/TodCalculator';
     </div>
   </section>
 
+  <section class="section-tight">
+    <div class="container">
+      <div class="trust-strip max-w-5xl mx-auto">
+        <div class="trust-logo-pill">State tariff references included</div>
+        <div class="trust-logo-pill">Peak, normal, off-peak modelling</div>
+        <div class="trust-logo-pill">DG and grid scenario planning</div>
+        <div class="trust-logo-pill">Built for Indian data centers</div>
+      </div>
+    </div>
+  </section>
+
   <!-- Calculator -->
   <section class="section pt-0">
     <div class="container">
-      <div class="calculator-container">
-        <TodCalculator client:load />
+      <div class="grid lg:grid-cols-[1.6fr_1fr] gap-6 items-start">
+        <div class="calculator-container surface-elevated">
+          <TodCalculator client:load />
+        </div>
+        <div class="space-y-4">
+          <div class="surface-elevated p-5">
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">How to use this model</h3>
+            <p class="text-sm text-gray-600 mb-3">
+              Start with your monthly kWh or kVAh estimate, then adjust load split between peak, normal, and off-peak windows.
+            </p>
+            <ul class="text-sm text-gray-600 space-y-2">
+              <li>- Compare at least two states to evaluate expansion locations</li>
+              <li>- Simulate DG-heavy periods for outage season planning</li>
+              <li>- Share outputs with finance before tariff change cycles</li>
+            </ul>
+          </div>
+          <div class="surface-elevated p-5">
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Assumptions</h3>
+            <p class="text-sm text-gray-600 mb-3">
+              Values are based on FY 2025-26 tariff schedules and representative commercial data center categories.
+            </p>
+            <p class="text-xs text-gray-500">
+              Final invoices can vary due to FAC/FPPCA updates, taxes, contract demand slabs, and local regulatory circulars.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -46,8 +81,8 @@ import TodCalculator from '../components/TodCalculator';
 
       <div class="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
         <div class="card text-center">
-          <div class="w-12 h-12 bg-[--color-accent]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg class="w-6 h-6 text-[--color-accent]" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <div class="w-12 h-12 bg-[#8b2e3e]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-6 h-6 text-[#8b2e3e]" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
             </svg>
           </div>
@@ -72,8 +107,8 @@ import TodCalculator from '../components/TodCalculator';
         </div>
 
         <div class="card text-center">
-          <div class="w-12 h-12 bg-[--color-primary]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg class="w-6 h-6 text-[--color-primary]" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <div class="w-12 h-12 bg-[#1e3a5f]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-6 h-6 text-[#1e3a5f]" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
             </svg>
           </div>
@@ -82,6 +117,35 @@ import TodCalculator from '../components/TodCalculator';
             Reduced rates during low-demand periods (night hours).
             Rebates range from 5% to ₹1.50/unit depending on state.
           </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-mesh-cool">
+    <div class="container">
+      <div class="text-center mb-12">
+        <span class="section-label">Planning Use Cases</span>
+        <h2 class="section-title">
+          Turn Calculator Outputs Into
+          <span class="block accent">Operational Decisions</span>
+        </h2>
+      </div>
+      <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+        <div class="process-step">
+          <span class="process-step-number mb-4">A</span>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Budgeting</h3>
+          <p class="text-sm text-gray-600">Estimate quarterly electricity spend under different load and tariff scenarios.</p>
+        </div>
+        <div class="process-step">
+          <span class="process-step-number mb-4">B</span>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Tenant Pricing</h3>
+          <p class="text-sm text-gray-600">Model pass-through rates before contract renewals to reduce future disputes.</p>
+        </div>
+        <div class="process-step">
+          <span class="process-step-number mb-4">C</span>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Expansion Planning</h3>
+          <p class="text-sm text-gray-600">Compare state-level effective rates when evaluating new city or facility launches.</p>
         </div>
       </div>
     </div>
@@ -100,7 +164,7 @@ import TodCalculator from '../components/TodCalculator';
 
       <div class="overflow-x-auto">
         <table class="w-full max-w-4xl mx-auto bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
-          <thead class="bg-[--color-primary] text-white">
+          <thead class="bg-[#1e3a5f] text-white">
             <tr>
               <th class="px-6 py-4 text-left font-semibold">State</th>
               <th class="px-6 py-4 text-left font-semibold">Base Rate</th>
@@ -114,28 +178,28 @@ import TodCalculator from '../components/TodCalculator';
               <td class="px-6 py-4 font-medium">Maharashtra</td>
               <td class="px-6 py-4">₹7.45/kVAh</td>
               <td class="px-6 py-4">₹750/kVA</td>
-              <td class="px-6 py-4 text-[--color-accent]">+₹0.80-1.10</td>
-              <td class="px-6 py-4 text-[--color-primary]">₹1.50/unit</td>
+              <td class="px-6 py-4 text-[#8b2e3e]">+₹0.80-1.10</td>
+              <td class="px-6 py-4 text-[#1e3a5f]">₹1.50/unit</td>
             </tr>
             <tr class="hover:bg-gray-50">
               <td class="px-6 py-4 font-medium">Tamil Nadu</td>
               <td class="px-6 py-4">₹7.50/kWh</td>
               <td class="px-6 py-4">₹608/kVA</td>
-              <td class="px-6 py-4 text-[--color-accent]">+25%</td>
-              <td class="px-6 py-4 text-[--color-primary]">5% (Night)</td>
+              <td class="px-6 py-4 text-[#8b2e3e]">+25%</td>
+              <td class="px-6 py-4 text-[#1e3a5f]">5% (Night)</td>
             </tr>
             <tr class="hover:bg-gray-50">
               <td class="px-6 py-4 font-medium">Karnataka</td>
               <td class="px-6 py-4">₹6.60/kWh</td>
               <td class="px-6 py-4">₹350/kVA</td>
-              <td class="px-6 py-4 text-[--color-accent]">+₹1/unit</td>
-              <td class="px-6 py-4 text-[--color-primary]">₹1/unit</td>
+              <td class="px-6 py-4 text-[#8b2e3e]">+₹1/unit</td>
+              <td class="px-6 py-4 text-[#1e3a5f]">₹1/unit</td>
             </tr>
             <tr class="hover:bg-gray-50">
               <td class="px-6 py-4 font-medium">Telangana</td>
               <td class="px-6 py-4">₹7.65/kVAh</td>
               <td class="px-6 py-4">₹500/kVA</td>
-              <td class="px-6 py-4 text-[--color-accent]">+₹1/unit</td>
+              <td class="px-6 py-4 text-[#8b2e3e]">+₹1/unit</td>
               <td class="px-6 py-4 text-amber-600">Suspended*</td>
             </tr>
           </tbody>
@@ -149,7 +213,7 @@ import TodCalculator from '../components/TodCalculator';
   </section>
 
   <!-- CTA -->
-  <section class="section bg-[--color-primary] text-white">
+  <section class="section bg-[#1e3a5f] text-white">
     <div class="container">
       <div class="max-w-3xl mx-auto text-center">
         <h2 class="text-3xl lg:text-4xl font-bold mb-6">
