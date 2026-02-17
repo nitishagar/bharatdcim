@@ -55,7 +55,8 @@ const breadcrumbs = [
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" />
     <link rel="canonical" href={canonicalURL} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -68,7 +69,7 @@ const breadcrumbs = [
     <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content="BharatDCIM" />
     <meta property="og:url" content={canonicalURL} />
-    <meta property="og:image" content={new URL('/og-image.svg', Astro.site)} />
+    <meta property="og:image" content={new URL('/images/og-image.jpg', Astro.site)} />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
@@ -86,7 +87,7 @@ const breadcrumbs = [
       "@type": "Organization",
       "name": "BharatDCIM",
       "url": "https://bharatdcim.com",
-      "logo": "https://bharatdcim.com/favicon.svg",
+      "logo": "https://bharatdcim.com/images/apple-touch-icon.png",
       "description": "India's first DCIM with native Time-of-Day tariff billing. Integrates with Nlyte, Sunbird, and Schneider EcoStruxure for Indian data center billing automation.",
       "sameAs": [
         "https://www.linkedin.com/company/bharat-dcim"
@@ -119,7 +120,8 @@ const breadcrumbs = [
       <div class="container">
         <div class="flex items-center justify-between h-16 lg:h-20">
           <!-- Logo -->
-          <a href="/" class="flex items-center gap-2">
+          <a href="/" class="flex items-center gap-2.5">
+            <img src="/images/logo-40.png" alt="BharatDCIM" class="w-8 h-8 rounded-full" width="32" height="32" />
             <span class="text-xl font-bold text-white">Bharat</span>
             <span class="text-xl font-bold text-[#e8a0ad]">DCIM</span>
           </a>
@@ -186,7 +188,8 @@ const breadcrumbs = [
         <div class="grid lg:grid-cols-5 gap-10 items-start">
           <!-- Brand -->
           <div class="lg:col-span-2">
-            <a href="/" class="flex items-center gap-1.5 mb-4">
+            <a href="/" class="flex items-center gap-2 mb-4">
+              <img src="/images/logo-40.png" alt="BharatDCIM" class="w-8 h-8 rounded-full" width="32" height="32" />
               <span class="text-lg font-bold text-white">Bharat</span>
               <span class="text-lg font-bold text-[--color-accent]" style="color: #e8a0ad;">DCIM</span>
             </a>
