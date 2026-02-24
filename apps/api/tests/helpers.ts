@@ -167,6 +167,18 @@ export async function createTestDb() {
       created_at TEXT NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS agent_heartbeats (
+      id TEXT PRIMARY KEY,
+      agent_id TEXT NOT NULL,
+      agent_version TEXT,
+      device_count INTEGER NOT NULL,
+      unsynced_count INTEGER,
+      status TEXT NOT NULL DEFAULT 'online',
+      last_heartbeat_at TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
     CREATE TABLE IF NOT EXISTS upload_audit (
       id TEXT PRIMARY KEY,
       tenant_id TEXT NOT NULL REFERENCES tenants(id),

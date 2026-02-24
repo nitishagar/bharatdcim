@@ -16,4 +16,10 @@ export type { CreditNoteValidation } from './invoice/credit-note.js';
 export { parseCSV, detectDCIMFormat, normalizeRows, validateCSVFile, validateCSVRow } from './csv/index.js';
 export type { ParsedCSV, DCIMFormat, NormalizedRow, CSVError, CSVValidationResult } from './csv/index.js';
 
+// Tariff fixtures
+export {
+  maharashtraTariff, tamilNaduTariff, karnatakaTariff, telanganaTariff,
+  tariffFixtures,
+} from './fixtures/tariffs.js';
+
 export type * from './types.js';

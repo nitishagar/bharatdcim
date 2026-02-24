@@ -173,6 +173,20 @@ export const invoiceAuditLog = sqliteTable('invoice_audit_log', {
   createdAt: text('created_at').notNull(),
 });
 
+// ─── Agent Heartbeats ─────────────────────────────────────────
+
+export const agentHeartbeats = sqliteTable('agent_heartbeats', {
+  id: text('id').primaryKey(),
+  agentId: text('agent_id').notNull(),
+  agentVersion: text('agent_version'),
+  deviceCount: integer('device_count').notNull(),
+  unsyncedCount: integer('unsynced_count'),
+  status: text('status').notNull().default('online'), // 'online' | 'offline'
+  lastHeartbeatAt: text('last_heartbeat_at').notNull(),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+});
+
 // ─── Upload Audit ──────────────────────────────────────────────
 
 export const uploadAudit = sqliteTable('upload_audit', {

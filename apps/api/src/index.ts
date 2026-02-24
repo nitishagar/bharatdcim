@@ -8,6 +8,7 @@ import { billsRouter } from './routes/bills.js';
 import { readingsRouter } from './routes/readings.js';
 import { invoicesRouter } from './routes/invoices.js';
 import { uploadsRouter } from './routes/uploads.js';
+import { agentsRouter } from './routes/agents.js';
 
 type Bindings = {
   TURSO_DATABASE_URL: string;
@@ -36,7 +37,7 @@ app.onError((err, c) => {
 app.get('/health', (c) => c.json({ status: 'ok' }));
 
 // Database middleware — injects db into context for API routes only
-const API_PREFIXES = ['/tariffs', '/meters', '/bills', '/readings', '/invoices', '/uploads'];
+const API_PREFIXES = ['/tariffs', '/meters', '/bills', '/readings', '/invoices', '/uploads', '/agents'];
 app.use('*', async (c, next) => {
   if (API_PREFIXES.some((p) => c.req.path === p || c.req.path.startsWith(p + '/'))) {
     const db = createDb(c.env.TURSO_DATABASE_URL, c.env.TURSO_AUTH_TOKEN);
@@ -52,6 +53,7 @@ app.route('/bills', billsRouter);
 app.route('/readings', readingsRouter);
 app.route('/invoices', invoicesRouter);
 app.route('/uploads', uploadsRouter);
+app.route('/agents', agentsRouter);
 
 // 404 handler
 app.notFound((c) => {

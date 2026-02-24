@@ -74,4 +74,37 @@ readingsRouter.post('/', async (c) => {
   return c.json({ inserted: rows.length }, 201);
 });
 
+// POST /readings/batch — SNMP agent batch upload format
+readingsRouter.post('/batch', async (c) => {
+  const db = c.get('db');
+  const body = await c.req.json();
+
+  if (!Array.isArray(body.readings) || body.readings.length === 0) {
+    return c.json(
+      { error: { code: 'VALIDATION_ERROR', message: 'Body must contain a non-empty readings array' } },
+      400,
+    );
+  }
+
+  const now = new Date().toISOString();
+  const rows = (body.readings as Array<Record<string, unknown>>).map((r) => ({
+    id: crypto.randomUUID(),
+    meterId: (r.meter_id || r.meterId) as string,
+    timestamp: r.timestamp as string,
+    kWh: r.kWh != null ? Math.round((r.kWh as number) * 1000) : null, // Convert kWh to paisa-equiv
+    kW: r.kW != null ? Math.round((r.kW as number) * 1000) : null,    // Convert kW to milliwatts
+    powerFactor: r.powerFactor != null ? Math.round((r.powerFactor as number) * 10000) : null, // to BPS
+    source: 'snmp' as const,
+    createdAt: now,
+  }));
+
+  const batchSize = 500;
+  for (let i = 0; i < rows.length; i += batchSize) {
+    const batch = rows.slice(i, i + batchSize);
+    await db.insert(powerReadings).values(batch);
+  }
+
+  return c.json({ accepted: rows.length, agentId: body.agentId || body.agent_id }, 201);
+});
+
 export { readingsRouter };
