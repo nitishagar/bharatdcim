@@ -9,7 +9,8 @@
     "test": "vitest run",
     "lint": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
-    "db:push": "drizzle-kit push"
+    "db:push": "drizzle-kit push",
+    "db:migrate": "tsx src/db/migrate.ts"
   },
   "dependencies": {
     "@bharatdcim/billing-engine": "workspace:*",

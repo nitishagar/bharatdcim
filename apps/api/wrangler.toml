@@ -1,7 +1,4 @@
 name = "bharatdcim-api"
 main = "src/index.ts"
 compatibility_date = "2025-01-01"
-
-[vars]
-TURSO_DATABASE_URL = ""
-TURSO_AUTH_TOKEN = ""
+# TURSO_DATABASE_URL and TURSO_AUTH_TOKEN are set as Worker secrets via wrangler secret put
