@@ -5,4 +5,11 @@ export { calculateBill } from './calculate.js';
 export { classifyReading, classifyReadingWithProRating, calculateSlotRate } from './tod.js';
 export { calculateBilledDemand } from './demand.js';
 
+// Invoice engine
+export { determineTaxType, validateGSTIN, calculateInvoiceTax } from './invoice/gst.js';
+export type { TaxType, GSTINValidation, TaxBreakdown } from './invoice/gst.js';
+export { getFinancialYear, formatInvoiceNumber, formatCreditNoteNumber } from './invoice/numbering.js';
+export { validateCreditNote } from './invoice/credit-note.js';
+export type { CreditNoteValidation } from './invoice/credit-note.js';
+
 export type * from './types.js';
