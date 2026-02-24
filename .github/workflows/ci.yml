@@ -1,0 +1,43 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  typescript:
+    name: TypeScript (build + test + lint)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.30.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm turbo run build test lint
+      - name: Verify marketing site output
+        run: |
+          PAGE_COUNT=$(find apps/web/dist -name "*.html" | wc -l)
+          echo "Built $PAGE_COUNT pages"
+          if [ "$PAGE_COUNT" -lt 15 ]; then
+            echo "ERROR: Expected 15+ pages, got $PAGE_COUNT"
+            exit 1
+          fi
+
+  snmp-agent:
+    name: Go SNMP Agent (build + test)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+          cache-dependency-path: agents/snmp/go.sum
+      - name: Build and test
+        working-directory: agents/snmp
+        run: make all

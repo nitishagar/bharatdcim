@@ -1,0 +1,27 @@
+{
+  "name": "@bharatdcim/api",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev src/index.ts",
+    "build": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push"
+  },
+  "dependencies": {
+    "@bharatdcim/billing-engine": "workspace:*",
+    "@libsql/client": "^0.14",
+    "drizzle-orm": "^0.38",
+    "hono": "^4.7"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.0",
+    "drizzle-kit": "^0.30",
+    "typescript": "^5.7",
+    "vitest": "^3.0",
+    "wrangler": "^4.0"
+  }
+}

@@ -1,0 +1,7 @@
+name = "bharatdcim-api"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+
+[vars]
+TURSO_DATABASE_URL = ""
+TURSO_AUTH_TOKEN = ""

@@ -26,3 +26,15 @@ pnpm-debug.log*
 # claude code
 .claude/
 thoughts/
+
+# Turborepo
+.turbo/
+
+# Go agent
+agents/snmp/bin/
+
+# Drizzle
+apps/api/drizzle/
+
+# Wrangler
+.wrangler/
