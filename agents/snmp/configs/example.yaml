@@ -1,0 +1,44 @@
+agent:
+  poll_interval_sec: 60
+  buffer_db_path: ./buffer.db
+
+cloud:
+  api_base_url: https://api.bharatdcim.in
+  auth_token: "your-jwt-token-here"
+  heartbeat_sec: 60
+  sync_batch_size: 1000
+  retry_max_attempts: 3
+
+devices:
+  - name: "APC PDU Rack A"
+    host: "192.168.1.10"
+    port: 161
+    community: "public"
+    version: "2c"
+    vendor: "apc"
+    meter_id: "pdu-rack-a"
+    counter_size: 32
+    timeout_sec: 5
+    retry_count: 3
+
+  - name: "Raritan PDU Rack B"
+    host: "192.168.1.11"
+    port: 161
+    community: "public"
+    version: "2c"
+    vendor: "raritan"
+    meter_id: "pdu-rack-b"
+    counter_size: 32
+    timeout_sec: 5
+    retry_count: 3
+
+  - name: "ServerTech Sentry Row C"
+    host: "192.168.1.12"
+    port: 161
+    community: "datacenter-ro"
+    version: "2c"
+    vendor: "servertech"
+    meter_id: "sentry-row-c"
+    counter_size: 64
+    timeout_sec: 10
+    retry_count: 3
