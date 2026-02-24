@@ -17,6 +17,9 @@ importers:
       '@bharatdcim/billing-engine':
         specifier: workspace:*
         version: link:../../packages/billing-engine
+      '@hono/swagger-ui':
+        specifier: ^0.5.3
+        version: 0.5.3(hono@4.12.2)
       '@libsql/client':
         specifier: ^0.14
         version: 0.14.0
@@ -915,6 +918,11 @@ packages:
     resolution: {integrity: sha512-Ilcr+JAIPhb1s6FRm4qoglQYSGXXrS+zAupZeNuWAA3qHVGDA1d1Gb84Hb/+otL3GzVZjFJESg5/1SfIvrgssA==}
     peerDependencies:
       vitest: ^1 || ^2 || ^3 || ^4
+
+  '@hono/swagger-ui@0.5.3':
+    resolution: {integrity: sha512-Hn90DOOJ62ICJQplQvCDVpi9Jcn6EhtRaiffyJIS53wA5RmRLtMCDQGVc0bor8vQD7JIwpkweWjs+3cycp+IvA==}
+    peerDependencies:
+      hono: '>=4.0.0'
 
   '@img/colour@1.0.0':
     resolution: {integrity: sha512-A5P/LfWGFSl6nsckYtjw9da+19jB8hkJ6ACTGcDfEJ0aE+l2n2El7dsVM7UVHZQ9s2lmYMWlrS21YLy2IR1LUw==}
@@ -4225,6 +4233,10 @@ snapshots:
     dependencies:
       fast-check: 4.5.3
       vitest: 3.2.4(@types/debug@4.1.12)(jiti@2.6.1)(lightningcss@1.31.1)(yaml@2.8.2)
+
+  '@hono/swagger-ui@0.5.3(hono@4.12.2)':
+    dependencies:
+      hono: 4.12.2
 
   '@img/colour@1.0.0': {}
 

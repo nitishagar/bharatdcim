@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@bharatdcim/billing-engine": "workspace:*",
+    "@hono/swagger-ui": "^0.5.3",
     "@libsql/client": "^0.14",
     "drizzle-orm": "^0.38",
     "hono": "^4.7"

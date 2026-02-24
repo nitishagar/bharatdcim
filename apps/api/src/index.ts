@@ -1,5 +1,8 @@
 import { Hono } from 'hono';
+import { HTTPException } from 'hono/http-exception';
 import { cors } from 'hono/cors';
+import { bearerAuth } from 'hono/bearer-auth';
+import { swaggerUI } from '@hono/swagger-ui';
 import { createDb } from './db/client.js';
 import type { Database } from './db/client.js';
 import { tariffs } from './routes/tariffs.js';
@@ -9,10 +12,12 @@ import { readingsRouter } from './routes/readings.js';
 import { invoicesRouter } from './routes/invoices.js';
 import { uploadsRouter } from './routes/uploads.js';
 import { agentsRouter } from './routes/agents.js';
+import { openApiSpec } from './openapi.js';
 
 type Bindings = {
   TURSO_DATABASE_URL: string;
   TURSO_AUTH_TOKEN: string;
+  API_TOKEN: string;
 };
 
 type Variables = {
@@ -26,6 +31,12 @@ app.use('*', cors({ origin: ['https://bharatdcim.com', 'http://localhost:4321'] 
 
 // Error handling
 app.onError((err, c) => {
+  if (err instanceof HTTPException) {
+    return c.json(
+      { error: { code: 'UNAUTHORIZED', message: 'Invalid or missing Bearer token' } },
+      err.status,
+    );
+  }
   console.error('Unhandled error:', err);
   return c.json(
     { error: { code: 'INTERNAL_ERROR', message: err.message || 'Internal server error' } },
@@ -33,11 +44,24 @@ app.onError((err, c) => {
   );
 });
 
-// Health check (no database needed)
+// Health check (no auth, no database)
 app.get('/health', (c) => c.json({ status: 'ok' }));
 
-// Database middleware — injects db into context for API routes only
+// OpenAPI spec + Swagger UI (no auth)
+app.get('/openapi.json', (c) => c.json(openApiSpec));
+app.get('/docs', swaggerUI({ url: '/openapi.json' }));
+
+// Bearer token auth for all API routes
 const API_PREFIXES = ['/tariffs', '/meters', '/bills', '/readings', '/invoices', '/uploads', '/agents'];
+app.use('*', async (c, next) => {
+  if (API_PREFIXES.some((p) => c.req.path === p || c.req.path.startsWith(p + '/'))) {
+    const auth = bearerAuth({ token: c.env.API_TOKEN });
+    return auth(c, next);
+  }
+  await next();
+});
+
+// Database middleware — injects db into context for API routes only
 app.use('*', async (c, next) => {
   if (API_PREFIXES.some((p) => c.req.path === p || c.req.path.startsWith(p + '/'))) {
     const db = createDb(c.env.TURSO_DATABASE_URL, c.env.TURSO_AUTH_TOKEN);

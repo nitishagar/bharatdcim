@@ -6,6 +6,7 @@ describe('Health Endpoint', () => {
     const res = await app.request('/health', undefined, {
       TURSO_DATABASE_URL: 'file::memory:',
       TURSO_AUTH_TOKEN: '',
+      API_TOKEN: 'test-token',
     });
     expect(res.status).toBe(200);
     const body = await res.json();
@@ -16,6 +17,7 @@ describe('Health Endpoint', () => {
     const res = await app.request('/nonexistent', undefined, {
       TURSO_DATABASE_URL: 'file::memory:',
       TURSO_AUTH_TOKEN: '',
+      API_TOKEN: 'test-token',
     });
     expect(res.status).toBe(404);
     const body = await res.json();
