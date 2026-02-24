@@ -1,0 +1,97 @@
+import { describe, it, expect } from 'vitest';
+import { createTestDb } from '../helpers.js';
+import {
+  tenants, tariffConfigs, meters, powerReadings, bills,
+  invoices, invoiceSequences, creditNotes, invoiceAuditLog, uploadAudit,
+} from '../../src/db/schema.js';
+
+describe('Drizzle Schema', () => {
+  it('all tables can be created in-memory', async () => {
+    const { client } = await createTestDb();
+    // If createTestDb succeeds, all DDL statements executed correctly
+
+    // Verify tables exist by querying sqlite_master
+    const result = await client.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name");
+    const tableNames = result.rows.map((r) => r.name as string);
+
+    expect(tableNames).toContain('tenants');
+    expect(tableNames).toContain('tariff_configs');
+    expect(tableNames).toContain('meters');
+    expect(tableNames).toContain('power_readings');
+    expect(tableNames).toContain('bills');
+    expect(tableNames).toContain('invoices');
+    expect(tableNames).toContain('invoice_sequences');
+    expect(tableNames).toContain('credit_notes');
+    expect(tableNames).toContain('invoice_audit_log');
+    expect(tableNames).toContain('upload_audit');
+  });
+
+  it('Drizzle table objects have correct column definitions', () => {
+    // Verify key tables export the expected structure
+    expect(tenants.id).toBeDefined();
+    expect(tenants.name).toBeDefined();
+    expect(tenants.gstin).toBeDefined();
+    expect(tenants.stateCode).toBeDefined();
+
+    expect(tariffConfigs.baseEnergyRatePaisa).toBeDefined();
+    expect(tariffConfigs.timeSlotsJson).toBeDefined();
+    expect(tariffConfigs.electricityDutyBps).toBeDefined();
+
+    expect(bills.totalBillPaisa).toBeDefined();
+    expect(bills.subtotalPaisa).toBeDefined();
+    expect(bills.gstPaisa).toBeDefined();
+
+    expect(invoices.invoiceNumber).toBeDefined();
+    expect(invoices.taxType).toBeDefined();
+
+    expect(uploadAudit.processingTimeMs).toBeDefined();
+    expect(uploadAudit.errorsJson).toBeDefined();
+  });
+
+  it('CRUD operations work on all major tables', async () => {
+    const { db } = await createTestDb();
+    const now = new Date().toISOString();
+
+    // Insert tenant
+    await db.insert(tenants).values({
+      id: 't1', name: 'TestCo', stateCode: 'MH', createdAt: now, updatedAt: now,
+    });
+
+    // Insert tariff
+    await db.insert(tariffConfigs).values({
+      id: 'mh-2025', stateCode: 'MH', discom: 'MSEDCL', category: 'HT I(A)',
+      effectiveFrom: '2025-01-01', billingUnit: 'kVAh',
+      baseEnergyRatePaisa: 868, wheelingChargePaisa: 74,
+      demandChargePerKvaPaisa: 60000, demandRatchetPercent: 75, minimumDemandKva: 50,
+      timeSlotsJson: '[]', fuelAdjustmentPaisa: 72, fuelAdjustmentType: 'absolute',
+      electricityDutyBps: 930, pfThresholdBps: 9000, pfPenaltyRatePaisa: 25,
+      version: 1, createdAt: now, updatedAt: now,
+    });
+
+    // Insert meter
+    await db.insert(meters).values({
+      id: 'm1', tenantId: 't1', name: 'Grid A', stateCode: 'MH',
+      tariffId: 'mh-2025', createdAt: now, updatedAt: now,
+    });
+
+    // Insert reading
+    await db.insert(powerReadings).values({
+      id: 'r1', meterId: 'm1', timestamp: now, createdAt: now,
+    });
+
+    // Verify reads
+    const allTenants = await db.select().from(tenants).all();
+    expect(allTenants).toHaveLength(1);
+    expect(allTenants[0].name).toBe('TestCo');
+
+    const allTariffs = await db.select().from(tariffConfigs).all();
+    expect(allTariffs).toHaveLength(1);
+    expect(allTariffs[0].baseEnergyRatePaisa).toBe(868);
+
+    const allMeters = await db.select().from(meters).all();
+    expect(allMeters).toHaveLength(1);
+
+    const allReadings = await db.select().from(powerReadings).all();
+    expect(allReadings).toHaveLength(1);
+  });
+});

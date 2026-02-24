@@ -1,0 +1,77 @@
+import { Hono } from 'hono';
+import { eq, and, gte, lte } from 'drizzle-orm';
+import type { Database } from '../db/client.js';
+import { powerReadings } from '../db/schema.js';
+
+type Env = { Variables: { db: Database } };
+
+const readingsRouter = new Hono<Env>();
+
+// GET /readings?meter_id=&from=&to= — query readings
+readingsRouter.get('/', async (c) => {
+  const db = c.get('db');
+  const meterId = c.req.query('meter_id');
+  const from = c.req.query('from');
+  const to = c.req.query('to');
+
+  if (!meterId) {
+    return c.json(
+      { error: { code: 'VALIDATION_ERROR', message: 'Query parameter meter_id is required' } },
+      400,
+    );
+  }
+
+  const conditions = [eq(powerReadings.meterId, meterId)];
+  if (from) conditions.push(gte(powerReadings.timestamp, from));
+  if (to) conditions.push(lte(powerReadings.timestamp, to));
+
+  const rows = await db
+    .select()
+    .from(powerReadings)
+    .where(and(...conditions))
+    .all();
+
+  return c.json(rows);
+});
+
+// POST /readings — batch insert readings
+readingsRouter.post('/', async (c) => {
+  const db = c.get('db');
+  const body = await c.req.json();
+
+  if (!Array.isArray(body.readings) || body.readings.length === 0) {
+    return c.json(
+      { error: { code: 'VALIDATION_ERROR', message: 'Body must contain a non-empty readings array' } },
+      400,
+    );
+  }
+
+  const now = new Date().toISOString();
+  const rows = (body.readings as Array<Record<string, unknown>>).map((r) => ({
+    id: r.id as string,
+    meterId: r.meterId as string,
+    timestamp: r.timestamp as string,
+    kWh: (r.kWh as number) ?? null,
+    kW: (r.kW as number) ?? null,
+    voltage: (r.voltage as number) ?? null,
+    current: (r.current as number) ?? null,
+    powerFactor: (r.powerFactor as number) ?? null,
+    source: (r.source as string) ?? null,
+    slotType: (r.slotType as string) ?? null,
+    slotName: (r.slotName as string) ?? null,
+    ratePaisa: (r.ratePaisa as number) ?? null,
+    uploadId: (r.uploadId as string) ?? null,
+    createdAt: now,
+  }));
+
+  // Batch insert in chunks of 500
+  const batchSize = 500;
+  for (let i = 0; i < rows.length; i += batchSize) {
+    const batch = rows.slice(i, i + batchSize);
+    await db.insert(powerReadings).values(batch);
+  }
+
+  return c.json({ inserted: rows.length }, 201);
+});
+
+export { readingsRouter };
