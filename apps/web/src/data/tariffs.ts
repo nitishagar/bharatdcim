@@ -40,9 +40,9 @@ export const stateTariffs: StateTariff[] = [
     discom: 'MSEDCL / MERC',
     category: 'HT I(A) Industry (General)',
     billingUnit: 'kVAh',
-    baseEnergyRate: 7.45, // ₹/kVAh (MERC Case 75/2025)
-    wheelingCharge: 0.80, // ₹/kVAh
-    demandCharge: 750, // ₹/kVA/month
+    baseEnergyRate: 8.68, // ₹/kVAh (MERC Case 75/2025, post-review petition)
+    wheelingCharge: 0.74, // ₹/kVAh
+    demandCharge: 600, // ₹/kVA/month
     demandBillingRule: 'Higher of: Actual MD, 75% of Contract Demand, or 50 kVA',
     timeSlots: [
       { name: 'Night Off-Peak', startHour: 22, endHour: 6, type: 'off-peak', multiplier: 1.0, adder: -1.50 },
@@ -53,12 +53,12 @@ export const stateTariffs: StateTariff[] = [
     ],
     fuelAdjustmentCharge: 0.72, // ₹/kVAh mid-range estimate (range: 0.50-0.95)
     fuelAdjustmentType: 'absolute',
-    electricityDuty: 0.16, // 16%
+    electricityDuty: 0.093, // 9.30% (Maharashtra Electricity Duty Act 2016, Industrial Part F)
     powerFactorPenaltyThreshold: 0.90,
     powerFactorPenaltyRate: 0.25,
     dgRate: 22.0,
     regulatoryStatus: 'Litigation Active - MERC Case 75/2025 remanded by Bombay HC. Current rates operational but sub judice.',
-    notes: 'kVAh billing (apparent energy). Night rebate -₹1.50 (22:00-06:00) is the most aggressive night incentive. Morning peak 09-12 (+₹0.80) and evening peak 18-22 (+₹1.10) reflect solar duck curve management. Total variable cost including wheeling: ₹8.25/kVAh.'
+    notes: 'kVAh billing (apparent energy). Night rebate -₹1.50 (22:00-06:00) is the most aggressive night incentive. Morning peak 09-12 (+₹0.80) and evening peak 18-22 (+₹1.10) reflect solar duck curve management. Total variable cost including wheeling: ₹9.42/kVAh.'
   },
   {
     state: 'Tamil Nadu',
@@ -105,7 +105,7 @@ export const stateTariffs: StateTariff[] = [
     fuelAdjustmentCharge: 0.28, // ₹/unit mid-range estimate (range: 0.20-0.35)
     fuelAdjustmentType: 'absolute',
     electricityDuty: 0.06, // 6%
-    powerFactorPenaltyThreshold: 0.85,
+    powerFactorPenaltyThreshold: 0.90, // 0.90 for HT; 0.85 applies only to LT (KERC Tariff Order 2025)
     powerFactorPenaltyRate: 0.15,
     dgRate: 20.0,
     regulatoryStatus: 'Stable - KERC MYT Order 2025. BESCOM Additional Surcharge petition (₹1.65/unit for OA) pending.',

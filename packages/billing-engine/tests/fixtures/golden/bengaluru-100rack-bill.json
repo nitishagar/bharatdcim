@@ -1,0 +1,22 @@
+{
+  "peakKWh": 90000,
+  "normalKWh": 180000,
+  "offPeakKWh": 90000,
+  "totalKWh": 360000,
+  "billedKVAh": null,
+  "peakChargesPaisa": 68400000,
+  "normalChargesPaisa": 118800000,
+  "offPeakChargesPaisa": 50400000,
+  "totalEnergyChargesPaisa": 237600000,
+  "wheelingChargesPaisa": 0,
+  "demandChargesPaisa": 28000000,
+  "billedDemandKVA": 800,
+  "fuelAdjustmentPaisa": 10080000,
+  "electricityDutyPaisa": 15936000,
+  "pfPenaltyPaisa": 0,
+  "dgChargesPaisa": 8000000,
+  "subtotalPaisa": 299616000,
+  "gstPaisa": 53930880,
+  "totalBillPaisa": 353546880,
+  "effectiveRatePaisaPerKWh": 971
+}
