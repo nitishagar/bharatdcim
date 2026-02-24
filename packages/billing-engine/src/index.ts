@@ -12,4 +12,8 @@ export { getFinancialYear, formatInvoiceNumber, formatCreditNoteNumber } from '.
 export { validateCreditNote } from './invoice/credit-note.js';
 export type { CreditNoteValidation } from './invoice/credit-note.js';
 
+// CSV import pipeline
+export { parseCSV, detectDCIMFormat, normalizeRows, validateCSVFile, validateCSVRow } from './csv/index.js';
+export type { ParsedCSV, DCIMFormat, NormalizedRow, CSVError, CSVValidationResult } from './csv/index.js';
+
 export type * from './types.js';

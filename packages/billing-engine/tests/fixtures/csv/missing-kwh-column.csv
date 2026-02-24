@@ -1,0 +1,3 @@
+timestamp,meter_id,voltage
+2025-02-15T10:00:00Z,meter-001,415
+2025-02-15T11:00:00Z,meter-001,412

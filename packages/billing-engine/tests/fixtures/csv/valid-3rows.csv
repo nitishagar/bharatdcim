@@ -1,0 +1,4 @@
+timestamp,meter_id,kwh,source
+2025-02-15T10:00:00Z,meter-001,100,grid
+2025-02-15T11:00:00Z,meter-001,110,grid
+2025-02-15T12:00:00Z,meter-001,105,grid
