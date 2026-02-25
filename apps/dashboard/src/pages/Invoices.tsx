@@ -45,7 +45,7 @@ export function Invoices() {
         <h2 className="text-2xl font-bold text-gray-900">Invoices</h2>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="rounded-lg bg-navy px-4 py-2 text-sm text-white hover:bg-navy-light"
+          className="rounded-lg bg-burgundy px-4 py-2 text-sm text-white hover:bg-burgundy-dark"
         >
           Generate Invoice
         </button>
@@ -83,7 +83,7 @@ export function Invoices() {
             </div>
           </div>
           <div className="flex gap-2">
-            <button type="submit" className="rounded-lg bg-navy px-4 py-2 text-sm text-white hover:bg-navy-light" disabled={createInvoice.isPending}>
+            <button type="submit" className="rounded-lg bg-burgundy px-4 py-2 text-sm text-white hover:bg-burgundy-dark" disabled={createInvoice.isPending}>
               {createInvoice.isPending ? 'Creating...' : 'Create Invoice'}
             </button>
             <button type="button" onClick={() => setShowForm(false)} className="rounded-lg border px-4 py-2 text-sm">

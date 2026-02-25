@@ -151,7 +151,7 @@ export function InvoiceDetail() {
           </div>
           <button
             onClick={handleCreditNote}
-            className="rounded-lg bg-navy px-4 py-2 text-sm text-white hover:bg-navy-light"
+            className="rounded-lg bg-burgundy px-4 py-2 text-sm text-white hover:bg-burgundy-dark"
             disabled={createCreditNote.isPending || !creditAmount || !creditReason}
           >
             Issue Credit Note

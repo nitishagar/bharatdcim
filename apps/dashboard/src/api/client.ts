@@ -1,16 +1,22 @@
 const API_BASE = import.meta.env.VITE_API_URL ?? 'https://bharatdcim-api.nitishagar.workers.dev';
 
-export function getApiToken(): string | null {
-  return localStorage.getItem('bharatdcim_api_token');
+// Token getter — wired from Clerk's useAuth().getToken via AuthBridge
+let _getToken: (() => Promise<string | null>) | null = null;
+
+export function setTokenGetter(fn: () => Promise<string | null>) {
+  _getToken = fn;
 }
 
-export function setApiToken(token: string): void {
-  localStorage.setItem('bharatdcim_api_token', token);
+async function requireToken(): Promise<string> {
+  if (_getToken) {
+    const token = await _getToken();
+    if (token) return token;
+  }
+  throw new Error('Not authenticated. Please sign in again.');
 }
 
 export async function api<T>(path: string, options?: RequestInit): Promise<T> {
-  const token = getApiToken();
-  if (!token) throw new Error('API token not configured. Go to Settings.');
+  const token = await requireToken();
 
   const res = await fetch(`${API_BASE}${path}`, {
     ...options,
@@ -30,8 +36,7 @@ export async function api<T>(path: string, options?: RequestInit): Promise<T> {
 }
 
 export async function uploadCSV(file: File, tenantId: string): Promise<unknown> {
-  const token = getApiToken();
-  if (!token) throw new Error('API token not configured. Go to Settings.');
+  const token = await requireToken();
 
   const form = new FormData();
   form.append('file', file);

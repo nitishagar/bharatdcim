@@ -40,21 +40,21 @@ export function Dashboard() {
       <div className="grid grid-cols-3 gap-4">
         <Link
           to="/billing"
-          className="rounded-lg border border-gray-200 bg-white p-4 hover:border-navy hover:shadow-sm transition-all"
+          className="rounded-lg border border-gray-200 bg-white p-4 hover:border-burgundy hover:shadow-sm transition-all"
         >
           <span className="text-sm font-medium text-gray-700">Calculate Bill</span>
           <p className="text-xs text-gray-400 mt-1">Generate a new bill from meter readings</p>
         </Link>
         <Link
           to="/uploads"
-          className="rounded-lg border border-gray-200 bg-white p-4 hover:border-navy hover:shadow-sm transition-all"
+          className="rounded-lg border border-gray-200 bg-white p-4 hover:border-burgundy hover:shadow-sm transition-all"
         >
           <span className="text-sm font-medium text-gray-700">Upload CSV</span>
           <p className="text-xs text-gray-400 mt-1">Import meter readings from CSV file</p>
         </Link>
         <Link
           to="/invoices"
-          className="rounded-lg border border-gray-200 bg-white p-4 hover:border-navy hover:shadow-sm transition-all"
+          className="rounded-lg border border-gray-200 bg-white p-4 hover:border-burgundy hover:shadow-sm transition-all"
         >
           <span className="text-sm font-medium text-gray-700">Generate Invoice</span>
           <p className="text-xs text-gray-400 mt-1">Create GST invoice from a bill</p>

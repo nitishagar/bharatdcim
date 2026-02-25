@@ -1,8 +1,8 @@
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { cors } from 'hono/cors';
-import { bearerAuth } from 'hono/bearer-auth';
 import { swaggerUI } from '@hono/swagger-ui';
+import { createRemoteJWKSet, jwtVerify } from 'jose';
 import { createDb } from './db/client.js';
 import type { Database } from './db/client.js';
 import { tariffs } from './routes/tariffs.js';
@@ -19,7 +19,12 @@ type Bindings = {
   TURSO_DATABASE_URL: string;
   TURSO_AUTH_TOKEN: string;
   API_TOKEN: string;
+  CLERK_ISSUER_URL?: string;
 };
+
+// Cache JWKS across requests within the same isolate
+let cachedJWKS: ReturnType<typeof createRemoteJWKSet> | null = null;
+let cachedJWKSUrl: string | null = null;
 
 type Variables = {
   db: Database;
@@ -60,14 +65,42 @@ app.get('/health', (c) => c.json({ status: 'ok' }));
 app.get('/openapi.json', (c) => c.json(openApiSpec));
 app.get('/docs', swaggerUI({ url: '/openapi.json' }));
 
-// Bearer token auth for all API routes
+// Auth for all API routes — accepts API_TOKEN (for agents/scripts) or Clerk JWT (for dashboard)
 const API_PREFIXES = ['/tariffs', '/meters', '/bills', '/readings', '/invoices', '/uploads', '/agents', '/dashboard'];
 app.use('*', async (c, next) => {
-  if (API_PREFIXES.some((p) => c.req.path === p || c.req.path.startsWith(p + '/'))) {
-    const auth = bearerAuth({ token: c.env.API_TOKEN });
-    return auth(c, next);
+  if (!API_PREFIXES.some((p) => c.req.path === p || c.req.path.startsWith(p + '/'))) {
+    return next();
   }
-  await next();
+
+  const authHeader = c.req.header('Authorization');
+  if (!authHeader?.startsWith('Bearer ')) {
+    throw new HTTPException(401, { message: 'Missing Bearer token' });
+  }
+
+  const token = authHeader.slice(7);
+
+  // Fast path: shared API token (SNMP agents, scripts, CI)
+  if (token === c.env.API_TOKEN) {
+    return next();
+  }
+
+  // Verify Clerk JWT
+  const issuerUrl = c.env.CLERK_ISSUER_URL;
+  if (issuerUrl) {
+    try {
+      const jwksUrl = `${issuerUrl}/.well-known/jwks.json`;
+      if (!cachedJWKS || cachedJWKSUrl !== jwksUrl) {
+        cachedJWKS = createRemoteJWKSet(new URL(jwksUrl));
+        cachedJWKSUrl = jwksUrl;
+      }
+      await jwtVerify(token, cachedJWKS, { issuer: issuerUrl });
+      return next();
+    } catch {
+      // JWT invalid — fall through to 401
+    }
+  }
+
+  throw new HTTPException(401, { message: 'Invalid or missing Bearer token' });
 });
 
 // Database middleware — injects db into context for API routes only

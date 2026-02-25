@@ -59,7 +59,7 @@ export function Uploads() {
         <h2 className="text-2xl font-bold text-gray-900">Uploads</h2>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="rounded-lg bg-navy px-4 py-2 text-sm text-white hover:bg-navy-light"
+          className="rounded-lg bg-burgundy px-4 py-2 text-sm text-white hover:bg-burgundy-dark"
         >
           Upload CSV
         </button>
@@ -74,7 +74,7 @@ export function Uploads() {
               type="file"
               accept=".csv"
               onChange={(e) => setSelectedFile(e.target.files?.[0] ?? null)}
-              className="w-full text-sm text-gray-600 file:mr-3 file:rounded-lg file:border-0 file:bg-navy file:px-4 file:py-2 file:text-sm file:text-white hover:file:bg-navy-light"
+              className="w-full text-sm text-gray-600 file:mr-3 file:rounded-lg file:border-0 file:bg-burgundy file:px-4 file:py-2 file:text-sm file:text-white hover:file:bg-burgundy-dark"
               required
             />
           </div>
@@ -91,7 +91,7 @@ export function Uploads() {
           <div className="flex gap-2">
             <button
               type="submit"
-              className="rounded-lg bg-navy px-4 py-2 text-sm text-white hover:bg-navy-light"
+              className="rounded-lg bg-burgundy px-4 py-2 text-sm text-white hover:bg-burgundy-dark"
               disabled={upload.isPending || !selectedFile}
             >
               {upload.isPending ? 'Uploading...' : 'Upload'}
