@@ -27,7 +27,14 @@ type Variables = {
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 // CORS
-app.use('*', cors({ origin: ['https://bharatdcim.com', 'http://localhost:4321'] }));
+app.use('*', cors({
+  origin: [
+    'https://bharatdcim.com',
+    'http://localhost:4321',
+    'https://bharatdcim-dashboard.pages.dev',
+    'http://localhost:5173',
+  ],
+}));
 
 // Error handling
 app.onError((err, c) => {
