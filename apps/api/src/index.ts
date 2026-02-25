@@ -12,6 +12,7 @@ import { readingsRouter } from './routes/readings.js';
 import { invoicesRouter } from './routes/invoices.js';
 import { uploadsRouter } from './routes/uploads.js';
 import { agentsRouter } from './routes/agents.js';
+import { dashboardRouter } from './routes/dashboard.js';
 import { openApiSpec } from './openapi.js';
 
 type Bindings = {
@@ -59,7 +60,7 @@ app.get('/openapi.json', (c) => c.json(openApiSpec));
 app.get('/docs', swaggerUI({ url: '/openapi.json' }));
 
 // Bearer token auth for all API routes
-const API_PREFIXES = ['/tariffs', '/meters', '/bills', '/readings', '/invoices', '/uploads', '/agents'];
+const API_PREFIXES = ['/tariffs', '/meters', '/bills', '/readings', '/invoices', '/uploads', '/agents', '/dashboard'];
 app.use('*', async (c, next) => {
   if (API_PREFIXES.some((p) => c.req.path === p || c.req.path.startsWith(p + '/'))) {
     const auth = bearerAuth({ token: c.env.API_TOKEN });
@@ -85,6 +86,7 @@ app.route('/readings', readingsRouter);
 app.route('/invoices', invoicesRouter);
 app.route('/uploads', uploadsRouter);
 app.route('/agents', agentsRouter);
+app.route('/dashboard', dashboardRouter);
 
 // 404 handler
 app.notFound((c) => {

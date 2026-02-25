@@ -8,6 +8,13 @@ type Env = { Variables: { db: Database } };
 
 const invoicesRouter = new Hono<Env>();
 
+// GET /invoices — list all invoices
+invoicesRouter.get('/', async (c) => {
+  const db = c.get('db');
+  const rows = await db.select().from(invoices).all();
+  return c.json(rows);
+});
+
 // POST /invoices — create invoice from bill
 invoicesRouter.post('/', async (c) => {
   const db = c.get('db');

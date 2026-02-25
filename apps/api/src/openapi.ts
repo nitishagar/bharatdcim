@@ -150,6 +150,11 @@ export const openApiSpec = {
       },
     },
     '/invoices': {
+      get: {
+        tags: ['Invoices'],
+        summary: 'List all invoices',
+        responses: { '200': { description: 'Array of invoices' } },
+      },
       post: {
         tags: ['Invoices'],
         summary: 'Generate GST invoice from bill',
@@ -217,6 +222,31 @@ export const openApiSpec = {
         tags: ['Agents'],
         summary: 'List registered agents',
         responses: { '200': { description: 'Array of agent heartbeats' } },
+      },
+    },
+    '/dashboard/summary': {
+      get: {
+        tags: ['Dashboard'],
+        summary: 'Aggregated KPI summary',
+        description: 'Returns total counts for meters, bills, invoices, and agents with aggregate stats.',
+        responses: {
+          '200': {
+            description: 'KPI summary object',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    meters: { type: 'object', properties: { total: { type: 'integer' } } },
+                    bills: { type: 'object', properties: { total: { type: 'integer' }, totalAmountPaisa: { type: 'integer' }, totalKwh: { type: 'integer' } } },
+                    invoices: { type: 'object', properties: { total: { type: 'integer' } } },
+                    agents: { type: 'object', properties: { total: { type: 'integer' }, online: { type: 'integer' } } },
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     },
   },
