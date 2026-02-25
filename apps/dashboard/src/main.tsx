@@ -13,7 +13,11 @@ const queryClient = new QueryClient({
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ClerkProvider publishableKey={clerkKey}>
+    <ClerkProvider
+      publishableKey={clerkKey}
+      signInFallbackRedirectUrl="/"
+      signUpFallbackRedirectUrl="/"
+    >
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <App />
