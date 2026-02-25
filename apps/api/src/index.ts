@@ -31,6 +31,7 @@ const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 app.use('*', cors({
   origin: [
     'https://bharatdcim.com',
+    'https://dashboard.bharatdcim.com',
     'http://localhost:4321',
     'https://bharatdcim-dashboard.pages.dev',
     'http://localhost:5173',
