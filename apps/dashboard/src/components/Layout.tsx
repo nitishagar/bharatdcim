@@ -72,14 +72,18 @@ export function Layout() {
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar — matches marketing site navy palette */}
       <aside className="w-56 bg-gradient-to-b from-navy to-[#162d4a] text-white flex flex-col">
-        <div className="p-4 border-b border-white/10">
+        <div className="p-3 border-b border-white/10">
           <OrganizationSwitcher
             hidePersonal={true}
             afterSelectOrganizationUrl="/"
             appearance={{
               elements: {
                 rootBox: 'w-full',
-                organizationSwitcherTrigger: 'w-full text-white hover:bg-white/10 rounded-md',
+                organizationSwitcherTrigger:
+                  'w-full text-white hover:bg-white/10 rounded-md px-2 py-1.5 [&>*]:text-white [&_span]:text-white [&_p]:text-white',
+                organizationPreviewMainIdentifier: 'text-white',
+                organizationSwitcherTriggerIcon: 'text-white/70',
+                organizationPreviewSecondaryIdentifier: 'text-white/60',
               },
             }}
           />
