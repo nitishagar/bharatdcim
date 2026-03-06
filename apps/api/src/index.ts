@@ -4,7 +4,7 @@ import { cors } from 'hono/cors';
 import { swaggerUI } from '@hono/swagger-ui';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
 import { createDb } from './db/client.js';
-import type { Database } from './db/client.js';
+import type { AppEnv } from './types.js';
 import { tariffs } from './routes/tariffs.js';
 import { metersRouter } from './routes/meters.js';
 import { billsRouter } from './routes/bills.js';
@@ -13,24 +13,14 @@ import { invoicesRouter } from './routes/invoices.js';
 import { uploadsRouter } from './routes/uploads.js';
 import { agentsRouter } from './routes/agents.js';
 import { dashboardRouter } from './routes/dashboard.js';
+import { platformRouter } from './routes/platform.js';
 import { openApiSpec } from './openapi.js';
-
-type Bindings = {
-  TURSO_DATABASE_URL: string;
-  TURSO_AUTH_TOKEN: string;
-  API_TOKEN: string;
-  CLERK_ISSUER_URL?: string;
-};
 
 // Cache JWKS across requests within the same isolate
 let cachedJWKS: ReturnType<typeof createRemoteJWKSet> | null = null;
 let cachedJWKSUrl: string | null = null;
 
-type Variables = {
-  db: Database;
-};
-
-const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
+const app = new Hono<AppEnv>();
 
 // CORS
 app.use('*', cors({
@@ -47,7 +37,7 @@ app.use('*', cors({
 app.onError((err, c) => {
   if (err instanceof HTTPException) {
     return c.json(
-      { error: { code: 'UNAUTHORIZED', message: 'Invalid or missing Bearer token' } },
+      { error: { code: 'UNAUTHORIZED', message: err.message || 'Invalid or missing Bearer token' } },
       err.status,
     );
   }
@@ -66,7 +56,7 @@ app.get('/openapi.json', (c) => c.json(openApiSpec));
 app.get('/docs', swaggerUI({ url: '/openapi.json' }));
 
 // Auth for all API routes — accepts API_TOKEN (for agents/scripts) or Clerk JWT (for dashboard)
-const API_PREFIXES = ['/tariffs', '/meters', '/bills', '/readings', '/invoices', '/uploads', '/agents', '/dashboard'];
+const API_PREFIXES = ['/tariffs', '/meters', '/bills', '/readings', '/invoices', '/uploads', '/agents', '/dashboard', '/platform'];
 app.use('*', async (c, next) => {
   if (!API_PREFIXES.some((p) => c.req.path === p || c.req.path.startsWith(p + '/'))) {
     return next();
@@ -81,6 +71,10 @@ app.use('*', async (c, next) => {
 
   // Fast path: shared API token (SNMP agents, scripts, CI)
   if (token === c.env.API_TOKEN) {
+    c.set('tenantId', null);
+    c.set('authType', 'api_token');
+    c.set('orgRole', null);
+    c.set('platformAdmin', false);
     return next();
   }
 
@@ -93,9 +87,27 @@ app.use('*', async (c, next) => {
         cachedJWKS = createRemoteJWKSet(new URL(jwksUrl));
         cachedJWKSUrl = jwksUrl;
       }
-      await jwtVerify(token, cachedJWKS, { issuer: issuerUrl });
+      const { payload } = await jwtVerify(token, cachedJWKS, { issuer: issuerUrl });
+
+      // Extract tenant_id from custom session claim
+      const tenantId = (payload as Record<string, unknown>).tenant_id as string | undefined;
+      // Extract org role from Clerk's compact 'o' claim
+      const orgRole = ((payload as Record<string, unknown>).o as Record<string, unknown> | undefined)?.rol as string | undefined;
+      // Extract platform admin flag from custom session claim
+      const platformAdmin = (payload as Record<string, unknown>).platformAdmin === true
+        || (payload as Record<string, unknown>).platformAdmin === 'true';
+
+      if (!tenantId && !platformAdmin) {
+        throw new HTTPException(403, { message: 'No active organization. Please select an organization.' });
+      }
+
+      c.set('tenantId', tenantId ?? null);
+      c.set('authType', 'clerk');
+      c.set('orgRole', orgRole ?? null);
+      c.set('platformAdmin', platformAdmin);
       return next();
-    } catch {
+    } catch (e) {
+      if (e instanceof HTTPException) throw e;
       // JWT invalid — fall through to 401
     }
   }
@@ -121,6 +133,7 @@ app.route('/invoices', invoicesRouter);
 app.route('/uploads', uploadsRouter);
 app.route('/agents', agentsRouter);
 app.route('/dashboard', dashboardRouter);
+app.route('/platform', platformRouter);
 
 // 404 handler
 app.notFound((c) => {

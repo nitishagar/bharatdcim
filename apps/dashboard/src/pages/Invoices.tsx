@@ -7,6 +7,7 @@ import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { EmptyState } from '../components/EmptyState';
 import { formatPaisa } from '../lib/formatCurrency';
+import { useIsAdmin } from '../hooks/useIsAdmin';
 
 const columns: Column<Invoice>[] = [
   { header: 'Invoice #', accessor: (inv) => inv.invoiceNumber },
@@ -20,6 +21,7 @@ export function Invoices() {
   const { data, isLoading, error, refetch } = useInvoices();
   const navigate = useNavigate();
   const createInvoice = useCreateInvoice();
+  const isAdmin = useIsAdmin();
 
   const [showForm, setShowForm] = useState(false);
   const [billId, setBillId] = useState('');
@@ -43,12 +45,14 @@ export function Invoices() {
     <div>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-bold text-gray-900">Invoices</h2>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="rounded-lg bg-burgundy px-4 py-2 text-sm text-white hover:bg-burgundy-dark"
-        >
-          Generate Invoice
-        </button>
+        {isAdmin && (
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="rounded-lg bg-burgundy px-4 py-2 text-sm text-white hover:bg-burgundy-dark"
+          >
+            Generate Invoice
+          </button>
+        )}
       </div>
 
       {showForm && (

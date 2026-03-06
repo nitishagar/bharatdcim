@@ -1,15 +1,14 @@
 import { Hono } from 'hono';
 import { eq, and, gte, lte } from 'drizzle-orm';
-import type { Database } from '../db/client.js';
-import { powerReadings } from '../db/schema.js';
+import type { AppEnv } from '../types.js';
+import { powerReadings, meters } from '../db/schema.js';
 
-type Env = { Variables: { db: Database } };
+const readingsRouter = new Hono<AppEnv>();
 
-const readingsRouter = new Hono<Env>();
-
-// GET /readings?meter_id=&from=&to= — query readings
+// GET /readings?meter_id=&from=&to= — query readings (verify meter belongs to tenant)
 readingsRouter.get('/', async (c) => {
   const db = c.get('db');
+  const tenantId = c.get('tenantId');
   const meterId = c.req.query('meter_id');
   const from = c.req.query('from');
   const to = c.req.query('to');
@@ -19,6 +18,18 @@ readingsRouter.get('/', async (c) => {
       { error: { code: 'VALIDATION_ERROR', message: 'Query parameter meter_id is required' } },
       400,
     );
+  }
+
+  // Verify meter belongs to tenant
+  if (tenantId) {
+    const meterRows = await db.select().from(meters)
+      .where(and(eq(meters.id, meterId), eq(meters.tenantId, tenantId))).all();
+    if (meterRows.length === 0) {
+      return c.json(
+        { error: { code: 'FORBIDDEN', message: `Meter ${meterId} not found or not accessible` } },
+        403,
+      );
+    }
   }
 
   const conditions = [eq(powerReadings.meterId, meterId)];

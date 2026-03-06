@@ -1,30 +1,20 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { Hono } from 'hono';
-import { createTestDb } from '../helpers.js';
+import { createTestDb, createAppWithTenant } from '../helpers.js';
 import { dashboardRouter } from '../../src/routes/dashboard.js';
 import { tenants, meters, tariffConfigs, bills, invoices, agentHeartbeats } from '../../src/db/schema.js';
 import type { Database } from '../../src/db/client.js';
-
-function createApp(db: Database) {
-  const app = new Hono<{ Variables: { db: Database } }>();
-  app.use('*', async (c, next) => {
-    c.set('db', db);
-    await next();
-  });
-  app.route('/dashboard', dashboardRouter);
-  return app;
-}
 
 const now = '2026-02-25T00:00:00Z';
 
 describe('GET /dashboard/summary', () => {
   let db: Database;
-  let app: ReturnType<typeof createApp>;
+  let app: ReturnType<typeof createAppWithTenant>;
 
   beforeEach(async () => {
     const testDb = await createTestDb();
     db = testDb.db as unknown as Database;
-    app = createApp(db);
+    app = createAppWithTenant(db, 't1');
+    app.route('/dashboard', dashboardRouter);
   });
 
   it('returns zeroes on empty database', async () => {

@@ -1,26 +1,30 @@
 import { Hono } from 'hono';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { calculateBill } from '@bharatdcim/billing-engine';
 import type { BillCalculationInput } from '@bharatdcim/billing-engine';
-import type { Database } from '../db/client.js';
+import type { AppEnv } from '../types.js';
 import { bills } from '../db/schema.js';
+import { requireAdmin } from '../middleware/rbac.js';
 
-type Env = { Variables: { db: Database } };
+const billsRouter = new Hono<AppEnv>();
 
-const billsRouter = new Hono<Env>();
-
-// GET /bills — list all bills
+// GET /bills — list bills (scoped by tenant)
 billsRouter.get('/', async (c) => {
   const db = c.get('db');
-  const rows = await db.select().from(bills).all();
+  const tenantId = c.get('tenantId');
+  if (!tenantId) return c.json([]);
+  const rows = await db.select().from(bills).where(eq(bills.tenantId, tenantId)).all();
   return c.json(rows);
 });
 
-// GET /bills/:id — get bill by ID
+// GET /bills/:id — get bill by ID (verify tenant ownership)
 billsRouter.get('/:id', async (c) => {
   const db = c.get('db');
+  const tenantId = c.get('tenantId');
   const id = c.req.param('id');
-  const rows = await db.select().from(bills).where(eq(bills.id, id)).all();
+  const conditions = [eq(bills.id, id)];
+  if (tenantId) conditions.push(eq(bills.tenantId, tenantId));
+  const rows = await db.select().from(bills).where(and(...conditions)).all();
   if (rows.length === 0) {
     return c.json({ error: { code: 'NOT_FOUND', message: `Bill ${id} not found` } }, 404);
   }
@@ -52,22 +56,27 @@ billsRouter.post('/calculate', async (c) => {
   return c.json(result);
 });
 
-// POST /bills — store a calculated bill
+// POST /bills — store a calculated bill (tenant from JWT, admin only)
 billsRouter.post('/', async (c) => {
+  requireAdmin(c);
   const db = c.get('db');
+  const tenantId = c.get('tenantId');
+  if (!tenantId) {
+    return c.json({ error: { code: 'FORBIDDEN', message: 'Tenant context required' } }, 403);
+  }
   const body = await c.req.json();
   const now = new Date().toISOString();
 
-  if (!body.id || !body.tenantId || !body.meterId || !body.tariffId) {
+  if (!body.id || !body.meterId || !body.tariffId) {
     return c.json(
-      { error: { code: 'VALIDATION_ERROR', message: 'Missing required fields: id, tenantId, meterId, tariffId' } },
+      { error: { code: 'VALIDATION_ERROR', message: 'Missing required fields: id, meterId, tariffId' } },
       400,
     );
   }
 
   const row = {
     id: body.id as string,
-    tenantId: body.tenantId as string,
+    tenantId: tenantId,
     meterId: body.meterId as string,
     tariffId: body.tariffId as string,
     billingPeriodStart: body.billingPeriodStart as string,

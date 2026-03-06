@@ -24,6 +24,7 @@ type AgentConfig struct {
 type CloudConfig struct {
 	APIBaseURL       string `yaml:"api_base_url"`
 	AuthToken        string `yaml:"auth_token"`
+	TenantID         string `yaml:"tenant_id"`
 	HeartbeatSec     int    `yaml:"heartbeat_sec"`
 	SyncBatchSize    int    `yaml:"sync_batch_size"`
 	RetryMaxAttempts int    `yaml:"retry_max_attempts"`

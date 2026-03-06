@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
-import { SignedIn, SignedOut, RedirectToSignIn, useAuth } from '@clerk/clerk-react';
+import { SignedIn, SignedOut, RedirectToSignIn, useAuth, useOrganization } from '@clerk/clerk-react';
 import { Routes, Route } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { setTokenGetter } from './api/client';
 import { Layout } from './components/Layout';
 import { Dashboard } from './pages/Dashboard';
@@ -14,6 +15,8 @@ import { Uploads } from './pages/Uploads';
 import { Agents } from './pages/Agents';
 import { Tariffs } from './pages/Tariffs';
 import { Settings } from './pages/Settings';
+import { PlatformOverview } from './pages/PlatformOverview';
+import { PlatformTenants } from './pages/PlatformTenants';
 
 /** Wires Clerk's session token into the API client */
 function AuthBridge() {
@@ -26,6 +29,18 @@ function AuthBridge() {
   return null;
 }
 
+/** Invalidates all TanStack Query caches when the active org changes */
+function OrgBridge() {
+  const { organization } = useOrganization();
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    queryClient.invalidateQueries();
+  }, [organization?.id, queryClient]);
+
+  return null;
+}
+
 export function App() {
   return (
     <>
@@ -34,6 +49,7 @@ export function App() {
       </SignedOut>
       <SignedIn>
         <AuthBridge />
+        <OrgBridge />
         <Routes>
           <Route element={<Layout />}>
             <Route index element={<Dashboard />} />
@@ -47,6 +63,8 @@ export function App() {
             <Route path="agents" element={<Agents />} />
             <Route path="tariffs" element={<Tariffs />} />
             <Route path="settings" element={<Settings />} />
+            <Route path="platform" element={<PlatformOverview />} />
+            <Route path="platform/tenants" element={<PlatformTenants />} />
           </Route>
         </Routes>
       </SignedIn>

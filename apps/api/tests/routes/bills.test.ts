@@ -1,16 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { Hono } from 'hono';
+import { createAppWithTenant } from '../helpers.js';
 import { billsRouter } from '../../src/routes/bills.js';
 import type { Database } from '../../src/db/client.js';
 
 // For the /bills/calculate endpoint, we don't need a real DB
 function createApp() {
-  const app = new Hono<{ Variables: { db: Database } }>();
-  app.use('*', async (c, next) => {
-    // Calculate route doesn't need DB
-    c.set('db', {} as Database);
-    await next();
-  });
+  const app = createAppWithTenant({} as Database, 'tenant-1');
   app.route('/bills', billsRouter);
   return app;
 }

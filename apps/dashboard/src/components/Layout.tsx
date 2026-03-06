@@ -1,5 +1,5 @@
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
-import { UserButton } from '@clerk/clerk-react';
+import { UserButton, OrganizationSwitcher, useAuth } from '@clerk/clerk-react';
 
 const NAV_ITEMS = [
   { to: '/', label: 'Overview', icon: '◎' },
@@ -12,6 +12,11 @@ const NAV_ITEMS = [
   { to: '/settings', label: 'Settings', icon: '⚙' },
 ];
 
+const PLATFORM_NAV_ITEMS = [
+  { to: '/platform', label: 'Platform Overview', icon: '🏢' },
+  { to: '/platform/tenants', label: 'Tenants', icon: '🏗' },
+];
+
 const TITLE_MAP: Record<string, string> = {
   '/': 'Overview',
   '/meters': 'Meters',
@@ -21,6 +26,8 @@ const TITLE_MAP: Record<string, string> = {
   '/agents': 'SNMP Agents',
   '/tariffs': 'Tariffs',
   '/settings': 'Settings',
+  '/platform': 'Platform Overview',
+  '/platform/tenants': 'Tenants',
 };
 
 function getPageTitle(pathname: string): string {
@@ -31,36 +38,67 @@ function getPageTitle(pathname: string): string {
   return 'Dashboard';
 }
 
+function usePlatformAdmin(): boolean {
+  const { sessionClaims } = useAuth();
+  return (sessionClaims as Record<string, unknown> | null)?.platformAdmin === true
+    || (sessionClaims as Record<string, unknown> | null)?.platformAdmin === 'true';
+}
+
+function NavItem({ to, label, icon, end }: { to: string; label: string; icon: string; end?: boolean }) {
+  return (
+    <NavLink
+      to={to}
+      end={end}
+      className={({ isActive }) =>
+        `flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
+          isActive
+            ? 'bg-white/15 text-white font-medium'
+            : 'text-white/70 hover:bg-white/10 hover:text-white'
+        }`
+      }
+    >
+      <span>{icon}</span>
+      {label}
+    </NavLink>
+  );
+}
+
 export function Layout() {
   const { pathname } = useLocation();
   const title = getPageTitle(pathname);
+  const isPlatformAdmin = usePlatformAdmin();
 
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar — matches marketing site navy palette */}
       <aside className="w-56 bg-gradient-to-b from-navy to-[#162d4a] text-white flex flex-col">
-        <div className="p-4 border-b border-white/10 flex items-center gap-2">
-          <span className="text-lg font-bold text-white">Bharat</span>
-          <span className="text-lg font-bold text-rose">DCIM</span>
+        <div className="p-4 border-b border-white/10">
+          <OrganizationSwitcher
+            hidePersonal={true}
+            afterSelectOrganizationUrl="/"
+            appearance={{
+              elements: {
+                rootBox: 'w-full',
+                organizationSwitcherTrigger: 'w-full text-white hover:bg-white/10 rounded-md',
+              },
+            }}
+          />
         </div>
-        <nav className="flex-1 py-2">
+        <nav className="flex-1 py-2 overflow-y-auto">
           {NAV_ITEMS.map(({ to, label, icon }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={to === '/'}
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
-                  isActive
-                    ? 'bg-white/15 text-white font-medium'
-                    : 'text-white/70 hover:bg-white/10 hover:text-white'
-                }`
-              }
-            >
-              <span>{icon}</span>
-              {label}
-            </NavLink>
+            <NavItem key={to} to={to} label={label} icon={icon} end={to === '/'} />
           ))}
+          {isPlatformAdmin && (
+            <>
+              <div className="mx-4 my-2 border-t border-white/10" />
+              <div className="px-4 py-1 text-xs font-semibold text-white/40 uppercase tracking-wider">
+                Platform
+              </div>
+              {PLATFORM_NAV_ITEMS.map(({ to, label, icon }) => (
+                <NavItem key={to} to={to} label={label} icon={icon} end={to === '/platform'} />
+              ))}
+            </>
+          )}
         </nav>
       </aside>
 

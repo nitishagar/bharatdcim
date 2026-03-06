@@ -1,18 +1,22 @@
 import { Hono } from 'hono';
 import { eq } from 'drizzle-orm';
-import type { Database } from '../db/client.js';
+import type { AppEnv } from '../types.js';
 import { uploadAudit } from '../db/schema.js';
 import { importCSV } from '../services/csv-import.js';
+import { requireAdmin } from '../middleware/rbac.js';
 
-type Env = { Variables: { db: Database } };
-
-const uploadsRouter = new Hono<Env>();
+const uploadsRouter = new Hono<AppEnv>();
 
 const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
 
-// POST /uploads/csv — CSV file upload + import
+// POST /uploads/csv — CSV file upload + import (tenant from JWT, admin only)
 uploadsRouter.post('/csv', async (c) => {
+  requireAdmin(c);
   const db = c.get('db');
+  const tenantId = c.get('tenantId');
+  if (!tenantId) {
+    return c.json({ error: { code: 'FORBIDDEN', message: 'Tenant context required' } }, 403);
+  }
 
   // Check content length
   const contentLength = parseInt(c.req.header('content-length') || '0', 10);
@@ -33,24 +37,18 @@ uploadsRouter.post('/csv', async (c) => {
     );
   }
 
-  const tenantId = (body['tenantId'] as string) || '';
-  if (!tenantId) {
-    return c.json(
-      { error: { code: 'VALIDATION_ERROR', message: 'Missing required field: tenantId' } },
-      400,
-    );
-  }
-
   const content = await file.text();
   const result = await importCSV(content, file.name, file.size, tenantId, null, db);
 
   return c.json(result, result.importedRows > 0 ? 201 : 400);
 });
 
-// GET /uploads — list upload history
+// GET /uploads — list upload history (scoped by tenant)
 uploadsRouter.get('/', async (c) => {
   const db = c.get('db');
-  const rows = await db.select().from(uploadAudit).all();
+  const tenantId = c.get('tenantId');
+  if (!tenantId) return c.json([]);
+  const rows = await db.select().from(uploadAudit).where(eq(uploadAudit.tenantId, tenantId)).all();
   return c.json(rows);
 });
 

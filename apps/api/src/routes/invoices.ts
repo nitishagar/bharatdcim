@@ -1,23 +1,29 @@
 import { Hono } from 'hono';
-import { eq } from 'drizzle-orm';
-import type { Database } from '../db/client.js';
+import { eq, and } from 'drizzle-orm';
+import type { AppEnv } from '../types.js';
 import { invoices } from '../db/schema.js';
 import { createInvoice, cancelInvoice, createCreditNote } from '../services/invoicing.js';
+import { requireAdmin } from '../middleware/rbac.js';
 
-type Env = { Variables: { db: Database } };
+const invoicesRouter = new Hono<AppEnv>();
 
-const invoicesRouter = new Hono<Env>();
-
-// GET /invoices — list all invoices
+// GET /invoices — list invoices (scoped by tenant)
 invoicesRouter.get('/', async (c) => {
   const db = c.get('db');
-  const rows = await db.select().from(invoices).all();
+  const tenantId = c.get('tenantId');
+  if (!tenantId) return c.json([]);
+  const rows = await db.select().from(invoices).where(eq(invoices.tenantId, tenantId)).all();
   return c.json(rows);
 });
 
-// POST /invoices — create invoice from bill
+// POST /invoices — create invoice from bill (admin only)
 invoicesRouter.post('/', async (c) => {
+  requireAdmin(c);
   const db = c.get('db');
+  const tenantId = c.get('tenantId');
+  if (!tenantId) {
+    return c.json({ error: { code: 'FORBIDDEN', message: 'Tenant context required' } }, 403);
+  }
   const body = await c.req.json();
 
   if (!body.billId || !body.supplierGSTIN || !body.recipientGSTIN) {
@@ -39,20 +45,28 @@ invoicesRouter.post('/', async (c) => {
   }
 });
 
-// GET /invoices/:id — get invoice
+// GET /invoices/:id — get invoice (verify tenant ownership)
 invoicesRouter.get('/:id', async (c) => {
   const db = c.get('db');
+  const tenantId = c.get('tenantId');
   const id = c.req.param('id');
-  const rows = await db.select().from(invoices).where(eq(invoices.id, id)).all();
+  const conditions = [eq(invoices.id, id)];
+  if (tenantId) conditions.push(eq(invoices.tenantId, tenantId));
+  const rows = await db.select().from(invoices).where(and(...conditions)).all();
   if (rows.length === 0) {
     return c.json({ error: { code: 'NOT_FOUND', message: `Invoice ${id} not found` } }, 404);
   }
   return c.json(rows[0]);
 });
 
-// POST /invoices/:id/cancel — cancel invoice
+// POST /invoices/:id/cancel — cancel invoice (admin only)
 invoicesRouter.post('/:id/cancel', async (c) => {
+  requireAdmin(c);
   const db = c.get('db');
+  const tenantId = c.get('tenantId');
+  if (!tenantId) {
+    return c.json({ error: { code: 'FORBIDDEN', message: 'Tenant context required' } }, 403);
+  }
   const id = c.req.param('id');
   const body = await c.req.json();
 
@@ -75,9 +89,14 @@ invoicesRouter.post('/:id/cancel', async (c) => {
   }
 });
 
-// POST /credit-notes — create credit note
+// POST /credit-notes — create credit note (admin only)
 invoicesRouter.post('/credit-notes', async (c) => {
+  requireAdmin(c);
   const db = c.get('db');
+  const tenantId = c.get('tenantId');
+  if (!tenantId) {
+    return c.json({ error: { code: 'FORBIDDEN', message: 'Tenant context required' } }, 403);
+  }
   const body = await c.req.json();
 
   if (!body.invoiceId || !body.amountPaisa || !body.reason) {

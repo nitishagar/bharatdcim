@@ -1,28 +1,18 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { Hono } from 'hono';
-import { createTestDb } from '../helpers.js';
+import { createTestDb, createAppWithTenant } from '../helpers.js';
 import { readingsRouter } from '../../src/routes/readings.js';
 import { tenants, meters } from '../../src/db/schema.js';
 import type { Database } from '../../src/db/client.js';
 
-function createApp(db: Database) {
-  const app = new Hono<{ Variables: { db: Database } }>();
-  app.use('*', async (c, next) => {
-    c.set('db', db);
-    await next();
-  });
-  app.route('/readings', readingsRouter);
-  return app;
-}
-
 describe('Readings Routes', () => {
   let db: Database;
-  let app: ReturnType<typeof createApp>;
+  let app: ReturnType<typeof createAppWithTenant>;
 
   beforeEach(async () => {
     const testDb = await createTestDb();
     db = testDb.db as unknown as Database;
-    app = createApp(db);
+    app = createAppWithTenant(db, 'tenant-1');
+    app.route('/readings', readingsRouter);
 
     // Seed tenant + meter
     const now = new Date().toISOString();

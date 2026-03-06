@@ -1,15 +1,25 @@
 import { Hono } from 'hono';
-import { eq } from 'drizzle-orm';
-import type { Database } from '../db/client.js';
+import { eq, or, isNull } from 'drizzle-orm';
+import type { AppEnv } from '../types.js';
 import { tariffConfigs } from '../db/schema.js';
+import { requireAdmin } from '../middleware/rbac.js';
 
-type Env = { Variables: { db: Database } };
+const tariffs = new Hono<AppEnv>();
 
-const tariffs = new Hono<Env>();
-
-// GET /tariffs — list all tariff configs
+// GET /tariffs — list tariff configs (global + tenant-specific for tenant users)
 tariffs.get('/', async (c) => {
   const db = c.get('db');
+  const tenantId = c.get('tenantId');
+
+  if (tenantId) {
+    // Return global tariffs (tenantId IS NULL) + tenant-specific overrides
+    const rows = await db.select().from(tariffConfigs)
+      .where(or(isNull(tariffConfigs.tenantId), eq(tariffConfigs.tenantId, tenantId)))
+      .all();
+    return c.json(rows);
+  }
+
+  // API_TOKEN or platform admin — return all
   const rows = await db.select().from(tariffConfigs).all();
   return c.json(rows);
 });
@@ -25,9 +35,11 @@ tariffs.get('/:id', async (c) => {
   return c.json(rows[0]);
 });
 
-// POST /tariffs — create tariff config
+// POST /tariffs — create tariff config (admin only)
 tariffs.post('/', async (c) => {
+  requireAdmin(c);
   const db = c.get('db');
+  const tenantId = c.get('tenantId');
   const body = await c.req.json();
   const now = new Date().toISOString();
 
@@ -40,6 +52,7 @@ tariffs.post('/', async (c) => {
 
   const row = {
     id: body.id as string,
+    tenantId: tenantId ?? null, // tenant-specific if created by tenant, global if API_TOKEN
     stateCode: body.stateCode as string,
     discom: body.discom as string ?? '',
     category: body.category as string ?? '',

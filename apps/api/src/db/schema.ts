@@ -16,6 +16,7 @@ export const tenants = sqliteTable('tenants', {
 
 export const tariffConfigs = sqliteTable('tariff_configs', {
   id: text('id').primaryKey(),
+  tenantId: text('tenant_id').references(() => tenants.id), // null = global tariff
   stateCode: text('state_code').notNull(),
   discom: text('discom').notNull(),
   category: text('category').notNull(),
@@ -181,6 +182,7 @@ export const agentHeartbeats = sqliteTable('agent_heartbeats', {
   agentVersion: text('agent_version'),
   deviceCount: integer('device_count').notNull(),
   unsyncedCount: integer('unsynced_count'),
+  tenantId: text('tenant_id').references(() => tenants.id),
   status: text('status').notNull().default('online'), // 'online' | 'offline'
   lastHeartbeatAt: text('last_heartbeat_at').notNull(),
   createdAt: text('created_at').notNull(),

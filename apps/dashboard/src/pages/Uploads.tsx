@@ -5,6 +5,7 @@ import { StatusBadge } from '../components/StatusBadge';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { EmptyState } from '../components/EmptyState';
+import { useIsAdmin } from '../hooks/useIsAdmin';
 
 const columns: Column<Upload>[] = [
   { header: 'File', accessor: (u) => u.fileName },
@@ -33,6 +34,7 @@ export function Uploads() {
   const { data, isLoading, error, refetch } = useUploads();
   const upload = useUploadCSV();
   const fileRef = useRef<HTMLInputElement>(null);
+  const isAdmin = useIsAdmin();
 
   const [showForm, setShowForm] = useState(false);
   const [tenantId, setTenantId] = useState('');
@@ -57,12 +59,14 @@ export function Uploads() {
     <div>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-bold text-gray-900">Uploads</h2>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="rounded-lg bg-burgundy px-4 py-2 text-sm text-white hover:bg-burgundy-dark"
-        >
-          Upload CSV
-        </button>
+        {isAdmin && (
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="rounded-lg bg-burgundy px-4 py-2 text-sm text-white hover:bg-burgundy-dark"
+          >
+            Upload CSV
+          </button>
+        )}
       </div>
 
       {showForm && (

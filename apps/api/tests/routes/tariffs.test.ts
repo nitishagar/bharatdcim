@@ -1,29 +1,24 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { Hono } from 'hono';
-import { eq } from 'drizzle-orm';
-import { createTestDb } from '../helpers.js';
+import { createTestDb, createAppWithTenant } from '../helpers.js';
 import { tariffs } from '../../src/routes/tariffs.js';
-import { tariffConfigs } from '../../src/db/schema.js';
+import { tariffConfigs, tenants } from '../../src/db/schema.js';
 import type { Database } from '../../src/db/client.js';
 
-function createApp(db: Database) {
-  const app = new Hono<{ Variables: { db: Database } }>();
-  app.use('*', async (c, next) => {
-    c.set('db', db);
-    await next();
-  });
-  app.route('/tariffs', tariffs);
-  return app;
-}
+const now = '2026-03-01T00:00:00Z';
 
 describe('Tariff Routes', () => {
   let db: Database;
-  let app: ReturnType<typeof createApp>;
+  let app: ReturnType<typeof createAppWithTenant>;
 
   beforeEach(async () => {
     const testDb = await createTestDb();
     db = testDb.db as unknown as Database;
-    app = createApp(db);
+    // Seed tenant so FK constraints pass
+    await (db as any).insert(tenants).values({
+      id: 'tenant-1', name: 'Test Tenant', stateCode: 'MH', createdAt: now, updatedAt: now,
+    });
+    app = createAppWithTenant(db, 'tenant-1');
+    app.route('/tariffs', tariffs);
   });
 
   it('GET /tariffs — empty list', async () => {

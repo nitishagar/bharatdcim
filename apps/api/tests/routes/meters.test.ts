@@ -1,28 +1,18 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { Hono } from 'hono';
-import { createTestDb } from '../helpers.js';
+import { createTestDb, createAppWithTenant } from '../helpers.js';
 import { metersRouter } from '../../src/routes/meters.js';
 import { tenants } from '../../src/db/schema.js';
 import type { Database } from '../../src/db/client.js';
 
-function createApp(db: Database) {
-  const app = new Hono<{ Variables: { db: Database } }>();
-  app.use('*', async (c, next) => {
-    c.set('db', db);
-    await next();
-  });
-  app.route('/meters', metersRouter);
-  return app;
-}
-
 describe('Meter Routes', () => {
   let db: Database;
-  let app: ReturnType<typeof createApp>;
+  let app: ReturnType<typeof createAppWithTenant>;
 
   beforeEach(async () => {
     const testDb = await createTestDb();
     db = testDb.db as unknown as Database;
-    app = createApp(db);
+    app = createAppWithTenant(db, 'tenant-1');
+    app.route('/meters', metersRouter);
 
     // Seed a tenant for FK constraints
     const now = new Date().toISOString();
@@ -47,7 +37,6 @@ describe('Meter Routes', () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         id: 'meter-001',
-        tenantId: 'tenant-1',
         name: 'Grid Meter A',
         stateCode: 'MH',
         meterType: 'grid',
@@ -57,13 +46,14 @@ describe('Meter Routes', () => {
     const body = await res.json();
     expect(body.id).toBe('meter-001');
     expect(body.name).toBe('Grid Meter A');
+    expect(body.tenantId).toBe('tenant-1');
   });
 
   it('POST /meters — validation error', async () => {
     const res = await app.request('/meters', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: 'meter-bad' }), // missing tenantId, name, stateCode
+      body: JSON.stringify({ id: 'meter-bad' }), // missing name, stateCode
     });
     expect(res.status).toBe(400);
     const body = await res.json();
@@ -76,7 +66,6 @@ describe('Meter Routes', () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         id: 'meter-002',
-        tenantId: 'tenant-1',
         name: 'DG Meter B',
         stateCode: 'MH',
         meterType: 'dg',

@@ -21,10 +21,11 @@ type ReadingPayload struct {
 
 // HeartbeatPayload is the JSON body for a heartbeat.
 type HeartbeatPayload struct {
-	AgentVersion string `json:"agent_version"`
-	DeviceCount  int    `json:"device_count"`
-	UnsyncedCount int64 `json:"unsynced_count"`
-	Timestamp    string `json:"timestamp"`
+	AgentVersion  string `json:"agent_version"`
+	DeviceCount   int    `json:"device_count"`
+	UnsyncedCount int64  `json:"unsynced_count"`
+	TenantID      string `json:"tenant_id,omitempty"`
+	Timestamp     string `json:"timestamp"`
 }
 
 // Client handles HTTPS communication with the BharatDCIM cloud API.

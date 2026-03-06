@@ -1,19 +1,23 @@
 import { Hono } from 'hono';
-import { sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { meters, bills, invoices, agentHeartbeats } from '../db/schema.js';
-import type { Database } from '../db/client.js';
+import type { AppEnv } from '../types.js';
 
-type Env = { Variables: { db: Database } };
+const dashboardRouter = new Hono<AppEnv>();
 
-const dashboardRouter = new Hono<Env>();
-
-// GET /dashboard/summary — aggregated KPIs
+// GET /dashboard/summary — aggregated KPIs (scoped by tenant)
 dashboardRouter.get('/summary', async (c) => {
   const db = c.get('db');
+  const tenantId = c.get('tenantId');
+
+  const meterCondition = tenantId ? eq(meters.tenantId, tenantId) : undefined;
+  const billCondition = tenantId ? eq(bills.tenantId, tenantId) : undefined;
+  const invoiceCondition = tenantId ? eq(invoices.tenantId, tenantId) : undefined;
 
   const [meterStats] = await db
     .select({ count: sql<number>`COUNT(*)` })
     .from(meters)
+    .where(meterCondition)
     .all();
 
   const [billStats] = await db
@@ -23,11 +27,13 @@ dashboardRouter.get('/summary', async (c) => {
       totalKwh: sql<number>`COALESCE(SUM(total_kwh), 0)`,
     })
     .from(bills)
+    .where(billCondition)
     .all();
 
   const [invoiceStats] = await db
     .select({ count: sql<number>`COUNT(*)` })
     .from(invoices)
+    .where(invoiceCondition)
     .all();
 
   const [agentStats] = await db

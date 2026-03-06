@@ -1,6 +1,10 @@
+import { Hono } from 'hono';
+import { HTTPException } from 'hono/http-exception';
 import { createClient } from '@libsql/client';
 import { drizzle } from 'drizzle-orm/libsql';
 import * as schema from '../src/db/schema.js';
+import type { Database } from '../src/db/client.js';
+import type { AppEnv } from '../src/types.js';
 
 /**
  * Create an in-memory SQLite database with all tables for testing.
@@ -24,6 +28,7 @@ export async function createTestDb() {
 
     CREATE TABLE IF NOT EXISTS tariff_configs (
       id TEXT PRIMARY KEY,
+      tenant_id TEXT REFERENCES tenants(id),
       state_code TEXT NOT NULL,
       discom TEXT NOT NULL,
       category TEXT NOT NULL,
@@ -173,6 +178,7 @@ export async function createTestDb() {
       agent_version TEXT,
       device_count INTEGER NOT NULL,
       unsynced_count INTEGER,
+      tenant_id TEXT REFERENCES tenants(id),
       status TEXT NOT NULL DEFAULT 'online',
       last_heartbeat_at TEXT NOT NULL,
       created_at TEXT NOT NULL,
@@ -196,4 +202,44 @@ export async function createTestDb() {
   `);
 
   return { db, client };
+}
+
+/**
+ * Create a Hono app with tenant context for testing.
+ * Sets db, tenantId, authType, orgRole, and platformAdmin in context.
+ */
+export function createAppWithTenant(
+  db: Database,
+  tenantId: string | null = null,
+  options: {
+    authType?: 'clerk' | 'api_token';
+    orgRole?: string | null;
+    platformAdmin?: boolean;
+  } = {},
+) {
+  const {
+    authType = 'clerk',
+    orgRole = 'admin',
+    platformAdmin = false,
+  } = options;
+
+  const app = new Hono<AppEnv>();
+  app.onError((err, c) => {
+    if (err instanceof HTTPException) {
+      return c.json(
+        { error: { code: 'FORBIDDEN', message: err.message } },
+        err.status,
+      );
+    }
+    throw err;
+  });
+  app.use('*', async (c, next) => {
+    c.set('db', db);
+    c.set('tenantId', tenantId);
+    c.set('authType', authType);
+    c.set('orgRole', orgRole);
+    c.set('platformAdmin', platformAdmin);
+    await next();
+  });
+  return app;
 }

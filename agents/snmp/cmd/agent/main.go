@@ -81,6 +81,7 @@ func main() {
 				AgentVersion:  version,
 				DeviceCount:   len(cfg.Devices),
 				UnsyncedCount: unsynced,
+				TenantID:      cfg.Cloud.TenantID,
 				Timestamp:     time.Now().UTC().Format(time.RFC3339),
 			})
 			if err != nil {
