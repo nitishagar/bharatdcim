@@ -165,11 +165,11 @@ import IntegrationFlowWidget from '../components/IntegrationFlowWidget';
             </tr>
             <tr class="border-b border-gray-100">
               <td class="px-6 py-4 text-gray-600 bg-white">Change Management</td>
-              <td class="px-6 py-4 text-gray-900 font-medium bg-[#8b2e3e]/[0.03]">Tenant Billing Portal</td>
+              <td class="px-6 py-4 text-gray-900 font-medium bg-[#8b2e3e]/[0.03]">Admin Dashboard & Billing</td>
             </tr>
             <tr>
               <td class="px-6 py-4 text-gray-600 bg-white rounded-bl-xl">CMDB Integration</td>
-              <td class="px-6 py-4 text-gray-900 font-medium bg-[#8b2e3e]/[0.03] rounded-br-xl">e-Invoice (IRP) Export</td>
+              <td class="px-6 py-4 text-gray-900 font-medium bg-[#8b2e3e]/[0.03] rounded-br-xl">GST Invoice Generation</td>
             </tr>
           </tbody>
         </table>
@@ -190,7 +190,7 @@ import IntegrationFlowWidget from '../components/IntegrationFlowWidget';
         <div class="process-step">
           <span class="process-step-number mb-4">01</span>
           <h3 class="text-lg font-semibold text-gray-900 mb-2">Connect</h3>
-          <p class="text-gray-600 text-sm">Point BharatDCIM at your DCIM's API endpoint or SNMP interface. We support REST, SNMP v2/v3, Modbus TCP, and CSV import.</p>
+          <p class="text-gray-600 text-sm">Import data via CSV exports from your DCIM (Nlyte, Sunbird, EcoStruxure formats auto-detected), connect our SNMP v2c polling agent to your PDUs, or use our REST API.</p>
         </div>
         <div class="process-step">
           <span class="process-step-number mb-4">02</span>
@@ -206,48 +206,37 @@ import IntegrationFlowWidget from '../components/IntegrationFlowWidget';
     </div>
   </section>
 
-  <!-- Enterprise Social Proof -->
+  <!-- Founder's Vision -->
   <section class="section relative bg-mesh-cool">
     <div class="container relative">
-      <div class="text-center mb-16">
-        <span class="section-label">Built For Enterprise</span>
-        <h2 class="section-title">
-          Trusted by Teams Running
-          <span class="block accent">Multi-State Operations</span>
+      <div class="max-w-3xl mx-auto">
+        <span class="section-label text-center block">Why We Built This</span>
+        <h2 class="section-title text-center mb-10">
+          The Problem We're
+          <span class="block accent">Solving</span>
         </h2>
-      </div>
 
-      <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-        <div class="card bg-gradient-to-br from-white to-gray-50">
-          <div class="mb-4">
-            <svg class="w-8 h-8 text-[#8b2e3e]/30" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
-          </div>
-          <p class="text-gray-700 mb-6">We kept Nlyte for asset tracking and added BharatDCIM for billing. Our finance team no longer spends a week on invoices.</p>
-          <div class="border-t border-gray-100 pt-4">
-            <p class="text-sm font-semibold text-gray-900">VP Operations</p>
-            <p class="text-xs text-gray-500">Multi-state DC Operator</p>
-          </div>
-        </div>
-
-        <div class="card bg-gradient-to-br from-white to-gray-50">
-          <div class="mb-4">
-            <svg class="w-8 h-8 text-[#8b2e3e]/30" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
-          </div>
-          <p class="text-gray-700 mb-6">The API integration took two days. The first automated invoice run caught three ToD classification errors we'd been making in Excel for months.</p>
-          <div class="border-t border-gray-100 pt-4">
-            <p class="text-sm font-semibold text-gray-900">Head of IT</p>
-            <p class="text-xs text-gray-500">Mumbai Colocation</p>
-          </div>
-        </div>
-
-        <div class="card bg-gradient-to-br from-white to-gray-50">
-          <div class="mb-4">
-            <svg class="w-8 h-8 text-[#8b2e3e]/30" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
-          </div>
-          <p class="text-gray-700 mb-6">Finally, a tool that understands Indian tariff complexity without us having to explain MERC vs TNERC differences.</p>
-          <div class="border-t border-gray-100 pt-4">
-            <p class="text-sm font-semibold text-gray-900">CFO</p>
-            <p class="text-xs text-gray-500">Southern India DC Group</p>
+        <div class="card bg-gradient-to-br from-white to-gray-50 p-8 md:p-10">
+          <div class="space-y-4 text-gray-700 leading-relaxed">
+            <p>
+              Indian data center operators face a billing challenge that no global DCIM addresses:
+              <strong>Time-of-Day tariffs, state-specific regulatory structures, kWh vs kVAh billing,
+              DG cost pass-through, and GST compliance</strong> — all in a single invoice.
+            </p>
+            <p>
+              Today, most operators bridge this gap with spreadsheets. Finance teams spend days
+              each month manually classifying consumption into ToD slots, applying the right
+              surcharges, splitting DG costs, and generating GST-compliant invoices.
+            </p>
+            <p>
+              BharatDCIM exists to eliminate that manual work. We've encoded the tariff structures
+              of Maharashtra, Tamil Nadu, Karnataka, and Telangana into a billing engine that
+              classifies consumption, applies the correct rates, and generates invoices automatically.
+            </p>
+            <p class="text-gray-900 font-medium">
+              Our goal: any Indian data center operator should be able to go from raw meter data
+              to accurate, auditable, GST-compliant tenant invoices — without touching a spreadsheet.
+            </p>
           </div>
         </div>
       </div>
@@ -289,7 +278,7 @@ import IntegrationFlowWidget from '../components/IntegrationFlowWidget';
         <details class="faq-item" open>
           <summary>How long does integration take?</summary>
           <p class="text-gray-600 text-sm mt-3">
-            Most integrations are live within 3-5 business days. API-based connections (Nlyte, Sunbird) typically take 1-2 days. SNMP and Modbus integrations take 2-3 days for discovery and mapping. CSV import can start on day one.
+            CSV import can start on day one — just export from your existing DCIM and upload. SNMP v2c polling setup typically takes 2-3 days for PDU discovery and OID mapping. Most operators are fully live within a week.
           </p>
         </details>
         <details class="faq-item">
@@ -301,13 +290,13 @@ import IntegrationFlowWidget from '../components/IntegrationFlowWidget';
         <details class="faq-item">
           <summary>Which DCIM platforms do you support?</summary>
           <p class="text-gray-600 text-sm mt-3">
-            We integrate with Nlyte Software (REST API v2), Sunbird dcTrack (REST API), and Schneider EcoStruxure IT (SNMP v3). We also support any DCIM that exposes power data via REST API, SNMP v2/v3, Modbus TCP, or CSV export.
+            We support CSV imports from Nlyte Software, Sunbird dcTrack, and Schneider EcoStruxure IT — our pipeline auto-detects the format from column headers. We also poll smart PDUs (APC, Raritan, Server Technology) directly via SNMP v2c, and offer a REST API for custom integrations.
           </p>
         </details>
         <details class="faq-item">
           <summary>What if my DCIM isn't listed?</summary>
           <p class="text-gray-600 text-sm mt-3">
-            Any system that exposes power data via API, SNMP, or CSV export can integrate with BharatDCIM. We've worked with custom and in-house DCIM solutions. Our team will map your data model during the integration assessment.
+            Any system that can export power consumption data as CSV can integrate with BharatDCIM. We also support SNMP v2c polling for direct PDU monitoring and a REST API for programmatic data submission. Contact us for a custom integration assessment.
           </p>
         </details>
       </div>
@@ -324,7 +313,7 @@ import IntegrationFlowWidget from '../components/IntegrationFlowWidget';
         "name": "How long does DCIM integration take?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Most integrations are live within 3-5 business days. API-based connections (Nlyte, Sunbird) typically take 1-2 days. SNMP and Modbus integrations take 2-3 days for discovery and mapping. CSV import can start on day one."
+          "text": "CSV import can start on day one — just export from your existing DCIM and upload. SNMP v2c polling setup typically takes 2-3 days for PDU discovery and OID mapping. Most operators are fully live within a week."
         }
       },
       {
@@ -340,7 +329,7 @@ import IntegrationFlowWidget from '../components/IntegrationFlowWidget';
         "name": "Which DCIM platforms does BharatDCIM support?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "We integrate with Nlyte Software (REST API v2), Sunbird dcTrack (REST API), and Schneider EcoStruxure IT (SNMP v3). We also support any DCIM that exposes power data via REST API, SNMP v2/v3, Modbus TCP, or CSV export."
+          "text": "We support CSV imports from Nlyte Software, Sunbird dcTrack, and Schneider EcoStruxure IT — our pipeline auto-detects the format from column headers. We also poll smart PDUs (APC, Raritan, Server Technology) directly via SNMP v2c, and offer a REST API for custom integrations."
         }
       },
       {
@@ -348,7 +337,7 @@ import IntegrationFlowWidget from '../components/IntegrationFlowWidget';
         "name": "What if my DCIM platform isn't listed?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Any system that exposes power data via API, SNMP, or CSV export can integrate with BharatDCIM. We've worked with custom and in-house DCIM solutions. Our team will map your data model during the integration assessment."
+          "text": "Any system that can export power consumption data as CSV can integrate with BharatDCIM. We also support SNMP v2c polling for direct PDU monitoring and a REST API for programmatic data submission. Contact us for a custom integration assessment."
         }
       }
     ]
@@ -362,14 +351,12 @@ import IntegrationFlowWidget from '../components/IntegrationFlowWidget';
     "operatingSystem": "Web",
     "description": "Add Indian billing intelligence to your existing DCIM. BharatDCIM integrates with Nlyte Software, Sunbird dcTrack, and Schneider EcoStruxure IT for ToD tariff billing, DG metering, and GST invoicing.",
     "featureList": [
-      "Nlyte Software REST API Integration",
-      "Sunbird dcTrack REST API Integration",
-      "Schneider EcoStruxure IT SNMP Integration",
-      "SNMP v2/v3 & Modbus TCP Support",
-      "CSV Import Pipeline",
+      "CSV Import from Nlyte, Sunbird, EcoStruxure (auto-detected)",
+      "SNMP v2c PDU Polling (APC, Raritan, Server Technology)",
+      "REST API for Custom Integrations",
       "ToD-Aware Billing Engine",
       "GST-Compliant Invoice Generation",
-      "Multi-State Tariff Support"
+      "Multi-State Tariff Support (MH, TN, KA, TS)"
     ],
     "provider": {
       "@type": "Organization",

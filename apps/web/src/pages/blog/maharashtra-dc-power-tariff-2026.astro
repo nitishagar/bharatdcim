@@ -35,33 +35,33 @@ import BlogPost from '../../layouts/BlogPost.astro';
     <tbody>
       <tr>
         <td>Base Energy Rate</td>
-        <td><strong>₹7.45/kVAh</strong></td>
-        <td>Apparent energy billing</td>
+        <td><strong>₹8.68/kVAh</strong></td>
+        <td>Apparent energy billing (MERC Case 75/2025)</td>
       </tr>
       <tr>
         <td>Wheeling Charge</td>
-        <td>₹0.80/kVAh</td>
+        <td>₹0.74/kVAh</td>
         <td>All consumers including OA</td>
       </tr>
       <tr>
         <td>Total Variable Cost</td>
-        <td><strong>₹8.25/kVAh</strong></td>
+        <td><strong>₹9.42/kVAh</strong></td>
         <td>Energy + Wheeling</td>
       </tr>
       <tr>
         <td>Demand Charge</td>
-        <td><strong>₹750/kVA/month</strong></td>
-        <td>Highest in India</td>
+        <td><strong>₹600/kVA/month</strong></td>
+        <td>Per kVA of billed demand</td>
       </tr>
       <tr>
         <td>FAC (Feb 2026)</td>
-        <td>₹0.50-0.95/kVAh</td>
-        <td>Variable monthly</td>
+        <td>₹0.72/kVAh</td>
+        <td>Absolute per-unit charge</td>
       </tr>
       <tr>
         <td>Electricity Duty</td>
-        <td>16%</td>
-        <td></td>
+        <td>9.30%</td>
+        <td>Maharashtra Electricity Duty Act 2016, Industrial Part F</td>
       </tr>
       <tr>
         <td>Power Factor Threshold</td>
@@ -111,39 +111,39 @@ import BlogPost from '../../layouts/BlogPost.astro';
         <td><strong>Night Off-Peak</strong></td>
         <td>22:00 - 06:00</td>
         <td><strong>-₹1.50/kVAh</strong></td>
-        <td><strong>₹5.95/kVAh</strong></td>
+        <td><strong>₹7.18/kVAh</strong></td>
       </tr>
       <tr>
         <td>Morning Normal</td>
         <td>06:00 - 09:00</td>
         <td>Base Rate</td>
-        <td>₹7.45/kVAh</td>
+        <td>₹8.68/kVAh</td>
       </tr>
       <tr>
         <td>Morning Peak</td>
         <td>09:00 - 12:00</td>
         <td>+₹0.80/kVAh</td>
-        <td>₹8.25/kVAh</td>
+        <td>₹9.48/kVAh</td>
       </tr>
       <tr>
         <td>Solar Hours</td>
         <td>12:00 - 18:00</td>
         <td>Base Rate</td>
-        <td>₹7.45/kVAh</td>
+        <td>₹8.68/kVAh</td>
       </tr>
       <tr>
         <td><strong>Evening Peak</strong></td>
         <td>18:00 - 22:00</td>
         <td><strong>+₹1.10/kVAh</strong></td>
-        <td><strong>₹8.55/kVAh</strong></td>
+        <td><strong>₹9.78/kVAh</strong></td>
       </tr>
     </tbody>
   </table>
 
   <div class="highlight-box">
     <strong>Night Rate Analysis:</strong> The -₹1.50/kVAh night rebate (22:00-06:00) is the most aggressive
-    night incentive among major DC states. At ₹5.95/kVAh effective rate, industries that shift load to
-    night hours can save 20% vs base rate and 30% vs evening peak.
+    night incentive among major DC states. At ₹7.18/kVAh effective rate, industries that shift load to
+    night hours can save 17% vs base rate and 27% vs evening peak.
   </div>
 
   <h2>Peak Hour Impact Analysis</h2>
@@ -158,10 +158,10 @@ import BlogPost from '../../layouts/BlogPost.astro';
     <li><strong>Night-optimized (40% night):</strong> Savings of ~₹5.7 lakhs/month vs all-normal</li>
   </ul>
 
-  <h2>Demand Charges: ₹750/kVA/month</h2>
+  <h2>Demand Charges: ₹600/kVA/month</h2>
 
   <p>
-    Maharashtra's demand charge is the highest in India at ₹750/kVA/month. Billing demand is the higher of:
+    Maharashtra's demand charge of ₹600/kVA/month is among the highest in India. Billing demand is the higher of:
   </p>
 
   <ol>
@@ -172,8 +172,8 @@ import BlogPost from '../../layouts/BlogPost.astro';
 
   <div class="warning-box">
     <strong>Capacity Utilization Warning:</strong> Industries with utilization below 75% pay a penalty on
-    unutilized capacity. Ensure your contracted demand is right-sized. At ₹750/kVA, every 100 kVA of
-    over-provisioning costs ₹75,000/month.
+    unutilized capacity. Ensure your contracted demand is right-sized. At ₹600/kVA, every 100 kVA of
+    over-provisioning costs ₹60,000/month.
   </div>
 
   <h2>Bulk Consumption Rebates</h2>
@@ -209,6 +209,14 @@ import BlogPost from '../../layouts/BlogPost.astro';
     Use our <a href="/calculator">ToD Power Tariff Calculator</a> to estimate your Maharashtra
     data center electricity costs based on your specific consumption pattern and power factor.
   </p>
+
+  <h2>Compare Other States</h2>
+
+  <ul>
+    <li><a href="/blog/tamil-nadu-dc-power-tariff-2026">Tamil Nadu Tariff Guide</a> — Dual peak windows, 25% surcharge, 90% demand ratchet</li>
+    <li><a href="/blog/karnataka-dc-power-tariff-2026">Karnataka Tariff Guide</a> — Lowest base rate at ₹6.60/kWh, symmetrical ToD</li>
+    <li><a href="/blog/telangana-dc-power-tariff-2026">Telangana Tariff Guide</a> — Winter rebate suspension, kVAh billing impact</li>
+  </ul>
 
   <h2>Sources</h2>
 

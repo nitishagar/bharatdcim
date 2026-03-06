@@ -31,7 +31,7 @@ import Layout from '../layouts/Layout.astro';
     <div class="container">
       <div class="trust-strip max-w-5xl mx-auto">
         <div class="trust-logo-pill">Meter data -> ToD classification -> GST invoice</div>
-        <div class="trust-logo-pill">Supports SNMP, Modbus, API, CSV</div>
+        <div class="trust-logo-pill">Supports SNMP v2c, REST API, CSV</div>
         <div class="trust-logo-pill">State-specific tariff logic</div>
         <div class="trust-logo-pill">Tenant transparency by default</div>
       </div>
@@ -65,15 +65,15 @@ import Layout from '../layouts/Layout.astro';
             <ul class="text-sm text-gray-500 space-y-1">
               <li class="flex items-center gap-2">
                 <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-                Percentage-based and absolute surcharge support
+                Percentage-based and absolute ToD surcharges
               </li>
               <li class="flex items-center gap-2">
                 <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-                Seasonal variation handling
+                Demand ratchet (90% for TN) and PF penalty calculation
               </li>
               <li class="flex items-center gap-2">
                 <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-                Energy vs demand charge separation
+                kWh and kVAh billing modes per state
               </li>
             </ul>
           </div>
@@ -117,21 +117,21 @@ import Layout from '../layouts/Layout.astro';
           <div>
             <h3 class="text-xl font-semibold text-gray-900 mb-2">GST-Compliant Invoicing</h3>
             <p class="text-gray-600 mb-4">
-              Auto-generated invoices with proper SAC codes (998315) and e-invoice format.
-              Full line-item breakdown for tenant transparency.
+              Auto-generated invoices with CGST/SGST/IGST calculation, GSTIN validation,
+              and financial-year sequenced numbering. Full line-item breakdown for transparency.
             </p>
             <ul class="text-sm text-gray-500 space-y-1">
               <li class="flex items-center gap-2">
                 <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-                18% GST with CGST/SGST and IGST support
+                18% GST with automatic CGST/SGST vs IGST determination
               </li>
               <li class="flex items-center gap-2">
                 <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-                GSTIN validation
+                GSTIN validation with Luhn-mod-36 checksum
               </li>
               <li class="flex items-center gap-2">
                 <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-                E-invoice JSON export (IRP-compatible)
+                Credit note issuance with GST Section 34 compliance
               </li>
             </ul>
           </div>
@@ -144,7 +144,7 @@ import Layout from '../layouts/Layout.astro';
             </svg>
           </div>
           <div>
-            <h3 class="text-xl font-semibold text-gray-900 mb-2">Tenant Self-Service Portal</h3>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">Tenant Self-Service Portal <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-semibold rounded-full bg-amber-100 text-amber-700 align-middle">Roadmap</span></h3>
             <p class="text-gray-600 mb-4">
               Give your tenants real-time visibility into their consumption and costs.
               Reduce support tickets with self-service invoice downloads.
@@ -190,7 +190,7 @@ import Layout from '../layouts/Layout.astro';
               <path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
             </svg>
           </div>
-          <h3 class="text-xl font-semibold text-gray-900 mb-3">Asset Management</h3>
+          <h3 class="text-xl font-semibold text-gray-900 mb-3">Asset Management <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-semibold rounded-full bg-amber-100 text-amber-700 align-middle">Roadmap</span></h3>
           <p class="text-gray-600">
             Track every server, PDU, and network device. Full lifecycle from procurement
             to decommissioning with audit trails.
@@ -203,7 +203,7 @@ import Layout from '../layouts/Layout.astro';
               <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 0 1-3-3m3 3a3 3 0 1 0 0 6h13.5a3 3 0 1 0 0-6m-16.5-3a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3m-19.5 0a4.5 4.5 0 0 1 .9-2.7L5.737 5.1a3.375 3.375 0 0 1 2.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 0 1 .9 2.7m0 0a3 3 0 0 1-3 3m0 3h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Zm-3 6h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Z" />
             </svg>
           </div>
-          <h3 class="text-xl font-semibold text-gray-900 mb-3">Rack Visualization</h3>
+          <h3 class="text-xl font-semibold text-gray-900 mb-3">Rack Visualization <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-semibold rounded-full bg-amber-100 text-amber-700 align-middle">Roadmap</span></h3>
           <p class="text-gray-600">
             Interactive rack diagrams with real-time power and capacity data.
             Drag-and-drop planning for moves, adds, and changes.
@@ -217,7 +217,7 @@ import Layout from '../layouts/Layout.astro';
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 18a3.75 3.75 0 0 0 .495-7.468 5.99 5.99 0 0 0-1.925 3.547 5.975 5.975 0 0 1-2.133-1.001A3.75 3.75 0 0 0 12 18Z" />
             </svg>
           </div>
-          <h3 class="text-xl font-semibold text-gray-900 mb-3">Environmental Monitoring</h3>
+          <h3 class="text-xl font-semibold text-gray-900 mb-3">Environmental Monitoring <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-semibold rounded-full bg-amber-100 text-amber-700 align-middle">Roadmap</span></h3>
           <p class="text-gray-600">
             Temperature, humidity, and airflow tracking. Alert thresholds
             and historical analysis for capacity planning.
@@ -232,8 +232,8 @@ import Layout from '../layouts/Layout.astro';
           </div>
           <h3 class="text-xl font-semibold text-gray-900 mb-3">Power Monitoring</h3>
           <p class="text-gray-600">
-            Integration with smart PDUs from Schneider, Raritan, and Server Technology.
-            Real-time and historical power consumption at rack and circuit level.
+            On-premises SNMP v2c agent polls APC (Schneider), Raritan, and Server Technology PDUs.
+            Store-and-forward buffering ensures no data loss during network interruptions.
           </p>
         </div>
 
@@ -243,7 +243,7 @@ import Layout from '../layouts/Layout.astro';
               <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
             </svg>
           </div>
-          <h3 class="text-xl font-semibold text-gray-900 mb-3">Capacity Planning</h3>
+          <h3 class="text-xl font-semibold text-gray-900 mb-3">Capacity Planning <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-semibold rounded-full bg-amber-100 text-amber-700 align-middle">Roadmap</span></h3>
           <p class="text-gray-600">
             Power, space, and cooling capacity analysis. Trend forecasting
             and what-if modeling for growth planning.
@@ -256,7 +256,7 @@ import Layout from '../layouts/Layout.astro';
               <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
             </svg>
           </div>
-          <h3 class="text-xl font-semibold text-gray-900 mb-3">SLA Management</h3>
+          <h3 class="text-xl font-semibold text-gray-900 mb-3">SLA Management <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-semibold rounded-full bg-amber-100 text-amber-700 align-middle">Roadmap</span></h3>
           <p class="text-gray-600">
             Track uptime commitments against actual performance. Automated
             SLA credit calculations and reporting.
@@ -294,7 +294,7 @@ import Layout from '../layouts/Layout.astro';
         <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-4 p-4 bg-white rounded-xl border border-gray-100">
           <div class="text-sm text-gray-600">Provides energy reports</div>
           <svg class="w-5 h-5 text-[#8b2e3e] shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.638L10.23 5.29a.75.75 0 1 1 1.04-1.08l5.5 5.25a.75.75 0 0 1 0 1.08l-5.5 5.25a.75.75 0 1 1-1.04-1.08l4.158-3.96H3.75A.75.75 0 0 1 3 10Z" clip-rule="evenodd"/></svg>
-          <div class="text-sm text-gray-900 font-medium">Generates GST-compliant invoices with SAC codes and e-invoice format</div>
+          <div class="text-sm text-gray-900 font-medium">Generates GST-compliant invoices with CGST/SGST/IGST split and GSTIN validation</div>
         </div>
         <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-4 p-4 bg-white rounded-xl border border-gray-100">
           <div class="text-sm text-gray-600">One global rate structure</div>
@@ -304,7 +304,7 @@ import Layout from '../layouts/Layout.astro';
         <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-4 p-4 bg-white rounded-xl border border-gray-100">
           <div class="text-sm text-gray-600">Generic tenant portal</div>
           <svg class="w-5 h-5 text-[#8b2e3e] shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.638L10.23 5.29a.75.75 0 1 1 1.04-1.08l5.5 5.25a.75.75 0 0 1 0 1.08l-5.5 5.25a.75.75 0 1 1-1.04-1.08l4.158-3.96H3.75A.75.75 0 0 1 3 10Z" clip-rule="evenodd"/></svg>
-          <div class="text-sm text-gray-900 font-medium">India-native portal with ToD breakdown, DG allocation, and bill download</div>
+          <div class="text-sm text-gray-900 font-medium">Admin dashboard with ToD breakdown, DG allocation, and bill generation</div>
         </div>
       </div>
 
@@ -338,7 +338,7 @@ import Layout from '../layouts/Layout.astro';
               </div>
               <div>
                 <h4 class="font-semibold text-gray-900">Smart PDU Integration</h4>
-                <p class="text-sm text-gray-600">Schneider, Raritan, Server Technology, Vertiv</p>
+                <p class="text-sm text-gray-600">APC (Schneider), Raritan, Server Technology</p>
               </div>
             </div>
             <div class="flex items-center gap-4 p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-gray-100">
@@ -348,8 +348,8 @@ import Layout from '../layouts/Layout.astro';
                 </svg>
               </div>
               <div>
-                <h4 class="font-semibold text-gray-900">SNMP & Modbus</h4>
-                <p class="text-sm text-gray-600">Universal protocol support for meters and sensors</p>
+                <h4 class="font-semibold text-gray-900">SNMP v2c Polling</h4>
+                <p class="text-sm text-gray-600">On-premises Go agent polls PDUs with store-and-forward buffering</p>
               </div>
             </div>
             <div class="flex items-center gap-4 p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-gray-100">
@@ -394,7 +394,7 @@ import Layout from '../layouts/Layout.astro';
                 </div>
                 <div class="bg-gray-100 rounded-lg p-3 text-center border border-gray-200">
                   <svg class="w-6 h-6 text-gray-600 mx-auto mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.288 15.038a5.25 5.25 0 0 1 7.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 0 1 1.06 0Z" /></svg>
-                  <div class="text-[10px] font-semibold text-gray-700">SNMP/Modbus</div>
+                  <div class="text-[10px] font-semibold text-gray-700">SNMP v2c</div>
                 </div>
                 <div class="bg-gray-100 rounded-lg p-3 text-center border border-gray-200">
                   <svg class="w-6 h-6 text-gray-600 mx-auto mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" /></svg>
@@ -424,7 +424,7 @@ import Layout from '../layouts/Layout.astro';
                   <div class="text-[10px] font-medium text-green-700">GST Invoices</div>
                 </div>
                 <div class="bg-blue-50/80 rounded-lg p-3 text-center">
-                  <div class="text-[10px] font-medium text-blue-700">Tenant Portal</div>
+                  <div class="text-[10px] font-medium text-blue-700">Admin Dashboard</div>
                 </div>
                 <div class="bg-purple-50/80 rounded-lg p-3 text-center">
                   <div class="text-[10px] font-medium text-purple-700">ERP Export</div>
@@ -517,19 +517,19 @@ import Layout from '../layouts/Layout.astro';
         <details class="faq-item">
           <summary>Can I integrate with my existing metering infrastructure?</summary>
           <p class="text-gray-600 text-sm mt-3">
-            Yes. BharatDCIM supports SNMP and Modbus for direct meter integration, works with major
-            smart PDU vendors (Schneider, Raritan, Server Technology, Vertiv), and offers a REST API
-            and CSV import for custom integrations. You can start with manual data entry and add
-            automated integration over time.
+            Yes. BharatDCIM includes an on-premises SNMP v2c polling agent that works with smart PDUs
+            from APC (Schneider), Raritan, and Server Technology. We also offer a REST API
+            and CSV import for custom integrations. You can start with manual CSV upload and add
+            automated SNMP polling over time.
           </p>
         </details>
         <details class="faq-item">
           <summary>Is the e-invoice integration mandatory?</summary>
           <p class="text-gray-600 text-sm mt-3">
             E-invoicing is currently mandatory for businesses with annual turnover exceeding Rs. 5 crore
-            (Notification 10/2023-CT). BharatDCIM generates invoices in the IRP-compatible JSON schema
-            (v1.03) so you're ready when you cross the threshold. For smaller operators, standard
-            GST-compliant PDF invoices are generated.
+            (Notification 10/2023-CT). BharatDCIM currently generates GST-compliant invoices with
+            CGST/SGST/IGST calculation, GSTIN validation, and credit note support. IRP-compatible
+            e-invoice generation is on our roadmap.
           </p>
         </details>
       </div>
@@ -569,7 +569,7 @@ import Layout from '../layouts/Layout.astro';
         "name": "Can I integrate with my existing metering infrastructure?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Yes. BharatDCIM supports SNMP and Modbus for direct meter integration, works with major smart PDU vendors (Schneider, Raritan, Server Technology, Vertiv), and offers a REST API and CSV import for custom integrations. You can start with manual data entry and add automated integration over time."
+          "text": "Yes. BharatDCIM includes an on-premises SNMP v2c polling agent that works with smart PDUs from APC (Schneider), Raritan, and Server Technology. We also offer a REST API and CSV import for custom integrations. You can start with manual CSV upload and add automated SNMP polling over time."
         }
       },
       {
@@ -577,7 +577,7 @@ import Layout from '../layouts/Layout.astro';
         "name": "Is the e-invoice integration mandatory?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "E-invoicing is currently mandatory for businesses with annual turnover exceeding Rs. 5 crore (Notification 10/2023-CT). BharatDCIM generates invoices in the IRP-compatible JSON schema (v1.03) so you're ready when you cross the threshold. For smaller operators, standard GST-compliant PDF invoices are generated."
+          "text": "E-invoicing is currently mandatory for businesses with annual turnover exceeding Rs. 5 crore (Notification 10/2023-CT). BharatDCIM currently generates GST-compliant invoices with CGST/SGST/IGST calculation, GSTIN validation, and credit note support. IRP-compatible e-invoice generation is on our roadmap."
         }
       }
     ]
@@ -600,10 +600,10 @@ import Layout from '../layouts/Layout.astro';
     "featureList": [
       "ToD-Aware Billing Engine",
       "DG Power Tracking",
-      "GST-Compliant Invoicing",
-      "Tenant Self-Service Portal",
-      "Multi-State Tariff Support",
-      "SNMP & Modbus Integration"
+      "GST-Compliant Invoicing with GSTIN Validation",
+      "Multi-State Tariff Support (MH, TN, KA, TS)",
+      "SNMP v2c PDU Polling Agent",
+      "CSV Import from Nlyte, Sunbird, EcoStruxure"
     ],
     "provider": {
       "@type": "Organization",

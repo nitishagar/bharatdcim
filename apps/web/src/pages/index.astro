@@ -36,6 +36,13 @@ import HeroDashboardWidget from '../components/HeroDashboardWidget';
         <div class="relative mt-8 xl:mt-0 max-w-3xl mx-auto xl:max-w-none">
           <div class="absolute -inset-2 bg-gradient-to-br from-[#1e3a5f]/30 to-[#8b2e3e]/25 rounded-3xl blur-3xl"></div>
           <HeroDashboardWidget client:load />
+          <noscript>
+            <div class="surface-elevated p-6 text-center">
+              <p class="text-gray-700 font-semibold mb-2">Interactive ToD Billing Dashboard</p>
+              <p class="text-gray-500 text-sm">Calculate data center power costs across Maharashtra, Tamil Nadu, Karnataka, and Telangana with real-time ToD tariff classification, DG allocation, and GST-compliant billing.</p>
+              <a href="/calculator" class="inline-block mt-4 text-[#8b2e3e] font-semibold hover:underline">Try the Calculator →</a>
+            </div>
+          </noscript>
         </div>
       </div>
     </div>
@@ -154,7 +161,7 @@ import HeroDashboardWidget from '../components/HeroDashboardWidget';
         <div class="process-step">
           <span class="process-step-number mb-4">01</span>
           <h3 class="text-lg font-semibold text-gray-900 mb-2">Ingest Data</h3>
-          <p class="text-gray-600 text-sm">Import data from smart PDUs and meters via SNMP, Modbus, API, or CSV uploads.</p>
+          <p class="text-gray-600 text-sm">Import data from smart PDUs and meters via SNMP v2c polling, REST API, or CSV uploads from Nlyte, Sunbird, and EcoStruxure.</p>
         </div>
         <div class="process-step">
           <span class="process-step-number mb-4">02</span>
@@ -164,7 +171,7 @@ import HeroDashboardWidget from '../components/HeroDashboardWidget';
         <div class="process-step">
           <span class="process-step-number mb-4">03</span>
           <h3 class="text-lg font-semibold text-gray-900 mb-2">Publish Bills</h3>
-          <p class="text-gray-600 text-sm">Generate GST-compliant invoices and expose transparent line items in tenant portals.</p>
+          <p class="text-gray-600 text-sm">Generate GST-compliant invoices with CGST/SGST/IGST split, credit notes, and full audit trail.</p>
         </div>
       </div>
     </div>
@@ -202,13 +209,13 @@ import HeroDashboardWidget from '../components/HeroDashboardWidget';
               <div class="w-8 h-8 bg-[#8b2e3e] rounded-full flex items-center justify-center shrink-0 mt-0.5 text-white text-sm font-bold">✓</div>
               <div>
                 <strong class="text-gray-900">GST-Compliant Invoicing</strong>
-                <p class="text-gray-600 text-sm">Auto-generated invoices with proper SAC codes and e-invoice format</p>
+                <p class="text-gray-600 text-sm">Auto-generated invoices with CGST/SGST/IGST calculation, GSTIN validation, and financial-year sequenced numbering</p>
               </div>
             </li>
             <li class="flex items-start gap-3">
               <div class="w-8 h-8 bg-[#8b2e3e] rounded-full flex items-center justify-center shrink-0 mt-0.5 text-white text-sm font-bold">✓</div>
               <div>
-                <strong class="text-gray-900">Tenant Transparency Portal</strong>
+                <strong class="text-gray-900">Tenant Transparency Portal <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-semibold rounded-full bg-amber-100 text-amber-700 align-middle">Roadmap</span></strong>
                 <p class="text-gray-600 text-sm">Self-service dashboard for tenants to view consumption and download bills</p>
               </div>
             </li>
@@ -275,8 +282,8 @@ import HeroDashboardWidget from '../components/HeroDashboardWidget';
               <path stroke-linecap="round" stroke-linejoin="round" d="M8.288 15.038a5.25 5.25 0 0 1 7.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 0 1 1.06 0Z" />
             </svg>
           </div>
-          <h3 class="text-xl font-semibold mb-3 text-gray-900">Protocol Support</h3>
-          <p class="text-gray-600">Native SNMP v2/v3 and Modbus TCP support for direct meter and PDU integration.</p>
+          <h3 class="text-xl font-semibold mb-3 text-gray-900">SNMP Polling</h3>
+          <p class="text-gray-600">On-premises Go agent polls APC, Raritan, and ServerTech PDUs via SNMP v2c with store-and-forward buffering.</p>
         </div>
 
         <div class="card bg-gradient-to-br from-white to-gray-50 hover-lift">
@@ -315,7 +322,7 @@ import HeroDashboardWidget from '../components/HeroDashboardWidget';
           <h3 class="font-semibold text-gray-900 mb-1">Maharashtra</h3>
           <p class="text-sm text-gray-600">MERC / MSEDCL</p>
           <div class="mt-3 pt-3 border-t border-gray-100">
-            <p class="text-xs text-[#8b2e3e] font-medium">Rs.750/kVA Demand Charge</p>
+            <p class="text-xs text-[#8b2e3e] font-medium">Rs.600/kVA Demand Charge</p>
           </div>
         </a>
 
@@ -337,7 +344,7 @@ import HeroDashboardWidget from '../components/HeroDashboardWidget';
           <h3 class="font-semibold text-gray-900 mb-1">Karnataka</h3>
           <p class="text-sm text-gray-600">BESCOM / KERC</p>
           <div class="mt-3 pt-3 border-t border-gray-100">
-            <p class="text-xs text-green-600 font-medium">Lowest Rates (~Rs.8.50/unit)</p>
+            <p class="text-xs text-green-600 font-medium">Lowest Base Rate (Rs.6.60/kWh)</p>
           </div>
         </a>
 

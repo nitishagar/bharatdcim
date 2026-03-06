@@ -48,8 +48,8 @@ import BlogPost from '../../layouts/BlogPost.astro';
       </tr>
       <tr>
         <td>Power Factor Threshold</td>
-        <td>0.85</td>
-        <td>Most lenient in India</td>
+        <td>0.90</td>
+        <td>Standard HT threshold (LT is 0.85)</td>
       </tr>
     </tbody>
   </table>
@@ -154,10 +154,10 @@ import BlogPost from '../../layouts/BlogPost.astro';
       </tr>
       <tr>
         <td>Maharashtra</td>
-        <td>₹7,50,000</td>
-        <td>₹22,35,000</td>
-        <td>~₹31.5 L</td>
-        <td>~₹10.50/unit</td>
+        <td>₹6,00,000</td>
+        <td>₹26,04,000</td>
+        <td>~₹34.5 L</td>
+        <td>~₹11.50/unit</td>
       </tr>
       <tr>
         <td>Telangana</td>
@@ -191,14 +191,13 @@ import BlogPost from '../../layouts/BlogPost.astro';
   <h2>Power Factor Advantage</h2>
 
   <p>
-    Karnataka's 0.85 PF threshold (vs 0.90 in other states) provides more flexibility:
+    Karnataka's 0.90 PF threshold (same as other states for HT consumers) still offers advantages through kWh billing:
   </p>
 
   <ul>
-    <li>Lower APFC panel requirements</li>
-    <li>More tolerance for variable IT loads</li>
-    <li>Reduced penalty exposure during UPS operations</li>
     <li>kWh billing means PF doesn't inflate billed units (unlike MH/TS kVAh billing)</li>
+    <li>PF penalty is a separate line item at ₹0.15/kWh per 0.01 below threshold</li>
+    <li>Simpler to manage than the implicit kVAh penalty in Maharashtra</li>
   </ul>
 
   <h2>Bengaluru Market Dynamics</h2>
@@ -232,6 +231,14 @@ import BlogPost from '../../layouts/BlogPost.astro';
     Use our <a href="/calculator">ToD Power Tariff Calculator</a> to estimate your Karnataka
     data center electricity costs with your specific consumption pattern.
   </p>
+
+  <h2>Compare Other States</h2>
+
+  <ul>
+    <li><a href="/blog/maharashtra-dc-power-tariff-2026">Maharashtra Tariff Guide</a> — kVAh billing, aggressive night rebate, ₹600/kVA demand</li>
+    <li><a href="/blog/tamil-nadu-dc-power-tariff-2026">Tamil Nadu Tariff Guide</a> — Dual peak windows, 25% surcharge, 90% demand ratchet</li>
+    <li><a href="/blog/telangana-dc-power-tariff-2026">Telangana Tariff Guide</a> — Winter rebate suspension, kVAh billing impact</li>
+  </ul>
 
   <h2>Sources</h2>
 
