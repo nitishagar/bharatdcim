@@ -34,7 +34,7 @@ invoicesRouter.post('/', async (c) => {
   }
 
   try {
-    const result = await createInvoice(body.billId, body.supplierGSTIN, body.recipientGSTIN, db);
+    const result = await createInvoice(body.billId, body.supplierGSTIN, body.recipientGSTIN, db, tenantId);
     return c.json(result.invoice, 201);
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';
@@ -78,7 +78,7 @@ invoicesRouter.post('/:id/cancel', async (c) => {
   }
 
   try {
-    const result = await cancelInvoice(id, body.reason, db);
+    const result = await cancelInvoice(id, body.reason, db, tenantId);
     return c.json(result);
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';
@@ -107,7 +107,7 @@ invoicesRouter.post('/credit-notes', async (c) => {
   }
 
   try {
-    const result = await createCreditNote(body.invoiceId, body.amountPaisa, body.reason, db);
+    const result = await createCreditNote(body.invoiceId, body.amountPaisa, body.reason, db, tenantId);
     return c.json(result, 201);
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';

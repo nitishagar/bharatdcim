@@ -54,6 +54,7 @@ export async function createInvoice(
   supplierGSTIN: string,
   recipientGSTIN: string,
   db: Database,
+  tenantId: string | null = null,
 ): Promise<{ invoice: typeof invoices.$inferSelect; invoiceNumber: string }> {
   // Validate GSTINs
   const supplierVal = validateGSTIN(supplierGSTIN);
@@ -71,6 +72,11 @@ export async function createInvoice(
     throw new Error(`Bill ${billId} not found`);
   }
   const bill = billRows[0];
+
+  // Tenant ownership check
+  if (tenantId && bill.tenantId !== tenantId) {
+    throw new Error(`Bill ${billId} not found`);
+  }
 
   if (bill.status === 'invoiced') {
     throw new Error(`Bill ${billId} is already invoiced`);
@@ -135,6 +141,7 @@ export async function cancelInvoice(
   invoiceId: string,
   reason: string,
   db: Database,
+  tenantId: string | null = null,
 ): Promise<typeof invoices.$inferSelect> {
   const rows = await db.select().from(invoices).where(eq(invoices.id, invoiceId)).all();
   if (rows.length === 0) {
@@ -142,6 +149,12 @@ export async function cancelInvoice(
   }
 
   const invoice = rows[0];
+
+  // Tenant ownership check
+  if (tenantId && invoice.tenantId !== tenantId) {
+    throw new Error(`Invoice ${invoiceId} not found`);
+  }
+
   if (invoice.status === 'cancelled') {
     throw new Error(`Invoice ${invoiceId} is already cancelled`);
   }
@@ -180,6 +193,7 @@ export async function createCreditNote(
   amountPaisa: number,
   reason: string,
   db: Database,
+  tenantId: string | null = null,
 ): Promise<typeof creditNotes.$inferSelect> {
   // Fetch original invoice
   const invoiceRows = await db.select().from(invoices).where(eq(invoices.id, invoiceId)).all();
@@ -187,6 +201,11 @@ export async function createCreditNote(
     throw new Error(`Invoice ${invoiceId} not found`);
   }
   const invoice = invoiceRows[0];
+
+  // Tenant ownership check
+  if (tenantId && invoice.tenantId !== tenantId) {
+    throw new Error(`Invoice ${invoiceId} not found`);
+  }
 
   // Validate credit note
   const validation = validateCreditNote(

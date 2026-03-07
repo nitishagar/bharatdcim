@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { eq, or, isNull } from 'drizzle-orm';
+import { eq, or, isNull, and } from 'drizzle-orm';
 import type { AppEnv } from '../types.js';
 import { tariffConfigs } from '../db/schema.js';
 import { requireAdmin } from '../middleware/rbac.js';
@@ -24,11 +24,17 @@ tariffs.get('/', async (c) => {
   return c.json(rows);
 });
 
-// GET /tariffs/:id — get tariff by ID
+// GET /tariffs/:id — get tariff by ID (global tariffs or own tenant's tariffs)
 tariffs.get('/:id', async (c) => {
   const db = c.get('db');
   const id = c.req.param('id');
-  const rows = await db.select().from(tariffConfigs).where(eq(tariffConfigs.id, id)).all();
+  const tenantId = c.get('tenantId');
+  const conditions = [eq(tariffConfigs.id, id)];
+  if (tenantId) {
+    // Allow access to global tariffs (tenantId IS NULL) OR own tenant's tariffs
+    conditions.push(or(isNull(tariffConfigs.tenantId), eq(tariffConfigs.tenantId, tenantId))!);
+  }
+  const rows = await db.select().from(tariffConfigs).where(and(...conditions)).all();
   if (rows.length === 0) {
     return c.json({ error: { code: 'NOT_FOUND', message: `Tariff ${id} not found` } }, 404);
   }

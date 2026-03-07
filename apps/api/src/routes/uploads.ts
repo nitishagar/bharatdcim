@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import type { AppEnv } from '../types.js';
 import { uploadAudit } from '../db/schema.js';
 import { importCSV } from '../services/csv-import.js';
@@ -52,11 +52,14 @@ uploadsRouter.get('/', async (c) => {
   return c.json(rows);
 });
 
-// GET /uploads/:id — specific upload audit
+// GET /uploads/:id — specific upload audit (scoped by tenant)
 uploadsRouter.get('/:id', async (c) => {
   const db = c.get('db');
   const id = c.req.param('id');
-  const rows = await db.select().from(uploadAudit).where(eq(uploadAudit.id, id)).all();
+  const tenantId = c.get('tenantId');
+  const conditions = [eq(uploadAudit.id, id)];
+  if (tenantId) conditions.push(eq(uploadAudit.tenantId, tenantId));
+  const rows = await db.select().from(uploadAudit).where(and(...conditions)).all();
   if (rows.length === 0) {
     return c.json({ error: { code: 'NOT_FOUND', message: `Upload ${id} not found` } }, 404);
   }

@@ -48,6 +48,7 @@ readingsRouter.get('/', async (c) => {
 // POST /readings — batch insert readings
 readingsRouter.post('/', async (c) => {
   const db = c.get('db');
+  const tenantId = c.get('tenantId');
   const body = await c.req.json();
 
   if (!Array.isArray(body.readings) || body.readings.length === 0) {
@@ -55,6 +56,21 @@ readingsRouter.post('/', async (c) => {
       { error: { code: 'VALIDATION_ERROR', message: 'Body must contain a non-empty readings array' } },
       400,
     );
+  }
+
+  // Verify all referenced meters belong to the caller's tenant
+  if (tenantId) {
+    const meterIds = [...new Set((body.readings as Array<Record<string, unknown>>).map((r) => r.meterId as string))];
+    for (const meterId of meterIds) {
+      const meterRows = await db.select({ tenantId: meters.tenantId })
+        .from(meters).where(eq(meters.id, meterId)).all();
+      if (meterRows.length === 0 || meterRows[0].tenantId !== tenantId) {
+        return c.json(
+          { error: { code: 'FORBIDDEN', message: `Meter ${meterId} does not belong to your tenant` } },
+          403,
+        );
+      }
+    }
   }
 
   const now = new Date().toISOString();
@@ -88,6 +104,7 @@ readingsRouter.post('/', async (c) => {
 // POST /readings/batch — SNMP agent batch upload format
 readingsRouter.post('/batch', async (c) => {
   const db = c.get('db');
+  const tenantId = c.get('tenantId');
   const body = await c.req.json();
 
   if (!Array.isArray(body.readings) || body.readings.length === 0) {
@@ -95,6 +112,23 @@ readingsRouter.post('/batch', async (c) => {
       { error: { code: 'VALIDATION_ERROR', message: 'Body must contain a non-empty readings array' } },
       400,
     );
+  }
+
+  // Verify all referenced meters belong to the caller's tenant (skipped for api_token callers)
+  if (tenantId) {
+    const meterIds = [...new Set((body.readings as Array<Record<string, unknown>>).map(
+      (r) => (r.meter_id || r.meterId) as string
+    ))];
+    for (const meterId of meterIds) {
+      const meterRows = await db.select({ tenantId: meters.tenantId })
+        .from(meters).where(eq(meters.id, meterId)).all();
+      if (meterRows.length === 0 || meterRows[0].tenantId !== tenantId) {
+        return c.json(
+          { error: { code: 'FORBIDDEN', message: `Meter ${meterId} does not belong to your tenant` } },
+          403,
+        );
+      }
+    }
   }
 
   const now = new Date().toISOString();

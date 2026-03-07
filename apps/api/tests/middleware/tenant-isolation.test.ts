@@ -6,6 +6,7 @@ import { invoicesRouter } from '../../src/routes/invoices.js';
 import { uploadsRouter } from '../../src/routes/uploads.js';
 import { readingsRouter } from '../../src/routes/readings.js';
 import { dashboardRouter } from '../../src/routes/dashboard.js';
+import { tariffs as tariffsRouter } from '../../src/routes/tariffs.js';
 import { tenants, meters, tariffConfigs, bills, invoices, uploadAudit, powerReadings } from '../../src/db/schema.js';
 import type { Database } from '../../src/db/client.js';
 
@@ -68,6 +69,23 @@ async function seedTwoTenants(db: Database) {
     taxType: 'CGST_SGST', taxableAmountPaisa: 77500, cgstPaisa: 6975, sgstPaisa: 6975,
     totalTaxPaisa: 13950, totalAmountPaisa: 91450, status: 'finalized',
     invoiceDate: '2026-02-01', createdAt: now, updatedAt: now,
+  });
+  // Tenant-ka specific tariff (NOT global — tenantId is set)
+  await (db as any).insert(tariffConfigs).values({
+    id: 'tc-ka', tenantId: 'tenant-ka', stateCode: 'KA', discom: 'BESCOM', category: 'HT', effectiveFrom: '2025-01-01',
+    billingUnit: 'kWh', baseEnergyRatePaisa: 660, wheelingChargePaisa: 0,
+    demandChargePerKvaPaisa: 35000, demandRatchetPercent: 100, minimumDemandKva: 0,
+    timeSlotsJson: '[]', fuelAdjustmentPaisa: 28, fuelAdjustmentType: 'absolute',
+    electricityDutyBps: 600, pfThresholdBps: 9000, pfPenaltyRatePaisa: 15,
+    version: 1, createdAt: now, updatedAt: now,
+  });
+  // Invoice for tenant-ka (for cross-tenant cancel/credit-note tests)
+  await (db as any).insert(invoices).values({
+    id: 'inv-ka-1', billId: 'bill-ka-1', tenantId: 'tenant-ka', invoiceNumber: 'INV-2526-0002',
+    financialYear: '2526', supplierGstin: '29AABCT1332E1ZP', recipientGstin: '29AADCB2230M1ZP',
+    taxType: 'CGST_SGST', taxableAmountPaisa: 38750, cgstPaisa: 3488, sgstPaisa: 3488,
+    totalTaxPaisa: 6975, totalAmountPaisa: 45725, status: 'finalized',
+    invoiceDate: '2026-03-01', createdAt: now, updatedAt: now,
   });
   // Upload audit
   await (db as any).insert(uploadAudit).values([
@@ -201,12 +219,13 @@ describe('Tenant Isolation', () => {
       expect(body).toHaveLength(1);
     });
 
-    it('tenant-ka sees no invoices', async () => {
+    it('tenant-ka sees only its invoices', async () => {
       const app = createAppWithTenant(db, 'tenant-ka');
       app.route('/invoices', invoicesRouter);
       const res = await app.request('/invoices');
       const body = await res.json();
-      expect(body).toHaveLength(0);
+      expect(body).toHaveLength(1);
+      expect(body[0].tenantId).toBe('tenant-ka');
     });
   });
 
@@ -257,7 +276,171 @@ describe('Tenant Isolation', () => {
       const body = await res.json();
       expect(body.meters.total).toBe(1);
       expect(body.bills.total).toBe(1);
-      expect(body.invoices.total).toBe(0);
+      expect(body.invoices.total).toBe(1);
+    });
+  });
+
+  // ── New tenant isolation gaps ─────────────────────────────────────────────
+
+  describe('TI-UPL-01: GET /uploads/:id cross-tenant', () => {
+    it('returns 404 when tenant-mh requests a tenant-ka upload by ID', async () => {
+      const app = createAppWithTenant(db, 'tenant-mh');
+      app.route('/uploads', uploadsRouter);
+      const res = await app.request('/uploads/up-ka-1');
+      expect(res.status).toBe(404);
+    });
+
+    it('returns 200 when tenant-mh requests its own upload by ID', async () => {
+      const app = createAppWithTenant(db, 'tenant-mh');
+      app.route('/uploads', uploadsRouter);
+      const res = await app.request('/uploads/up-mh-1');
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.tenantId).toBe('tenant-mh');
+    });
+  });
+
+  describe('TI-TAR-01/02: GET /tariffs/:id tenant vs global', () => {
+    it('TI-TAR-01: returns 404 when tenant-mh requests tenant-ka specific tariff', async () => {
+      const app = createAppWithTenant(db, 'tenant-mh');
+      app.route('/tariffs', tariffsRouter);
+      const res = await app.request('/tariffs/tc-ka');
+      expect(res.status).toBe(404);
+    });
+
+    it('TI-TAR-02: returns 200 when tenant-mh requests a global tariff (tenant_id IS NULL)', async () => {
+      const app = createAppWithTenant(db, 'tenant-mh');
+      app.route('/tariffs', tariffsRouter);
+      const res = await app.request('/tariffs/tc1');
+      expect(res.status).toBe(200);
+    });
+
+    it('TI-TAR-02b: tenant-ka can access its own specific tariff', async () => {
+      const app = createAppWithTenant(db, 'tenant-ka');
+      app.route('/tariffs', tariffsRouter);
+      const res = await app.request('/tariffs/tc-ka');
+      expect(res.status).toBe(200);
+    });
+  });
+
+  describe('TI-RDG-01: POST /readings cross-tenant meter check', () => {
+    it('rejects readings referencing a meter belonging to a different tenant', async () => {
+      const app = createAppWithTenant(db, 'tenant-mh');
+      app.route('/readings', readingsRouter);
+      const res = await app.request('/readings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          readings: [
+            { id: 'r-bad-1', meterId: 'meter-ka-1', timestamp: '2026-03-01T00:00:00Z', kWh: 100 },
+          ],
+        }),
+      });
+      expect(res.status).toBe(403);
+      const body = await res.json();
+      expect(body.error.code).toBe('FORBIDDEN');
+    });
+
+    it('allows readings for own tenant meter', async () => {
+      const app = createAppWithTenant(db, 'tenant-mh');
+      app.route('/readings', readingsRouter);
+      const res = await app.request('/readings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          readings: [
+            { id: 'r-ok-1', meterId: 'meter-mh-1', timestamp: '2026-03-01T00:00:00Z', kWh: 100 },
+          ],
+        }),
+      });
+      expect(res.status).toBe(201);
+    });
+  });
+
+  describe('TI-RDG-02: POST /readings/batch cross-tenant meter check', () => {
+    it('rejects batch readings referencing a meter belonging to a different tenant', async () => {
+      const app = createAppWithTenant(db, 'tenant-mh');
+      app.route('/readings', readingsRouter);
+      const res = await app.request('/readings/batch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          readings: [
+            { meter_id: 'meter-ka-1', timestamp: '2026-03-01T00:00:00Z', kwh: 100, kw: 10, pf: 0.95 },
+          ],
+        }),
+      });
+      expect(res.status).toBe(403);
+      const body = await res.json();
+      expect(body.error.code).toBe('FORBIDDEN');
+    });
+
+    it('api_token callers (no tenantId) can batch-insert without cross-tenant check', async () => {
+      const app = createAppWithTenant(db, null, { authType: 'api_token' });
+      app.route('/readings', readingsRouter);
+      const res = await app.request('/readings/batch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          readings: [
+            { meter_id: 'meter-mh-1', timestamp: '2026-03-01T00:00:00Z', kwh: 50, kw: 5, pf: 0.9 },
+          ],
+        }),
+      });
+      expect(res.status).toBe(201);
+    });
+  });
+
+  describe('TI-INV-01/02/03: Invoice service cross-tenant checks', () => {
+    // TI-INV-01: createInvoice rejects bill from different tenant
+    it('TI-INV-01: POST /invoices rejects bill belonging to different tenant', async () => {
+      const app = createAppWithTenant(db, 'tenant-mh');
+      app.route('/invoices', invoicesRouter);
+      const res = await app.request('/invoices', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          billId: 'bill-ka-1',          // belongs to tenant-ka
+          supplierGSTIN: '27AABCT1332E1ZT', // valid MH GSTIN (state 27)
+          recipientGSTIN: '29AABCT1332E1ZP', // valid KA GSTIN (state 29)
+        }),
+      });
+      // Should be rejected — bill belongs to tenant-ka, not tenant-mh
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.error.message).toMatch(/not found/i);
+    });
+
+    // TI-INV-02: cancelInvoice rejects invoice from different tenant
+    it('TI-INV-02: POST /invoices/:id/cancel rejects invoice belonging to different tenant', async () => {
+      const app = createAppWithTenant(db, 'tenant-mh');
+      app.route('/invoices', invoicesRouter);
+      const res = await app.request('/invoices/inv-ka-1/cancel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason: 'Duplicate invoice' }),
+      });
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.error.message).toMatch(/not found/i);
+    });
+
+    // TI-INV-03: createCreditNote rejects invoice from different tenant
+    it('TI-INV-03: POST /invoices/credit-notes rejects invoice belonging to different tenant', async () => {
+      const app = createAppWithTenant(db, 'tenant-mh');
+      app.route('/invoices', invoicesRouter);
+      const res = await app.request('/invoices/credit-notes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          invoiceId: 'inv-ka-1',      // belongs to tenant-ka
+          amountPaisa: 10000,
+          reason: 'Overbilled',
+        }),
+      });
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.error.message).toMatch(/not found/i);
     });
   });
 });
