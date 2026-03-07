@@ -34,8 +34,7 @@ export function useUpload(id: string) {
 export function useUploadCSV() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ file, tenantId }: { file: File; tenantId: string }) =>
-      uploadCSV(file, tenantId),
+    mutationFn: ({ file }: { file: File }) => uploadCSV(file),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['uploads'] });
       queryClient.invalidateQueries({ queryKey: ['readings'] });

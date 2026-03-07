@@ -37,7 +37,6 @@ export function Uploads() {
   const isAdmin = useIsAdmin();
 
   const [showForm, setShowForm] = useState(false);
-  const [tenantId, setTenantId] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -45,10 +44,9 @@ export function Uploads() {
     e.preventDefault();
     if (!selectedFile) return;
     try {
-      await upload.mutateAsync({ file: selectedFile, tenantId });
+      await upload.mutateAsync({ file: selectedFile });
       setShowForm(false);
       setSelectedFile(null);
-      setTenantId('');
       if (fileRef.current) fileRef.current.value = '';
     } catch {
       // error handled by mutation state
@@ -79,16 +77,6 @@ export function Uploads() {
               accept=".csv"
               onChange={(e) => setSelectedFile(e.target.files?.[0] ?? null)}
               className="w-full text-sm text-gray-600 file:mr-3 file:rounded-lg file:border-0 file:bg-burgundy file:px-4 file:py-2 file:text-sm file:text-white hover:file:bg-burgundy-dark"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Tenant ID</label>
-            <input
-              value={tenantId}
-              onChange={(e) => setTenantId(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-              placeholder="e.g. tenant-mumbai"
               required
             />
           </div>

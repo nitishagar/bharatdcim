@@ -35,12 +35,11 @@ export async function api<T>(path: string, options?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-export async function uploadCSV(file: File, tenantId: string): Promise<unknown> {
+export async function uploadCSV(file: File): Promise<unknown> {
   const token = await requireToken();
 
   const form = new FormData();
   form.append('file', file);
-  form.append('tenantId', tenantId);
 
   const res = await fetch(`${API_BASE}/uploads/csv`, {
     method: 'POST',
