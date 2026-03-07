@@ -21,6 +21,7 @@ type ReadingPayload struct {
 
 // HeartbeatPayload is the JSON body for a heartbeat.
 type HeartbeatPayload struct {
+	AgentID       string `json:"agent_id"`
 	AgentVersion  string `json:"agent_version"`
 	DeviceCount   int    `json:"device_count"`
 	UnsyncedCount int64  `json:"unsynced_count"`
@@ -54,7 +55,7 @@ func (c *Client) UploadReadings(readings []ReadingPayload) (int, error) {
 		return 0, fmt.Errorf("marshal readings: %w", err)
 	}
 
-	resp, err := c.doWithRetry("POST", "/api/readings", body)
+	resp, err := c.doWithRetry("POST", "/readings/batch", body)
 	if err != nil {
 		return 0, err
 	}
@@ -75,7 +76,7 @@ func (c *Client) SendHeartbeat(payload HeartbeatPayload) error {
 		return fmt.Errorf("marshal heartbeat: %w", err)
 	}
 
-	resp, err := c.doWithRetry("POST", "/api/agents/heartbeat", body)
+	resp, err := c.doWithRetry("POST", "/agents/heartbeat", body)
 	if err != nil {
 		return err
 	}

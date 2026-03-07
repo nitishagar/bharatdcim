@@ -24,6 +24,7 @@ type AgentConfig struct {
 type CloudConfig struct {
 	APIBaseURL       string `yaml:"api_base_url"`
 	AuthToken        string `yaml:"auth_token"`
+	AgentID          string `yaml:"agent_id"`
 	TenantID         string `yaml:"tenant_id"`
 	HeartbeatSec     int    `yaml:"heartbeat_sec"`
 	SyncBatchSize    int    `yaml:"sync_batch_size"`
@@ -65,6 +66,9 @@ func Load(path string) (*Config, error) {
 }
 
 func (c *Config) validate() error {
+	if c.Cloud.AgentID == "" {
+		return fmt.Errorf("config: cloud.agent_id is required")
+	}
 	if len(c.Devices) == 0 {
 		return fmt.Errorf("config: at least one device required")
 	}

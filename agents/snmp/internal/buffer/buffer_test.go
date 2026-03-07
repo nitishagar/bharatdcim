@@ -104,6 +104,66 @@ func TestSNMP022_ReconnectionSync(t *testing.T) {
 	}
 }
 
+// SNMP-B03: GetUnsynced respects limit parameter
+func TestSNMPB03_GetUnsyncedRespectsLimit(t *testing.T) {
+	buf := newTestBuffer(t)
+
+	for i := 0; i < 10; i++ {
+		ts := time.Date(2026, 1, 1, i, 0, 0, 0, time.UTC).Format(time.RFC3339)
+		if err := buf.Insert(Reading{MeterID: "m-001", Timestamp: ts, KWh: float64(i)}); err != nil {
+			t.Fatalf("insert %d: %v", i, err)
+		}
+	}
+
+	readings, err := buf.GetUnsynced(3)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(readings) != 3 {
+		t.Errorf("SNMP-B03: expected 3 with limit=3, got %d", len(readings))
+	}
+	// Verify FIFO: first inserted should come first
+	if readings[0].KWh != 0 || readings[1].KWh != 1 || readings[2].KWh != 2 {
+		t.Errorf("SNMP-B03: expected readings in FIFO order, got KWh: %v, %v, %v",
+			readings[0].KWh, readings[1].KWh, readings[2].KWh)
+	}
+}
+
+// SNMP-B06: PurgeOlderThan keeps unsynced readings regardless of age
+func TestSNMPB06_PurgeOlderThanKeepsUnsyncedReadings(t *testing.T) {
+	buf := newTestBuffer(t)
+
+	// Insert an unsynced reading (do NOT mark synced)
+	if err := buf.Insert(Reading{
+		MeterID:   "m-001",
+		Timestamp: "2026-01-01T00:00:00Z",
+		KWh:       42,
+	}); err != nil {
+		t.Fatal(err)
+	}
+
+	// Wait to ensure created_at is in the past
+	time.Sleep(1100 * time.Millisecond)
+
+	// Purge with duration=0 (everything "older than now")
+	purged, err := buf.PurgeOlderThan(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if purged != 0 {
+		t.Errorf("SNMP-B06: expected 0 purged (unsynced must not be deleted), got %d", purged)
+	}
+
+	// Verify reading is still there
+	count, err := buf.Count()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if count != 1 {
+		t.Errorf("SNMP-B06: expected 1 reading still present, got %d", count)
+	}
+}
+
 func TestPurgeOlderThan(t *testing.T) {
 	buf := newTestBuffer(t)
 

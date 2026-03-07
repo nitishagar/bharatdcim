@@ -78,6 +78,7 @@ func main() {
 		case <-heartbeatTicker.C:
 			unsynced, _ := buf.UnsyncedCount()
 			err := cloud.SendHeartbeat(syncclient.HeartbeatPayload{
+				AgentID:       cfg.Cloud.AgentID,
 				AgentVersion:  version,
 				DeviceCount:   len(cfg.Devices),
 				UnsyncedCount: unsynced,
