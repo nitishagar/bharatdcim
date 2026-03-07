@@ -77,6 +77,38 @@ describe('Readings Routes', () => {
     expect(body).toHaveLength(2);
   });
 
+  // RDG-BATCH-01: POST /readings/batch rejects readings referencing non-existent meter ID
+  it('POST /readings/batch — rejects readings with non-existent meter ID', async () => {
+    const res = await app.request('/readings/batch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        readings: [
+          { meter_id: 'meter-does-not-exist', timestamp: '2026-02-15T10:00:00Z', kwh: 100, kw: 10 },
+        ],
+      }),
+    });
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.error.code).toBe('VALIDATION_ERROR');
+    expect(body.error.message).toMatch(/meter-does-not-exist/);
+  });
+
+  it('POST /readings/batch — accepts valid meter readings', async () => {
+    const res = await app.request('/readings/batch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        readings: [
+          { meter_id: 'meter-001', timestamp: '2026-02-15T10:00:00Z', kwh: 100, kw: 10, pf: 0.95 },
+        ],
+      }),
+    });
+    expect(res.status).toBe(201);
+    const body = await res.json();
+    expect(body.accepted).toBe(1);
+  });
+
   it('GET /readings?meter_id=&from=&to= — date range filter', async () => {
     await app.request('/readings', {
       method: 'POST',

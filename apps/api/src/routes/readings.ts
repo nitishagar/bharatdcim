@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { eq, and, gte, lte } from 'drizzle-orm';
+import { eq, and, gte, lte, inArray } from 'drizzle-orm';
 import type { AppEnv } from '../types.js';
 import { powerReadings, meters } from '../db/schema.js';
 
@@ -114,17 +114,28 @@ readingsRouter.post('/batch', async (c) => {
     );
   }
 
+  const meterIds = [...new Set((body.readings as Array<Record<string, unknown>>).map(
+    (r) => (r.meter_id || r.meterId) as string
+  ))];
+
+  // Defense-in-depth: verify all meter IDs exist (applies to all callers including api_token)
+  const existingMeters = await db.select({ id: meters.id, tenantId: meters.tenantId })
+    .from(meters).where(inArray(meters.id, meterIds)).all();
+  const existingIds = new Set(existingMeters.map((m) => m.id));
+  const missingIds = meterIds.filter((id) => !existingIds.has(id));
+  if (missingIds.length > 0) {
+    return c.json(
+      { error: { code: 'VALIDATION_ERROR', message: `Unknown meter IDs: ${missingIds.join(', ')}` } },
+      400,
+    );
+  }
+
   // Verify all referenced meters belong to the caller's tenant (skipped for api_token callers)
   if (tenantId) {
-    const meterIds = [...new Set((body.readings as Array<Record<string, unknown>>).map(
-      (r) => (r.meter_id || r.meterId) as string
-    ))];
-    for (const meterId of meterIds) {
-      const meterRows = await db.select({ tenantId: meters.tenantId })
-        .from(meters).where(eq(meters.id, meterId)).all();
-      if (meterRows.length === 0 || meterRows[0].tenantId !== tenantId) {
+    for (const meter of existingMeters) {
+      if (meter.tenantId !== tenantId) {
         return c.json(
-          { error: { code: 'FORBIDDEN', message: `Meter ${meterId} does not belong to your tenant` } },
+          { error: { code: 'FORBIDDEN', message: `Meter ${meter.id} does not belong to your tenant` } },
           403,
         );
       }
