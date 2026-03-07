@@ -1,5 +1,5 @@
 import { useAgents, type Agent } from '../api/hooks/useAgents';
-import { DataTable, type Column } from '../components/DataTable';
+import { DataTable, type ColumnDef } from '../components/DataTable';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { EmptyState } from '../components/EmptyState';
@@ -42,13 +42,13 @@ function formatAge(iso: string): string {
   return `${Math.floor(hours / 24)}d ago`;
 }
 
-const columns: Column<Agent>[] = [
-  { header: 'Agent ID', accessor: (a) => a.agentId },
-  { header: 'Version', accessor: (a) => a.agentVersion ?? '—' },
-  { header: 'Devices', accessor: (a) => a.deviceCount },
-  { header: 'Unsynced', accessor: (a) => a.unsyncedCount ?? 0 },
-  { header: 'Status', accessor: (a) => <StatusDot agent={a} /> },
-  { header: 'Last Heartbeat', accessor: (a) => formatAge(a.lastHeartbeatAt) },
+const columns: ColumnDef<Agent, unknown>[] = [
+  { accessorKey: 'agentId', header: 'Agent ID' },
+  { id: 'version', header: 'Version', accessorFn: (a) => a.agentVersion ?? '—' },
+  { accessorKey: 'deviceCount', header: 'Devices' },
+  { id: 'unsynced', header: 'Unsynced', accessorFn: (a) => a.unsyncedCount ?? 0 },
+  { id: 'status', header: 'Status', accessorFn: (a) => a.status, cell: ({ row }) => <StatusDot agent={row.original} />, enableSorting: false },
+  { id: 'heartbeat', header: 'Last Heartbeat', accessorFn: (a) => a.lastHeartbeatAt, cell: ({ row }) => formatAge(row.original.lastHeartbeatAt) },
 ];
 
 export function Agents() {
@@ -68,7 +68,11 @@ export function Agents() {
           {online}/{data.length} online &middot; Auto-refreshes every 30s
         </span>
       </div>
-      <DataTable columns={columns} data={data} />
+      <DataTable
+        columns={columns}
+        data={data}
+        searchPlaceholder="Search agents..."
+      />
     </div>
   );
 }

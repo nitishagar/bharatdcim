@@ -1,20 +1,23 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useInvoices, useCreateInvoice, type Invoice } from '../api/hooks/useInvoices';
-import { DataTable, type Column } from '../components/DataTable';
+import { DataTable, type ColumnDef } from '../components/DataTable';
 import { StatusBadge } from '../components/StatusBadge';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { EmptyState } from '../components/EmptyState';
 import { formatPaisa } from '../lib/formatCurrency';
 import { useIsAdmin } from '../hooks/useIsAdmin';
+import { createInvoiceSchema, type CreateInvoiceForm } from '../lib/schemas';
 
-const columns: Column<Invoice>[] = [
-  { header: 'Invoice #', accessor: (inv) => inv.invoiceNumber },
-  { header: 'Tenant', accessor: (inv) => inv.tenantId },
-  { header: 'Amount', accessor: (inv) => formatPaisa(inv.totalAmountPaisa) },
-  { header: 'Status', accessor: (inv) => <StatusBadge status={inv.status} /> },
-  { header: 'Date', accessor: (inv) => inv.invoiceDate },
+const columns: ColumnDef<Invoice, unknown>[] = [
+  { accessorKey: 'invoiceNumber', header: 'Invoice #' },
+  { accessorKey: 'tenantId', header: 'Tenant' },
+  { id: 'amount', header: 'Amount', accessorFn: (inv) => inv.totalAmountPaisa, cell: ({ row }) => formatPaisa(row.original.totalAmountPaisa) },
+  { accessorKey: 'status', header: 'Status', cell: ({ row }) => <StatusBadge status={row.original.status} />, enableSorting: false },
+  { accessorKey: 'invoiceDate', header: 'Date' },
 ];
 
 export function Invoices() {
@@ -22,22 +25,19 @@ export function Invoices() {
   const navigate = useNavigate();
   const createInvoice = useCreateInvoice();
   const isAdmin = useIsAdmin();
-
   const [showForm, setShowForm] = useState(false);
-  const [billId, setBillId] = useState('');
-  const [supplierGSTIN, setSupplierGSTIN] = useState('');
-  const [recipientGSTIN, setRecipientGSTIN] = useState('');
 
-  async function handleCreate(e: React.FormEvent) {
-    e.preventDefault();
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<CreateInvoiceForm>({
+    resolver: zodResolver(createInvoiceSchema),
+  });
+
+  async function onSubmit(formData: CreateInvoiceForm) {
     try {
-      await createInvoice.mutateAsync({ billId, supplierGSTIN, recipientGSTIN });
+      await createInvoice.mutateAsync(formData);
       setShowForm(false);
-      setBillId('');
-      setSupplierGSTIN('');
-      setRecipientGSTIN('');
+      reset();
     } catch {
-      // error handled by mutation state
+      // error handled by toast
     }
   }
 
@@ -56,34 +56,33 @@ export function Invoices() {
       </div>
 
       {showForm && (
-        <form onSubmit={handleCreate} className="bg-white rounded-lg border p-4 mb-4 space-y-3">
+        <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-lg border p-4 mb-4 space-y-3">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Bill ID</label>
             <input
-              value={billId}
-              onChange={(e) => setBillId(e.target.value)}
+              {...register('billId')}
               className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-              required
             />
+            {errors.billId && <p className="mt-1 text-sm text-red-500">{errors.billId.message}</p>}
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Supplier GSTIN</label>
               <input
-                value={supplierGSTIN}
-                onChange={(e) => setSupplierGSTIN(e.target.value)}
+                {...register('supplierGSTIN')}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                required
+                placeholder="e.g., 29ABCDE1234F1Z5"
               />
+              {errors.supplierGSTIN && <p className="mt-1 text-sm text-red-500">{errors.supplierGSTIN.message}</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Recipient GSTIN</label>
               <input
-                value={recipientGSTIN}
-                onChange={(e) => setRecipientGSTIN(e.target.value)}
+                {...register('recipientGSTIN')}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                required
+                placeholder="e.g., 29ABCDE1234F1Z5"
               />
+              {errors.recipientGSTIN && <p className="mt-1 text-sm text-red-500">{errors.recipientGSTIN.message}</p>}
             </div>
           </div>
           <div className="flex gap-2">
@@ -94,7 +93,6 @@ export function Invoices() {
               Cancel
             </button>
           </div>
-          {createInvoice.error && <p className="text-sm text-red-600">{createInvoice.error.message}</p>}
         </form>
       )}
 
@@ -109,6 +107,7 @@ export function Invoices() {
           columns={columns}
           data={data}
           onRowClick={(inv) => navigate(`/invoices/${inv.id}`)}
+          searchPlaceholder="Search invoices..."
         />
       )}
     </div>

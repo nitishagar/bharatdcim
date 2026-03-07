@@ -1,22 +1,25 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useBills, useCalculateBill, useSaveBill, type Bill } from '../api/hooks/useBills';
 import { useMeters, type Meter } from '../api/hooks/useMeters';
 import { useTariffs, type Tariff } from '../api/hooks/useTariffs';
-import { DataTable, type Column } from '../components/DataTable';
+import { DataTable, type ColumnDef } from '../components/DataTable';
 import { StatusBadge } from '../components/StatusBadge';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { EmptyState } from '../components/EmptyState';
 import { formatPaisa } from '../lib/formatCurrency';
 import { useIsAdmin } from '../hooks/useIsAdmin';
+import { calculateBillSchema, type CalculateBillForm } from '../lib/schemas';
 
-const columns: Column<Bill>[] = [
-  { header: 'Period', accessor: (b) => `${b.billingPeriodStart} – ${b.billingPeriodEnd}` },
-  { header: 'Meter', accessor: (b) => b.meterId },
-  { header: 'kWh', accessor: (b) => b.totalKwh.toLocaleString('en-IN') },
-  { header: 'Amount', accessor: (b) => formatPaisa(b.totalBillPaisa) },
-  { header: 'Status', accessor: (b) => <StatusBadge status={b.status} /> },
+const columns: ColumnDef<Bill, unknown>[] = [
+  { id: 'period', header: 'Period', accessorFn: (b) => `${b.billingPeriodStart} – ${b.billingPeriodEnd}` },
+  { accessorKey: 'meterId', header: 'Meter' },
+  { id: 'kwh', header: 'kWh', accessorFn: (b) => b.totalKwh, cell: ({ row }) => row.original.totalKwh.toLocaleString('en-IN') },
+  { id: 'amount', header: 'Amount', accessorFn: (b) => b.totalBillPaisa, cell: ({ row }) => formatPaisa(row.original.totalBillPaisa) },
+  { accessorKey: 'status', header: 'Status', cell: ({ row }) => <StatusBadge status={row.original.status} />, enableSorting: false },
 ];
 
 /** Convert DB tariff row to billing engine TariffConfig format */
@@ -82,7 +85,7 @@ export function Billing() {
       </div>
 
       {showForm && (
-        <CalculateBillForm
+        <CalculateBillFormComponent
           onClose={() => setShowForm(false)}
           onSaved={() => {
             setShowForm(false);
@@ -102,54 +105,54 @@ export function Billing() {
           columns={columns}
           data={data}
           onRowClick={(b) => navigate(`/billing/${b.id}`)}
+          searchPlaceholder="Search bills..."
         />
       )}
     </div>
   );
 }
 
-function CalculateBillForm({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
+function CalculateBillFormComponent({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
   const { data: meters } = useMeters();
   const { data: tariffs } = useTariffs();
   const calculateBill = useCalculateBill();
   const saveBill = useSaveBill();
-
-  const [meterId, setMeterId] = useState('');
-  const [periodStart, setPeriodStart] = useState('');
-  const [periodEnd, setPeriodEnd] = useState('');
-  const [peakKwh, setPeakKwh] = useState('');
-  const [normalKwh, setNormalKwh] = useState('');
-  const [offPeakKwh, setOffPeakKwh] = useState('');
-  const [contractedDemandKva, setContractedDemandKva] = useState('');
-  const [recordedDemandKva, setRecordedDemandKva] = useState('');
-  const [powerFactor, setPowerFactor] = useState('0.95');
   const [result, setResult] = useState<Record<string, unknown> | null>(null);
 
+  const { register, handleSubmit, watch, formState: { errors }, getValues } = useForm<CalculateBillForm>({
+    resolver: zodResolver(calculateBillSchema),
+    defaultValues: {
+      meterId: '', periodStart: '', periodEnd: '',
+      peakKwh: '', normalKwh: '', offPeakKwh: '',
+      contractedDemandKva: '', recordedDemandKva: '', powerFactor: '0.95',
+    },
+  });
+
+  const meterId = watch('meterId');
   const selectedMeter = meters?.find((m: Meter) => m.id === meterId);
   const selectedTariff = tariffs?.find((t: Tariff) => t.id === selectedMeter?.tariffId);
 
-  async function handleCalculate(e: React.FormEvent) {
-    e.preventDefault();
+  async function onCalculate(formData: CalculateBillForm) {
     if (!selectedTariff) return;
 
     const readings = [
       {
-        timestamp: periodStart,
-        kWh: parseFloat(peakKwh) || 0,
+        timestamp: formData.periodStart,
+        kWh: parseFloat(formData.peakKwh) || 0,
         slotName: 'Peak',
         slotType: 'peak' as const,
         ratePaisa: getSlotRate(selectedTariff, 'peak'),
       },
       {
-        timestamp: periodStart,
-        kWh: parseFloat(normalKwh) || 0,
+        timestamp: formData.periodStart,
+        kWh: parseFloat(formData.normalKwh) || 0,
         slotName: 'Normal',
         slotType: 'normal' as const,
         ratePaisa: getSlotRate(selectedTariff, 'normal'),
       },
       {
-        timestamp: periodStart,
-        kWh: parseFloat(offPeakKwh) || 0,
+        timestamp: formData.periodStart,
+        kWh: parseFloat(formData.offPeakKwh) || 0,
         slotName: 'Off-Peak',
         slotType: 'off-peak' as const,
         ratePaisa: getSlotRate(selectedTariff, 'off-peak'),
@@ -159,21 +162,22 @@ function CalculateBillForm({ onClose, onSaved }: { onClose: () => void; onSaved:
     const data = {
       readings,
       tariff: toTariffConfig(selectedTariff),
-      contractedDemandKVA: parseFloat(contractedDemandKva) || 0,
-      recordedDemandKVA: parseFloat(recordedDemandKva) || 0,
-      powerFactor: parseFloat(powerFactor) || 0.95,
+      contractedDemandKVA: parseFloat(formData.contractedDemandKva) || 0,
+      recordedDemandKVA: parseFloat(formData.recordedDemandKva) || 0,
+      powerFactor: parseFloat(formData.powerFactor) || 0.95,
     };
 
     try {
       const res = await calculateBill.mutateAsync(data);
       setResult(res);
     } catch {
-      // error handled by mutation state
+      // error handled by toast
     }
   }
 
   async function handleSave() {
     if (!result || !selectedMeter || !selectedTariff) return;
+    const vals = getValues();
 
     const id = crypto.randomUUID();
     const billData = {
@@ -181,17 +185,17 @@ function CalculateBillForm({ onClose, onSaved }: { onClose: () => void; onSaved:
       tenantId: selectedMeter.tenantId,
       meterId: selectedMeter.id,
       tariffId: selectedTariff.id,
-      billingPeriodStart: periodStart,
-      billingPeriodEnd: periodEnd,
+      billingPeriodStart: vals.periodStart,
+      billingPeriodEnd: vals.periodEnd,
       peakKwh: (result as Record<string, number>).peakKWh ?? 0,
       normalKwh: (result as Record<string, number>).normalKWh ?? 0,
       offPeakKwh: (result as Record<string, number>).offPeakKWh ?? 0,
       totalKwh: (result as Record<string, number>).totalKWh ?? 0,
       billedKvah: (result as Record<string, number | null>).billedKVAh ?? null,
-      contractedDemandKva: parseFloat(contractedDemandKva) || 0,
-      recordedDemandKva: parseFloat(recordedDemandKva) || 0,
+      contractedDemandKva: parseFloat(vals.contractedDemandKva) || 0,
+      recordedDemandKva: parseFloat(vals.recordedDemandKva) || 0,
       billedDemandKva: (result as Record<string, number>).billedDemandKVA ?? 0,
-      powerFactor: parseFloat(powerFactor) || 0.95,
+      powerFactor: parseFloat(vals.powerFactor) || 0.95,
       peakChargesPaisa: (result as Record<string, number>).peakChargesPaisa ?? 0,
       normalChargesPaisa: (result as Record<string, number>).normalChargesPaisa ?? 0,
       offPeakChargesPaisa: (result as Record<string, number>).offPeakChargesPaisa ?? 0,
@@ -213,47 +217,44 @@ function CalculateBillForm({ onClose, onSaved }: { onClose: () => void; onSaved:
       await saveBill.mutateAsync(billData);
       onSaved();
     } catch {
-      // error handled by mutation state
+      // error handled by toast
     }
   }
 
   return (
     <div className="bg-white rounded-lg border p-4 mb-4 space-y-4">
-      <form onSubmit={handleCalculate} className="space-y-3">
-        <div className="grid grid-cols-3 gap-4">
+      <form onSubmit={handleSubmit(onCalculate)} className="space-y-3" onChange={() => setResult(null)}>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Meter</label>
             <select
-              value={meterId}
-              onChange={(e) => { setMeterId(e.target.value); setResult(null); }}
+              {...register('meterId')}
               className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-              required
             >
               <option value="">Select meter...</option>
               {meters?.map((m: Meter) => (
                 <option key={m.id} value={m.id}>{m.name} ({m.stateCode})</option>
               ))}
             </select>
+            {errors.meterId && <p className="mt-1 text-sm text-red-500">{errors.meterId.message}</p>}
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Period Start</label>
             <input
               type="date"
-              value={periodStart}
-              onChange={(e) => setPeriodStart(e.target.value)}
+              {...register('periodStart')}
               className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-              required
             />
+            {errors.periodStart && <p className="mt-1 text-sm text-red-500">{errors.periodStart.message}</p>}
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Period End</label>
             <input
               type="date"
-              value={periodEnd}
-              onChange={(e) => setPeriodEnd(e.target.value)}
+              {...register('periodEnd')}
               className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-              required
             />
+            {errors.periodEnd && <p className="mt-1 text-sm text-red-500">{errors.periodEnd.message}</p>}
           </div>
         </div>
 
@@ -264,76 +265,33 @@ function CalculateBillForm({ onClose, onSaved }: { onClose: () => void; onSaved:
           </div>
         )}
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Peak kWh</label>
-            <input
-              type="number"
-              step="0.01"
-              value={peakKwh}
-              onChange={(e) => { setPeakKwh(e.target.value); setResult(null); }}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-              placeholder="0"
-            />
+            <input type="number" step="0.01" {...register('peakKwh')} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" placeholder="0" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Normal kWh</label>
-            <input
-              type="number"
-              step="0.01"
-              value={normalKwh}
-              onChange={(e) => { setNormalKwh(e.target.value); setResult(null); }}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-              placeholder="0"
-            />
+            <input type="number" step="0.01" {...register('normalKwh')} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" placeholder="0" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Off-Peak kWh</label>
-            <input
-              type="number"
-              step="0.01"
-              value={offPeakKwh}
-              onChange={(e) => { setOffPeakKwh(e.target.value); setResult(null); }}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-              placeholder="0"
-            />
+            <input type="number" step="0.01" {...register('offPeakKwh')} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" placeholder="0" />
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Contracted Demand (KVA)</label>
-            <input
-              type="number"
-              step="0.01"
-              value={contractedDemandKva}
-              onChange={(e) => { setContractedDemandKva(e.target.value); setResult(null); }}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-              placeholder="0"
-            />
+            <input type="number" step="0.01" {...register('contractedDemandKva')} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" placeholder="0" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Recorded Demand (KVA)</label>
-            <input
-              type="number"
-              step="0.01"
-              value={recordedDemandKva}
-              onChange={(e) => { setRecordedDemandKva(e.target.value); setResult(null); }}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-              placeholder="0"
-            />
+            <input type="number" step="0.01" {...register('recordedDemandKva')} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" placeholder="0" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Power Factor</label>
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              max="1"
-              value={powerFactor}
-              onChange={(e) => { setPowerFactor(e.target.value); setResult(null); }}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-            />
+            <input type="number" step="0.01" min="0" max="1" {...register('powerFactor')} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" />
           </div>
         </div>
 
@@ -354,10 +312,6 @@ function CalculateBillForm({ onClose, onSaved }: { onClose: () => void; onSaved:
           </button>
         </div>
 
-        {calculateBill.error && (
-          <p className="text-sm text-red-600">{calculateBill.error.message}</p>
-        )}
-
         {!selectedTariff && meterId && (
           <p className="text-sm text-amber-600">
             No tariff configured for this meter. Assign a tariff first.
@@ -370,7 +324,6 @@ function CalculateBillForm({ onClose, onSaved }: { onClose: () => void; onSaved:
           result={result}
           onSave={handleSave}
           saving={saveBill.isPending}
-          saveError={saveBill.error}
         />
       )}
     </div>
@@ -381,12 +334,10 @@ function BillPreview({
   result,
   onSave,
   saving,
-  saveError,
 }: {
   result: Record<string, unknown>;
   onSave: () => void;
   saving: boolean;
-  saveError: Error | null;
 }) {
   const r = result as Record<string, number>;
 
@@ -408,7 +359,7 @@ function BillPreview({
     <div className="border-t pt-4">
       <h4 className="text-sm font-semibold text-gray-800 mb-2">Bill Preview</h4>
 
-      <div className="grid grid-cols-3 gap-4 mb-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-3">
         <div className="rounded-lg bg-gray-50 p-3">
           <span className="text-xs text-gray-500">Total kWh</span>
           <p className="font-semibold">{(r.totalKWh ?? 0).toLocaleString('en-IN')}</p>
@@ -447,8 +398,6 @@ function BillPreview({
       >
         {saving ? 'Saving...' : 'Save Bill'}
       </button>
-
-      {saveError && <p className="text-sm text-red-600 mt-1">{saveError.message}</p>}
     </div>
   );
 }

@@ -1,10 +1,14 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useInvoice, useCancelInvoice, useCreateCreditNote } from '../api/hooks/useInvoices';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { StatusBadge } from '../components/StatusBadge';
+import { Breadcrumb } from '../components/Breadcrumb';
 import { formatPaisa } from '../lib/formatCurrency';
+import { cancelInvoiceSchema, creditNoteSchema, type CancelInvoiceForm, type CreditNoteForm } from '../lib/schemas';
 
 export function InvoiceDetail() {
   const { id } = useParams<{ id: string }>();
@@ -12,28 +16,35 @@ export function InvoiceDetail() {
   const cancelInvoice = useCancelInvoice();
   const createCreditNote = useCreateCreditNote();
 
-  const [cancelReason, setCancelReason] = useState('');
   const [showCancel, setShowCancel] = useState(false);
   const [showCreditNote, setShowCreditNote] = useState(false);
-  const [creditAmount, setCreditAmount] = useState('');
-  const [creditReason, setCreditReason] = useState('');
+
+  const cancelForm = useForm<CancelInvoiceForm>({
+    resolver: zodResolver(cancelInvoiceSchema),
+  });
+
+  const creditForm = useForm<CreditNoteForm>({
+    resolver: zodResolver(creditNoteSchema),
+  });
 
   if (isLoading) return <LoadingSpinner />;
   if (error) return <ErrorMessage error={error} />;
   if (!invoice) return null;
 
-  async function handleCancel() {
-    await cancelInvoice.mutateAsync({ id: id!, reason: cancelReason });
+  async function handleCancel(data: CancelInvoiceForm) {
+    await cancelInvoice.mutateAsync({ id: id!, reason: data.reason });
     setShowCancel(false);
+    cancelForm.reset();
   }
 
-  async function handleCreditNote() {
+  async function handleCreditNote(data: CreditNoteForm) {
     await createCreditNote.mutateAsync({
       invoiceId: id!,
-      amountPaisa: Math.round(parseFloat(creditAmount) * 100),
-      reason: creditReason,
+      amountPaisa: Math.round(parseFloat(data.amount) * 100),
+      reason: data.reason,
     });
     setShowCreditNote(false);
+    creditForm.reset();
   }
 
   const taxRows = invoice.taxType === 'CGST_SGST'
@@ -45,12 +56,13 @@ export function InvoiceDetail() {
 
   return (
     <div>
+      <Breadcrumb items={[{ label: 'Invoices', to: '/invoices' }, { label: invoice.invoiceNumber }]} />
       <div className="flex items-center gap-3 mb-4">
         <h2 className="text-2xl font-bold text-gray-900">{invoice.invoiceNumber}</h2>
         <StatusBadge status={invoice.status} />
       </div>
 
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="bg-white rounded-lg border p-4">
           <span className="text-xs text-gray-500">Bill ID</span>
           <p className="font-medium text-sm">{invoice.billId}</p>
@@ -112,51 +124,57 @@ export function InvoiceDetail() {
       )}
 
       {showCancel && (
-        <div className="mt-4 bg-white rounded-lg border p-4">
+        <form onSubmit={cancelForm.handleSubmit(handleCancel)} className="mt-4 bg-white rounded-lg border p-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">Cancellation Reason</label>
           <input
-            value={cancelReason}
-            onChange={(e) => setCancelReason(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm mb-2"
+            {...cancelForm.register('reason')}
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm mb-1"
           />
+          {cancelForm.formState.errors.reason && (
+            <p className="text-sm text-red-500 mb-2">{cancelForm.formState.errors.reason.message}</p>
+          )}
           <button
-            onClick={handleCancel}
+            type="submit"
             className="rounded-lg bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700"
-            disabled={cancelInvoice.isPending || !cancelReason}
+            disabled={cancelInvoice.isPending}
           >
-            Confirm Cancel
+            {cancelInvoice.isPending ? 'Cancelling...' : 'Confirm Cancel'}
           </button>
-        </div>
+        </form>
       )}
 
       {showCreditNote && (
-        <div className="mt-4 bg-white rounded-lg border p-4 space-y-2">
+        <form onSubmit={creditForm.handleSubmit(handleCreditNote)} className="mt-4 bg-white rounded-lg border p-4 space-y-2">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Amount (₹)</label>
             <input
               type="number"
               step="0.01"
-              value={creditAmount}
-              onChange={(e) => setCreditAmount(e.target.value)}
+              {...creditForm.register('amount')}
               className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
             />
+            {creditForm.formState.errors.amount && (
+              <p className="mt-1 text-sm text-red-500">{creditForm.formState.errors.amount.message}</p>
+            )}
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Reason</label>
             <input
-              value={creditReason}
-              onChange={(e) => setCreditReason(e.target.value)}
+              {...creditForm.register('reason')}
               className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
             />
+            {creditForm.formState.errors.reason && (
+              <p className="mt-1 text-sm text-red-500">{creditForm.formState.errors.reason.message}</p>
+            )}
           </div>
           <button
-            onClick={handleCreditNote}
+            type="submit"
             className="rounded-lg bg-burgundy px-4 py-2 text-sm text-white hover:bg-burgundy-dark"
-            disabled={createCreditNote.isPending || !creditAmount || !creditReason}
+            disabled={createCreditNote.isPending}
           >
-            Issue Credit Note
+            {createCreditNote.isPending ? 'Issuing...' : 'Issue Credit Note'}
           </button>
-        </div>
+        </form>
       )}
     </div>
   );

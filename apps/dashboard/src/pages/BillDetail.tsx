@@ -3,6 +3,7 @@ import { useBill } from '../api/hooks/useBills';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { StatusBadge } from '../components/StatusBadge';
+import { Breadcrumb } from '../components/Breadcrumb';
 import { formatPaisa } from '../lib/formatCurrency';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -44,12 +45,13 @@ export function BillDetail() {
 
   return (
     <div>
+      <Breadcrumb items={[{ label: 'Billing', to: '/billing' }, { label: 'Bill Detail' }]} />
       <div className="flex items-center gap-3 mb-4">
         <h2 className="text-2xl font-bold text-gray-900">Bill Detail</h2>
         <StatusBadge status={bill.status} />
       </div>
 
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="bg-white rounded-lg border p-4">
           <span className="text-xs text-gray-500">Meter</span>
           <p className="font-medium">{bill.meterId}</p>
@@ -68,7 +70,7 @@ export function BillDetail() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div>
           <h3 className="text-lg font-semibold text-gray-800 mb-3">Charge Breakdown</h3>
           <div className="bg-white rounded-lg border p-4" style={{ height: 300 }}>

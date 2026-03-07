@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { api } from '../client';
 
 export interface Bill {
@@ -67,6 +68,12 @@ export function useCalculateBill() {
         method: 'POST',
         body: JSON.stringify(data),
       }),
+    onSuccess: () => {
+      toast.success('Bill calculated');
+    },
+    onError: (err: Error) => {
+      toast.error(err.message);
+    },
   });
 }
 
@@ -77,6 +84,10 @@ export function useSaveBill() {
       api<Bill>('/bills', { method: 'POST', body: JSON.stringify(data) }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bills'] });
+      toast.success('Bill saved');
+    },
+    onError: (err: Error) => {
+      toast.error(err.message);
     },
   });
 }

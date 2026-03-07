@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
 import { UserButton, OrganizationSwitcher, useAuth } from '@clerk/clerk-react';
 
@@ -44,11 +45,12 @@ function usePlatformAdmin(): boolean {
     || (sessionClaims as Record<string, unknown> | null)?.platformAdmin === 'true';
 }
 
-function NavItem({ to, label, icon, end }: { to: string; label: string; icon: string; end?: boolean }) {
+function NavItem({ to, label, icon, end, onClick }: { to: string; label: string; icon: string; end?: boolean; onClick?: () => void }) {
   return (
     <NavLink
       to={to}
       end={end}
+      onClick={onClick}
       className={({ isActive }) =>
         `flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
           isActive
@@ -67,11 +69,30 @@ export function Layout() {
   const { pathname } = useLocation();
   const title = getPageTitle(pathname);
   const isPlatformAdmin = usePlatformAdmin();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Close sidebar on route change (mobile)
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [pathname]);
+
+  const closeSidebar = () => setSidebarOpen(false);
 
   return (
     <div className="flex h-screen bg-gray-50">
-      {/* Sidebar — matches marketing site navy palette */}
-      <aside className="w-56 bg-gradient-to-b from-navy to-[#162d4a] text-white flex flex-col">
+      {/* Backdrop overlay — mobile only */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-black/40 lg:hidden"
+          onClick={closeSidebar}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside
+        data-open={sidebarOpen}
+        className="fixed inset-y-0 left-0 z-40 w-56 bg-gradient-to-b from-navy to-[#162d4a] text-white flex flex-col -translate-x-full transition-transform duration-300 data-[open=true]:translate-x-0 lg:relative lg:translate-x-0"
+      >
         <div className="p-3 border-b border-white/10">
           <OrganizationSwitcher
             hidePersonal={true}
@@ -90,7 +111,7 @@ export function Layout() {
         </div>
         <nav className="flex-1 py-2 overflow-y-auto">
           {NAV_ITEMS.map(({ to, label, icon }) => (
-            <NavItem key={to} to={to} label={label} icon={icon} end={to === '/'} />
+            <NavItem key={to} to={to} label={label} icon={icon} end={to === '/'} onClick={closeSidebar} />
           ))}
           {isPlatformAdmin && (
             <>
@@ -99,7 +120,7 @@ export function Layout() {
                 Platform
               </div>
               {PLATFORM_NAV_ITEMS.map(({ to, label, icon }) => (
-                <NavItem key={to} to={to} label={label} icon={icon} end={to === '/platform'} />
+                <NavItem key={to} to={to} label={label} icon={icon} end={to === '/platform'} onClick={closeSidebar} />
               ))}
             </>
           )}
@@ -108,11 +129,23 @@ export function Layout() {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-6">
-          <h1 className="text-lg font-semibold text-gray-800">{title}</h1>
+        <header className="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-6">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              className="lg:hidden p-1.5 -ml-1 rounded-md text-gray-600 hover:bg-gray-100"
+              onClick={() => setSidebarOpen(true)}
+              aria-label="Open sidebar"
+            >
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+              </svg>
+            </button>
+            <h1 className="text-lg font-semibold text-gray-800">{title}</h1>
+          </div>
           <UserButton />
         </header>
-        <main className="flex-1 overflow-auto p-6">
+        <main className="flex-1 overflow-auto p-4 lg:p-6">
           <Outlet />
         </main>
       </div>

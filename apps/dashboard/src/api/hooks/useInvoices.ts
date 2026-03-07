@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { api } from '../client';
 
 export interface Invoice {
@@ -45,6 +46,10 @@ export function useCreateInvoice() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
       queryClient.invalidateQueries({ queryKey: ['bills'] });
+      toast.success('Invoice created');
+    },
+    onError: (err: Error) => {
+      toast.error(err.message);
     },
   });
 }
@@ -59,6 +64,10 @@ export function useCancelInvoice() {
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
+      toast.success('Invoice cancelled');
+    },
+    onError: (err: Error) => {
+      toast.error(err.message);
     },
   });
 }
@@ -70,6 +79,10 @@ export function useCreateCreditNote() {
       api<unknown>('/invoices/credit-notes', { method: 'POST', body: JSON.stringify(data) }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
+      toast.success('Credit note issued');
+    },
+    onError: (err: Error) => {
+      toast.error(err.message);
     },
   });
 }

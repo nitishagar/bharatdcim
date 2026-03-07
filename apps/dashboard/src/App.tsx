@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { SignedIn, SignedOut, RedirectToSignIn, useAuth, useOrganization } from '@clerk/clerk-react';
 import { Routes, Route } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
+import { Toaster } from 'sonner';
 import { setTokenGetter } from './api/client';
 import { Layout } from './components/Layout';
 import { Dashboard } from './pages/Dashboard';
@@ -50,6 +51,7 @@ export function App() {
       <SignedIn>
         <AuthBridge />
         <OrgBridge />
+        <Toaster position="top-right" richColors />
         <Routes>
           <Route element={<Layout />}>
             <Route index element={<Dashboard />} />

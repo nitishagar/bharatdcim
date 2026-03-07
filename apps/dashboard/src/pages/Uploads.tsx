@@ -1,27 +1,29 @@
 import { useState, useRef } from 'react';
 import { useUploads, useUploadCSV, type Upload } from '../api/hooks/useUploads';
-import { DataTable, type Column } from '../components/DataTable';
+import { DataTable, type ColumnDef } from '../components/DataTable';
 import { StatusBadge } from '../components/StatusBadge';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { EmptyState } from '../components/EmptyState';
 import { useIsAdmin } from '../hooks/useIsAdmin';
 
-const columns: Column<Upload>[] = [
-  { header: 'File', accessor: (u) => u.fileName },
-  { header: 'Format', accessor: (u) => <StatusBadge status={u.format} /> },
+const columns: ColumnDef<Upload, unknown>[] = [
+  { accessorKey: 'fileName', header: 'File' },
+  { accessorKey: 'format', header: 'Format', cell: ({ row }) => <StatusBadge status={row.original.format} />, enableSorting: false },
   {
+    id: 'rows',
     header: 'Rows',
-    accessor: (u) => (
+    accessorFn: (u) => u.importedRows,
+    cell: ({ row }) => (
       <span>
-        {u.importedRows} imported
-        {u.skippedRows > 0 && <span className="text-amber-600"> / {u.skippedRows} skipped</span>}
+        {row.original.importedRows} imported
+        {row.original.skippedRows > 0 && <span className="text-amber-600"> / {row.original.skippedRows} skipped</span>}
       </span>
     ),
   },
-  { header: 'Size', accessor: (u) => formatFileSize(u.fileSize) },
-  { header: 'Time', accessor: (u) => `${u.processingTimeMs}ms` },
-  { header: 'Date', accessor: (u) => new Date(u.createdAt).toLocaleDateString('en-IN') },
+  { id: 'size', header: 'Size', accessorFn: (u) => u.fileSize, cell: ({ row }) => formatFileSize(row.original.fileSize) },
+  { id: 'time', header: 'Time', accessorFn: (u) => u.processingTimeMs, cell: ({ row }) => `${row.original.processingTimeMs}ms` },
+  { id: 'date', header: 'Date', accessorFn: (u) => u.createdAt, cell: ({ row }) => new Date(row.original.createdAt).toLocaleDateString('en-IN') },
 ];
 
 function formatFileSize(bytes: number): string {
@@ -96,7 +98,7 @@ export function Uploads() {
               Cancel
             </button>
           </div>
-          {upload.error && <p className="text-sm text-red-600">{upload.error.message}</p>}
+          {/* errors handled by toast notifications */}
         </form>
       )}
 
@@ -112,6 +114,7 @@ export function Uploads() {
             columns={columns}
             data={data}
             onRowClick={(u) => setExpandedId(expandedId === u.id ? null : u.id)}
+            searchPlaceholder="Search uploads..."
           />
           {expandedId && <UploadErrors upload={data.find((u) => u.id === expandedId)} />}
         </>
