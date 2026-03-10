@@ -1,10 +1,12 @@
 package normalize
 
-// ServerTech Sentry MIB normalization.
+// ServerTech Sentry3 MIB normalization.
 //
 // OID reference (Enterprise: .1.3.6.1.4.1.1718):
-//   Input Feed Load → .1.3.6.1.4.1.1718.3.2.2.1.7  (hundredths of Amps)
-//   Outlet Power    → .1.3.6.1.4.1.1718.3.2.3.1.41 (Watts)
+//   Infeed Active Power  → .1.3.6.1.4.1.1718.3.2.2.1.12 (Watts, infeedActivePower)
+//   Infeed Energy        → .1.3.6.1.4.1.1718.3.2.2.1.16 (tenth kWh, infeedEnergy)
+//   Infeed Current       → .1.3.6.1.4.1.1718.3.2.2.1.7  (hundredths of Amps)
+//   Power Factor         → .1.3.6.1.4.1.1718.3.2.2.1.14 (hundredths, e.g. 95 = 0.95)
 
 // ServerTechNormalizer handles ServerTech Sentry PDU raw SNMP values.
 type ServerTechNormalizer struct{}
@@ -14,9 +16,9 @@ func (s *ServerTechNormalizer) NormalizePower(rawValue int64) float64 {
 	return float64(rawValue) / 1000.0
 }
 
-// NormalizeEnergy returns ServerTech energy directly (already in kWh).
+// NormalizeEnergy converts ServerTech raw energy (tenth kWh) to kWh.
 func (s *ServerTechNormalizer) NormalizeEnergy(rawValue int64) float64 {
-	return float64(rawValue)
+	return float64(rawValue) / 10.0
 }
 
 // NormalizeCurrent converts ServerTech raw current (hundredths of A) to Amps.

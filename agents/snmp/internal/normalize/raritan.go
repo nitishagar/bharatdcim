@@ -1,11 +1,12 @@
 package normalize
 
-// Raritan PDU-MIB normalization.
+// Raritan PDU2-MIB normalization.
 //
 // OID reference (Enterprise: .1.3.6.1.4.1.13742):
-//   Inlet Power   → .1.3.6.1.4.1.13742.6.5.2.3.1.4  (Watts)
-//   Inlet Energy  → .1.3.6.1.4.1.13742.6.5.2.3.1.4  (Wh)
-//   Inlet Current → .1.3.6.1.4.1.13742.6.5.2.3.1.4  (mA)
+//   Inlet Active Power  → .1.3.6.1.4.1.13742.6.5.2.3.1.4.1.1.5 (milliwatts, sensorType=activePower)
+//   Inlet Active Energy → .1.3.6.1.4.1.13742.6.5.2.3.1.4.1.1.8 (Wh, sensorType=activeEnergy)
+//   Inlet Current       → .1.3.6.1.4.1.13742.6.5.2.3.1.4.1.1.1 (mA)
+//   Power Factor        → .1.3.6.1.4.1.13742.6.5.2.3.1.4.1.1.7 (0.001 units, e.g. 950 = 0.95)
 
 // RaritanNormalizer handles Raritan PDU raw SNMP values.
 type RaritanNormalizer struct{}

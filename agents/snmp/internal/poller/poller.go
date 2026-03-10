@@ -16,8 +16,8 @@ import (
 // OIDs for power and energy readings per vendor.
 var vendorOIDs = map[string]struct{ Power, Energy string }{
 	"apc":        {".1.3.6.1.4.1.318.1.1.26.4.3.1.5.1", ".1.3.6.1.4.1.318.1.1.26.4.3.1.7.1"},
-	"raritan":    {".1.3.6.1.4.1.13742.6.5.2.3.1.4", ".1.3.6.1.4.1.13742.6.5.2.3.1.4"},
-	"servertech": {".1.3.6.1.4.1.1718.3.2.3.1.41", ".1.3.6.1.4.1.1718.3.2.3.1.41"},
+	"raritan":    {".1.3.6.1.4.1.13742.6.5.2.3.1.4.1.1.5", ".1.3.6.1.4.1.13742.6.5.2.3.1.4.1.1.8"},
+	"servertech": {".1.3.6.1.4.1.1718.3.2.2.1.12", ".1.3.6.1.4.1.1718.3.2.2.1.16"},
 }
 
 // prevCounters stores the last energy counter reading per device for delta calc.
