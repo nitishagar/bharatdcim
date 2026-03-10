@@ -224,6 +224,28 @@ export const openApiSpec = {
         responses: { '200': { description: 'Array of agent heartbeats' } },
       },
     },
+    '/platform/tenants': {
+      get: {
+        summary: 'List all tenants (platform admin only)',
+        tags: ['Platform'],
+        security: [{ bearerAuth: [] }],
+        responses: {
+          '200': { description: 'Array of tenant objects' },
+          '403': { description: 'Forbidden — not a platform admin' },
+        },
+      },
+    },
+    '/platform/overview': {
+      get: {
+        summary: 'Cross-tenant aggregate KPIs (platform admin only)',
+        tags: ['Platform'],
+        security: [{ bearerAuth: [] }],
+        responses: {
+          '200': { description: 'Cross-tenant aggregate counts (tenants, meters, bills, invoices)' },
+          '403': { description: 'Forbidden — not a platform admin' },
+        },
+      },
+    },
     '/dashboard/summary': {
       get: {
         tags: ['Dashboard'],
