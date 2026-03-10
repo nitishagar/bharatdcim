@@ -10,7 +10,7 @@ export const openApiSpec = {
       'Enterprise power billing API for Indian data centers. Handles ToD tariff classification, GST-compliant invoicing, multi-vendor CSV import, and SNMP-based metering.',
   },
   servers: [
-    { url: 'https://bharatdcim-api.nitishagar.workers.dev', description: 'Production' },
+    { url: 'https://api.bharatdcim.com', description: 'Production' },
   ],
   components: {
     securitySchemes: {
@@ -222,6 +222,28 @@ export const openApiSpec = {
         tags: ['Agents'],
         summary: 'List registered agents',
         responses: { '200': { description: 'Array of agent heartbeats' } },
+      },
+    },
+    '/platform/tenants': {
+      get: {
+        summary: 'List all tenants (platform admin only)',
+        tags: ['Platform'],
+        security: [{ bearerAuth: [] }],
+        responses: {
+          '200': { description: 'Array of tenant objects' },
+          '403': { description: 'Forbidden — not a platform admin' },
+        },
+      },
+    },
+    '/platform/overview': {
+      get: {
+        summary: 'Cross-tenant aggregate KPIs (platform admin only)',
+        tags: ['Platform'],
+        security: [{ bearerAuth: [] }],
+        responses: {
+          '200': { description: 'Cross-tenant aggregate counts (tenants, meters, bills, invoices)' },
+          '403': { description: 'Forbidden — not a platform admin' },
+        },
       },
     },
     '/dashboard/summary': {

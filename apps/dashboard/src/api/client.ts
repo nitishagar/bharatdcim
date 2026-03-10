@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_URL ?? 'https://bharatdcim-api.nitishagar.workers.dev';
+const API_BASE = import.meta.env.VITE_API_URL ?? 'https://api.bharatdcim.com';
 
 // Token getter — wired from Clerk's useAuth().getToken via AuthBridge
 let _getToken: (() => Promise<string | null>) | null = null;

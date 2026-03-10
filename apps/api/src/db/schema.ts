@@ -105,7 +105,7 @@ export const bills = sqliteTable('bills', {
   gstPaisa: integer('gst_paisa').notNull(),
   totalBillPaisa: integer('total_bill_paisa').notNull(),
   effectiveRatePaisaPerKwh: integer('effective_rate_paisa_per_kwh').notNull(),
-  status: text('status').notNull().default('draft'), // 'draft' | 'finalized' | 'invoiced'
+  status: text('status').notNull().default('draft'), // 'draft' | 'invoiced' (note: 'finalized' reserved, not yet implemented)
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
 });

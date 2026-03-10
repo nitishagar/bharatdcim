@@ -51,7 +51,7 @@ agentsRouter.post('/heartbeat', async (c) => {
     });
   }
 
-  return c.json({ status: 'ok', agentId, timestamp: now });
+  return c.json({ status: 'ok', agentId, timestamp: now }, 201);
 });
 
 // GET /agents — list registered agents, scoped by tenant

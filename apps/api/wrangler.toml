@@ -3,5 +3,9 @@ main = "src/index.ts"
 compatibility_date = "2025-01-01"
 # TURSO_DATABASE_URL, TURSO_AUTH_TOKEN, and API_TOKEN are set as Worker secrets via wrangler secret put
 
+routes = [
+  { pattern = "api.bharatdcim.com/*", custom_domain = true }
+]
+
 [vars]
 CLERK_ISSUER_URL = "https://clerk.dashboard.bharatdcim.com"
