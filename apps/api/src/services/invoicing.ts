@@ -127,6 +127,7 @@ export async function createInvoice(
     invoiceId,
     action: 'created',
     detailsJson: JSON.stringify({ billId, taxType: taxBreakdown.taxType }),
+    actor: tenantId ?? 'api_token',
     createdAt: nowStr,
   });
 
@@ -178,6 +179,7 @@ export async function cancelInvoice(
     invoiceId,
     action: 'cancelled',
     detailsJson: JSON.stringify({ reason }),
+    actor: tenantId ?? 'api_token',
     createdAt: now,
   });
 
@@ -257,6 +259,7 @@ export async function createCreditNote(
     invoiceId,
     action: 'credit_note_issued',
     detailsJson: JSON.stringify({ creditNoteId, amountPaisa, reason }),
+    actor: tenantId ?? 'api_token',
     createdAt: nowStr,
   });
 

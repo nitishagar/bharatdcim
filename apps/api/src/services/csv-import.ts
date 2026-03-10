@@ -84,7 +84,7 @@ export async function importCSV(
         id: generateId(),
         meterId: record.meterId,
         timestamp: record.timestamp,
-        kwhPaisa: Math.round(record.kWh * 100), // Store as integer for consistency
+        kWh: Math.round(record.kWh * 1000), // stored as ×1000 paisa-equivalent for precision
         source: record.source || null,
         slotType: slotType || null,
         slotName: slotName || null,
