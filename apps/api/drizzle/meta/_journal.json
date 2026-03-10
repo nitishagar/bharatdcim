@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1771932683994,
+      "tag": "0000_tidy_fenris",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1741600000000,
+      "tag": "0001_tariff_tenant_id_agent_idx",
+      "breakpoints": true
+    }
+  ]
+}
