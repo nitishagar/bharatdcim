@@ -71,6 +71,42 @@ func TestSNMP014_ServerTechCurrent(t *testing.T) {
 	}
 }
 
+// SNMP-015: APC power factor — raw 95 (hundredths) → 0.95
+func TestSNMP015_APCPowerFactor(t *testing.T) {
+	n, err := GetNormalizer("apc")
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := n.NormalizePowerFactor(95)
+	if !floatEq(got, 0.95) {
+		t.Errorf("expected 0.95, got %f", got)
+	}
+}
+
+// SNMP-016: Raritan power factor — raw 950 (0.001 units) → 0.95
+func TestSNMP016_RaritanPowerFactor(t *testing.T) {
+	n, err := GetNormalizer("raritan")
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := n.NormalizePowerFactor(950)
+	if !floatEq(got, 0.95) {
+		t.Errorf("expected 0.95, got %f", got)
+	}
+}
+
+// SNMP-017: ServerTech power factor — raw 95 (hundredths) → 0.95
+func TestSNMP017_ServerTechPowerFactor(t *testing.T) {
+	n, err := GetNormalizer("servertech")
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := n.NormalizePowerFactor(95)
+	if !floatEq(got, 0.95) {
+		t.Errorf("expected 0.95, got %f", got)
+	}
+}
+
 func TestUnsupportedVendor(t *testing.T) {
 	_, err := GetNormalizer("unknown")
 	if err == nil {

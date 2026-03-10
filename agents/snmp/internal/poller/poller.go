@@ -13,11 +13,23 @@ import (
 	"github.com/nitishagar/bharatdcim/agents/snmp/internal/normalize"
 )
 
-// OIDs for power and energy readings per vendor.
-var vendorOIDs = map[string]struct{ Power, Energy string }{
-	"apc":        {".1.3.6.1.4.1.318.1.1.26.4.3.1.5.1", ".1.3.6.1.4.1.318.1.1.26.4.3.1.7.1"},
-	"raritan":    {".1.3.6.1.4.1.13742.6.5.2.3.1.4", ".1.3.6.1.4.1.13742.6.5.2.3.1.4"},
-	"servertech": {".1.3.6.1.4.1.1718.3.2.3.1.41", ".1.3.6.1.4.1.1718.3.2.3.1.41"},
+// OIDs for power, energy, and power factor readings per vendor.
+var vendorOIDs = map[string]struct{ Power, Energy, PowerFactor string }{
+	"apc": {
+		Power:       ".1.3.6.1.4.1.318.1.1.26.4.3.1.5.1",
+		Energy:      ".1.3.6.1.4.1.318.1.1.26.4.3.1.7.1",
+		PowerFactor: ".1.3.6.1.4.1.318.1.1.26.6.3.1.9", // hundredths: 95 = 0.95
+	},
+	"raritan": {
+		Power:       ".1.3.6.1.4.1.13742.6.5.2.3.1.4.1.1.5",
+		Energy:      ".1.3.6.1.4.1.13742.6.5.2.3.1.4.1.1.8",
+		PowerFactor: ".1.3.6.1.4.1.13742.6.5.2.3.1.4.1.1.7", // 0.001 units: 950 = 0.95
+	},
+	"servertech": {
+		Power:       ".1.3.6.1.4.1.1718.3.2.2.1.12",
+		Energy:      ".1.3.6.1.4.1.1718.3.2.2.1.16",
+		PowerFactor: ".1.3.6.1.4.1.1718.3.2.2.1.14", // hundredths: 95 = 0.95
+	},
 }
 
 // prevCounters stores the last energy counter reading per device for delta calc.
@@ -82,13 +94,13 @@ func (p *Poller) pollDevice(dev config.DeviceConfig) error {
 	}
 	defer snmpClient.Conn.Close()
 
-	result, err := snmpClient.Get([]string{oids.Power, oids.Energy})
+	result, err := snmpClient.Get([]string{oids.Power, oids.Energy, oids.PowerFactor})
 	if err != nil {
 		return fmt.Errorf("snmp get: %w", err)
 	}
 
-	if len(result.Variables) < 2 {
-		return fmt.Errorf("expected 2 variables, got %d", len(result.Variables))
+	if len(result.Variables) < 3 {
+		return fmt.Errorf("expected 3 variables, got %d", len(result.Variables))
 	}
 
 	rawPower := toInt64(result.Variables[0])
@@ -110,11 +122,15 @@ func (p *Poller) pollDevice(dev config.DeviceConfig) error {
 		kwhDelta = norm.NormalizeEnergy(int64(cr.Delta))
 	}
 
+	rawPF := toInt64(result.Variables[2])
+	pf := norm.NormalizePowerFactor(rawPF)
+
 	return p.buf.Insert(buffer.Reading{
 		MeterID:   dev.MeterID,
 		Timestamp: time.Now().UTC().Format(time.RFC3339),
 		KWh:       kwhDelta,
 		KW:        kw,
+		PF:        pf,
 	})
 }
 
