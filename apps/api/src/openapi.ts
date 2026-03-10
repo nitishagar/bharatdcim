@@ -10,7 +10,7 @@ export const openApiSpec = {
       'Enterprise power billing API for Indian data centers. Handles ToD tariff classification, GST-compliant invoicing, multi-vendor CSV import, and SNMP-based metering.',
   },
   servers: [
-    { url: 'https://bharatdcim-api.nitishagar.workers.dev', description: 'Production' },
+    { url: 'https://api.bharatdcim.com', description: 'Production' },
   ],
   components: {
     securitySchemes: {
