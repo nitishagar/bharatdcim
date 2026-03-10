@@ -30,3 +30,8 @@ func (r *RaritanNormalizer) NormalizeCurrent(rawValue int64) float64 {
 func (r *RaritanNormalizer) NormalizeVoltage(rawValue int64) float64 {
 	return float64(rawValue)
 }
+
+// NormalizePowerFactor converts Raritan raw power factor (0.001 units) to 0.0–1.0.
+func (r *RaritanNormalizer) NormalizePowerFactor(rawValue int64) float64 {
+	return float64(rawValue) / 1000.0
+}

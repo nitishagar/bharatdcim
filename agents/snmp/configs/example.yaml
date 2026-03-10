@@ -3,8 +3,9 @@ agent:
   buffer_db_path: ./buffer.db
 
 cloud:
-  api_base_url: https://api.bharatdcim.in
+  api_base_url: https://bharatdcim-api.nitishagar.workers.dev
   auth_token: "your-jwt-token-here"
+  agent_id: "your-agent-id-here"  # REQUIRED: unique identifier for this agent instance
   heartbeat_sec: 60
   sync_batch_size: 1000
   retry_max_attempts: 3

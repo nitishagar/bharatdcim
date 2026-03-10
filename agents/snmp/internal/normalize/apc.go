@@ -30,3 +30,8 @@ func (a *APCNormalizer) NormalizeCurrent(rawValue int64) float64 {
 func (a *APCNormalizer) NormalizeVoltage(rawValue int64) float64 {
 	return float64(rawValue)
 }
+
+// NormalizePowerFactor converts APC raw power factor (hundredths) to 0.0–1.0.
+func (a *APCNormalizer) NormalizePowerFactor(rawValue int64) float64 {
+	return float64(rawValue) / 100.0
+}

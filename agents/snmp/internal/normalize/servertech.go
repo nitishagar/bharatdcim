@@ -30,3 +30,8 @@ func (s *ServerTechNormalizer) NormalizeCurrent(rawValue int64) float64 {
 func (s *ServerTechNormalizer) NormalizeVoltage(rawValue int64) float64 {
 	return float64(rawValue)
 }
+
+// NormalizePowerFactor converts ServerTech raw power factor (hundredths) to 0.0–1.0.
+func (s *ServerTechNormalizer) NormalizePowerFactor(rawValue int64) float64 {
+	return float64(rawValue) / 100.0
+}

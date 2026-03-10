@@ -9,6 +9,7 @@ test:
 	CGO_ENABLED=1 go test ./... -v -count=1
 
 lint:
+	# golangci-lint should be added for comprehensive linting (run: golangci-lint run ./...)
 	go vet ./...
 
 clean:
