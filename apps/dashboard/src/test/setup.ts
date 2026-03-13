@@ -36,6 +36,7 @@ vi.mock('@clerk/clerk-react', () => ({
   RedirectToSignIn: () => null,
   OrganizationSwitcher: () => null,
   UserButton: () => null,
+  UserProfile: () => null,
 }));
 
 // MSW lifecycle

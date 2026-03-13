@@ -8,18 +8,13 @@ describe('Settings page', () => {
     expect(screen.getByText('Settings')).toBeInTheDocument();
   });
 
-  it('renders the user email from Clerk mock', () => {
+  it('renders the organization name from Clerk mock', () => {
     renderWithProviders(<Settings />);
-    expect(screen.getByText('test@example.com')).toBeInTheDocument();
+    expect(screen.getByText('Test Org')).toBeInTheDocument();
   });
 
-  it('renders the user full name from Clerk mock', () => {
+  it('shows API connection section', () => {
     renderWithProviders(<Settings />);
-    expect(screen.getByText('Test User')).toBeInTheDocument();
-  });
-
-  it('shows API connection status', () => {
-    renderWithProviders(<Settings />);
-    expect(screen.getByText('Connected')).toBeInTheDocument();
+    expect(screen.getByText('API Connection')).toBeInTheDocument();
   });
 });
