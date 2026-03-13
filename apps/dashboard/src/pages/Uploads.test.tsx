@@ -1,4 +1,5 @@
 import { screen, waitFor } from '@testing-library/react';
+const emptyPage = { data: [], total: 0, limit: 25, offset: 0 };
 import { http, HttpResponse } from 'msw';
 import { vi } from 'vitest';
 import { useAuth } from '@clerk/clerk-react';
@@ -11,7 +12,7 @@ describe('Uploads page', () => {
     server.use(
       http.get('*/uploads', async () => {
         await new Promise<void>((resolve) => setTimeout(resolve, 100));
-        return HttpResponse.json([]);
+        return HttpResponse.json(emptyPage);
       }),
     );
     renderWithProviders(<Uploads />);
@@ -40,7 +41,7 @@ describe('Uploads page', () => {
   });
 
   it('renders empty state when no uploads', async () => {
-    server.use(http.get('*/uploads', () => HttpResponse.json([])));
+    server.use(http.get('*/uploads', () => HttpResponse.json(emptyPage)));
     renderWithProviders(<Uploads />);
     await waitFor(() => expect(screen.getByText('No uploads found')).toBeInTheDocument());
   });

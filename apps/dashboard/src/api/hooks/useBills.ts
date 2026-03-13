@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { api } from '../client';
+import { type PaginationParams, type PaginatedResult, buildPaginationQuery } from './types';
 
 export interface Bill {
   id: string;
@@ -46,10 +47,11 @@ export interface BillCalculation {
   dgRatePaisa?: number;
 }
 
-export function useBills() {
+export function useBills(params: PaginationParams = { limit: 25, offset: 0 }) {
+  const qs = buildPaginationQuery(params);
   return useQuery({
-    queryKey: ['bills'],
-    queryFn: () => api<Bill[]>('/bills'),
+    queryKey: ['bills', params],
+    queryFn: () => api<PaginatedResult<Bill>>(`/bills?${qs}`),
   });
 }
 

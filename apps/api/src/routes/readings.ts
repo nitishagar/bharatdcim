@@ -1,7 +1,8 @@
 import { Hono } from 'hono';
-import { eq, and, gte, lte, inArray } from 'drizzle-orm';
+import { eq, and, gte, lte, inArray, sql } from 'drizzle-orm';
 import type { AppEnv } from '../types.js';
 import { powerReadings, meters } from '../db/schema.js';
+import { parsePagination } from '../utils/pagination.js';
 
 const readingsRouter = new Hono<AppEnv>();
 
@@ -32,17 +33,21 @@ readingsRouter.get('/', async (c) => {
     }
   }
 
+  const { hasPagination, limit, offset } = parsePagination(c);
+
   const conditions = [eq(powerReadings.meterId, meterId)];
   if (from) conditions.push(gte(powerReadings.timestamp, from));
   if (to) conditions.push(lte(powerReadings.timestamp, to));
+  const where = and(...conditions);
 
-  const rows = await db
-    .select()
-    .from(powerReadings)
-    .where(and(...conditions))
-    .all();
+  if (!hasPagination) {
+    const rows = await db.select().from(powerReadings).where(where).all();
+    return c.json(rows);
+  }
 
-  return c.json(rows);
+  const [{ total }] = await db.select({ total: sql<number>`COUNT(*)` }).from(powerReadings).where(where).all();
+  const data = await db.select().from(powerReadings).where(where).limit(limit).offset(offset).all();
+  return c.json({ data, total: Number(total), limit, offset });
 });
 
 // POST /readings — batch insert readings

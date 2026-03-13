@@ -22,13 +22,16 @@ const columns: ColumnDef<Invoice, unknown>[] = [
 ];
 
 export function Invoices() {
-  const { data, isLoading, error, refetch } = useInvoices();
-  const { data: bills } = useBills();
+  const [pageIndex, setPageIndex] = useState(0);
+  const [pageSize, setPageSize] = useState(25);
+  const [search, setSearch] = useState('');
+  const { data, isLoading, error, refetch } = useInvoices({ limit: pageSize, offset: pageIndex * pageSize, search });
+  const { data: billsData } = useBills({ limit: 100 });
   const navigate = useNavigate();
   const createInvoice = useCreateInvoice();
   const isAdmin = useIsAdmin();
   const [showForm, setShowForm] = useState(false);
-  const uninvoicedBills = bills?.filter((b: Bill) => b.status !== 'invoiced') ?? [];
+  const uninvoicedBills = billsData?.data?.filter((b: Bill) => b.status !== 'invoiced') ?? [];
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm<CreateInvoiceForm>({
     resolver: zodResolver(createInvoiceSchema),
@@ -110,15 +113,22 @@ export function Invoices() {
         <TableSkeleton />
       ) : error ? (
         <ErrorMessage error={error} onRetry={() => refetch()} />
-      ) : !data?.length ? (
+      ) : !data?.data?.length ? (
         <EmptyState message="No invoices found" />
       ) : (
         <DataTable
           columns={columns}
-          data={data}
+          data={data.data}
           onRowClick={(inv) => navigate(`/invoices/${inv.id}`)}
           searchPlaceholder="Search invoices..."
           exportFilename="invoices"
+          manualPagination
+          pageIndex={pageIndex}
+          pageSize={pageSize}
+          totalRows={data.total}
+          onPageChange={setPageIndex}
+          onPageSizeChange={setPageSize}
+          onSearch={(s) => { setSearch(s); setPageIndex(0); }}
         />
       )}
     </div>

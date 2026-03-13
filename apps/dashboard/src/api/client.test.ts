@@ -30,6 +30,7 @@ describe('api client', () => {
   });
 
   it('resolves with parsed JSON on successful response', async () => {
+    server.use(http.get('*/meters', () => HttpResponse.json([{ id: 'test-1' }])));
     const result = await api<{ id: string }[]>('/meters');
     expect(Array.isArray(result)).toBe(true);
   });

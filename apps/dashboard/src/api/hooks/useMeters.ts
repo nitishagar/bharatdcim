@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { api } from '../client';
+import { type PaginationParams, type PaginatedResult, buildPaginationQuery } from './types';
 
 export interface Meter {
   id: string;
@@ -15,10 +16,11 @@ export interface Meter {
   updatedAt: string;
 }
 
-export function useMeters() {
+export function useMeters(params: PaginationParams = { limit: 25, offset: 0 }) {
+  const qs = buildPaginationQuery(params);
   return useQuery({
-    queryKey: ['meters'],
-    queryFn: () => api<Meter[]>('/meters'),
+    queryKey: ['meters', params],
+    queryFn: () => api<PaginatedResult<Meter>>(`/meters?${qs}`),
   });
 }
 

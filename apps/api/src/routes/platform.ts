@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
-import { sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import type { AppEnv } from '../types.js';
 import { tenants, meters, bills, invoices } from '../db/schema.js';
 
@@ -19,6 +19,60 @@ platformRouter.get('/tenants', async (c) => {
   const db = c.get('db');
   const rows = await db.select().from(tenants).all();
   return c.json(rows);
+});
+
+// POST /platform/tenants — create a new tenant (platform admin only)
+platformRouter.post('/tenants', async (c) => {
+  requirePlatformAdmin(c);
+  const db = c.get('db');
+  const body = await c.req.json();
+
+  if (!body.name || !body.stateCode) {
+    return c.json(
+      { error: { code: 'VALIDATION_ERROR', message: 'Missing required fields: name, stateCode' } },
+      400,
+    );
+  }
+
+  const now = new Date().toISOString();
+  const row = {
+    id: crypto.randomUUID(),
+    name: body.name as string,
+    stateCode: body.stateCode as string,
+    gstin: (body.gstin as string) ?? null,
+    billingAddress: (body.billingAddress as string) ?? null,
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  await db.insert(tenants).values(row);
+  return c.json(row, 201);
+});
+
+// PATCH /platform/tenants/:id — update tenant fields (platform admin only)
+platformRouter.patch('/tenants/:id', async (c) => {
+  requirePlatformAdmin(c);
+  const db = c.get('db');
+  const id = c.req.param('id');
+
+  const existing = await db.select().from(tenants).where(eq(tenants.id, id)).all();
+  if (existing.length === 0) {
+    return c.json({ error: { code: 'NOT_FOUND', message: `Tenant ${id} not found` } }, 404);
+  }
+
+  const body = await c.req.json();
+  const now = new Date().toISOString();
+  const updates: Partial<typeof tenants.$inferInsert> = { updatedAt: now };
+
+  if (body.name !== undefined) updates.name = body.name as string;
+  if (body.stateCode !== undefined) updates.stateCode = body.stateCode as string;
+  if (body.gstin !== undefined) updates.gstin = body.gstin as string;
+  if (body.billingAddress !== undefined) updates.billingAddress = body.billingAddress as string;
+
+  await db.update(tenants).set(updates).where(eq(tenants.id, id));
+
+  const [updated] = await db.select().from(tenants).where(eq(tenants.id, id)).all();
+  return c.json(updated);
 });
 
 // GET /platform/overview — cross-tenant dashboard summary

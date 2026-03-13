@@ -21,7 +21,10 @@ const columns: ColumnDef<Meter, unknown>[] = [
 ];
 
 export function Meters() {
-  const { data, isLoading, error, refetch } = useMeters();
+  const [pageIndex, setPageIndex] = useState(0);
+  const [pageSize, setPageSize] = useState(25);
+  const [search, setSearch] = useState('');
+  const { data, isLoading, error, refetch } = useMeters({ limit: pageSize, offset: pageIndex * pageSize, search });
   const navigate = useNavigate();
   const isAdmin = useIsAdmin();
   const [showForm, setShowForm] = useState(false);
@@ -51,15 +54,22 @@ export function Meters() {
         <TableSkeleton />
       ) : error ? (
         <ErrorMessage error={error} onRetry={() => refetch()} />
-      ) : !data?.length ? (
+      ) : !data?.data?.length ? (
         <EmptyState message="No meters found" />
       ) : (
         <DataTable
           columns={columns}
-          data={data}
+          data={data.data}
           onRowClick={(m) => navigate(`/meters/${m.id}`)}
           searchPlaceholder="Search meters..."
           exportFilename="meters"
+          manualPagination
+          pageIndex={pageIndex}
+          pageSize={pageSize}
+          totalRows={data.total}
+          onPageChange={setPageIndex}
+          onPageSizeChange={setPageSize}
+          onSearch={(s) => { setSearch(s); setPageIndex(0); }}
         />
       )}
     </div>
@@ -68,7 +78,8 @@ export function Meters() {
 
 function CreateMeterFormComponent({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
   const createMeter = useCreateMeter();
-  const { data: tariffs } = useTariffs();
+  const { data: tariffsData } = useTariffs({ limit: 100 });
+  const tariffs = tariffsData?.data;
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm<CreateMeterForm>({
     resolver: zodResolver(createMeterSchema),

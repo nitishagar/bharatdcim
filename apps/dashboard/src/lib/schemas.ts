@@ -48,6 +48,21 @@ export const createMeterSchema = z.object({
 
 export type CreateMeterForm = z.infer<typeof createMeterSchema>;
 
+export const createTenantSchema = z.object({
+  name: z.string().min(1, 'Tenant name is required'),
+  stateCode: z.string().min(1, 'State code is required'),
+  gstin: z.string().optional().refine(
+    (v) => !v || /^\d{2}[A-Z]{5}\d{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/.test(v),
+    'Invalid GSTIN format (e.g., 29ABCDE1234F1Z5)',
+  ),
+  billingAddress: z.string().optional(),
+});
+
+export type CreateTenantForm = z.infer<typeof createTenantSchema>;
+
+export const updateTenantSchema = createTenantSchema;
+export type UpdateTenantForm = CreateTenantForm;
+
 export const createTariffSchema = z.object({
   stateCode: z.string().min(1, 'State code is required'),
   discom: z.string().min(1, 'DISCOM is required'),

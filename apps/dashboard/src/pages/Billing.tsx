@@ -65,7 +65,9 @@ function getSlotRate(tariff: Tariff, slotType: string): number {
 }
 
 export function Billing() {
-  const { data, isLoading, error, refetch } = useBills();
+  const [pageIndex, setPageIndex] = useState(0);
+  const [pageSize, setPageSize] = useState(25);
+  const { data, isLoading, error, refetch } = useBills({ limit: pageSize, offset: pageIndex * pageSize });
   const navigate = useNavigate();
   const isAdmin = useIsAdmin();
 
@@ -99,15 +101,21 @@ export function Billing() {
         <TableSkeleton />
       ) : error ? (
         <ErrorMessage error={error} onRetry={() => refetch()} />
-      ) : !data?.length ? (
+      ) : !data?.data?.length ? (
         <EmptyState message="No bills found" />
       ) : (
         <DataTable
           columns={columns}
-          data={data}
+          data={data.data}
           onRowClick={(b) => navigate(`/billing/${b.id}`)}
           searchPlaceholder="Search bills..."
           exportFilename="bills"
+          manualPagination
+          pageIndex={pageIndex}
+          pageSize={pageSize}
+          totalRows={data.total}
+          onPageChange={setPageIndex}
+          onPageSizeChange={setPageSize}
         />
       )}
     </div>
@@ -115,8 +123,10 @@ export function Billing() {
 }
 
 function CalculateBillFormComponent({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
-  const { data: meters } = useMeters();
-  const { data: tariffs } = useTariffs();
+  const { data: metersData } = useMeters({ limit: 100 });
+  const { data: tariffsData } = useTariffs({ limit: 100 });
+  const meters = metersData?.data;
+  const tariffs = tariffsData?.data;
   const calculateBill = useCalculateBill();
   const saveBill = useSaveBill();
   const [result, setResult] = useState<Record<string, unknown> | null>(null);
@@ -136,11 +146,13 @@ function CalculateBillFormComponent({ onClose, onSaved }: { onClose: () => void;
   const selectedMeter = meters?.find((m: Meter) => m.id === meterId);
   const selectedTariff = tariffs?.find((t: Tariff) => t.id === selectedMeter?.tariffId);
 
-  const { data: readings } = useReadings(
+  const { data: readingsData } = useReadings(
     meterId,
     periodStart || undefined,
     periodEnd || undefined,
+    { limit: 1000 },
   );
+  const readings = readingsData?.data;
 
   useEffect(() => {
     if (!readings || !periodStart || !periodEnd) return;
@@ -296,7 +308,7 @@ function CalculateBillFormComponent({ onClose, onSaved }: { onClose: () => void;
         {meterId && periodStart && periodEnd && readings !== undefined && (
           <div className={`rounded-lg px-3 py-2 text-xs ${readings.length > 0 ? 'bg-blue-50 text-blue-700' : 'bg-amber-50 text-amber-700'}`}>
             {readings.length > 0
-              ? `Auto-filled from ${readings.length} readings`
+              ? `Auto-filled from ${readings.length} reading${readings.length !== 1 ? 's' : ''}`
               : 'No readings found for this period — enter kWh manually'}
           </div>
         )}

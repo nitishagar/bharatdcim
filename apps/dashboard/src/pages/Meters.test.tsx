@@ -6,12 +6,14 @@ import { server } from '../test/server';
 import { renderWithProviders } from '../test/utils';
 import { Meters } from './Meters';
 
+const emptyPage = { data: [], total: 0, limit: 25, offset: 0 };
+
 describe('Meters page', () => {
   it('renders loading spinner initially', () => {
     server.use(
       http.get('*/meters', async () => {
         await new Promise<void>((resolve) => setTimeout(resolve, 100));
-        return HttpResponse.json([]);
+        return HttpResponse.json(emptyPage);
       }),
     );
     renderWithProviders(<Meters />);
@@ -39,7 +41,7 @@ describe('Meters page', () => {
   });
 
   it('renders empty state when no meters', async () => {
-    server.use(http.get('*/meters', () => HttpResponse.json([])));
+    server.use(http.get('*/meters', () => HttpResponse.json(emptyPage)));
     renderWithProviders(<Meters />);
     await waitFor(() => expect(screen.getByText('No meters found')).toBeInTheDocument());
   });

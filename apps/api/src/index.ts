@@ -15,6 +15,12 @@ import { agentsRouter } from './routes/agents.js';
 import { dashboardRouter } from './routes/dashboard.js';
 import { platformRouter } from './routes/platform.js';
 import { openApiSpec } from './openapi.js';
+import {
+  checkLimit,
+  AUTHENTICATED_LIMIT,
+  UNAUTHENTICATED_LIMIT,
+  RATE_LIMITED_PREFIXES,
+} from './middleware/rateLimiter.js';
 
 // Cache JWKS across requests within the same isolate
 let cachedJWKS: ReturnType<typeof createRemoteJWKSet> | null = null;
@@ -56,7 +62,7 @@ app.get('/openapi.json', (c) => c.json(openApiSpec));
 app.get('/docs', swaggerUI({ url: '/openapi.json' }));
 
 // Auth for all API routes — accepts API_TOKEN (for agents/scripts) or Clerk JWT (for dashboard)
-const API_PREFIXES = ['/tariffs', '/meters', '/bills', '/readings', '/invoices', '/uploads', '/agents', '/dashboard', '/platform'];
+const API_PREFIXES = RATE_LIMITED_PREFIXES;
 app.use('*', async (c, next) => {
   if (!API_PREFIXES.some((p) => c.req.path === p || c.req.path.startsWith(p + '/'))) {
     return next();
@@ -113,6 +119,44 @@ app.use('*', async (c, next) => {
   }
 
   throw new HTTPException(401, { message: 'Invalid or missing Bearer token' });
+});
+
+// Rate limiting — runs after auth so tenantId/authType/platformAdmin are available in context
+app.use('*', async (c, next) => {
+  if (!API_PREFIXES.some((p) => c.req.path === p || c.req.path.startsWith(p + '/'))) {
+    return next();
+  }
+
+  const authType = c.get('authType');
+  // API_TOKEN callers are trusted internal services — no rate limiting
+  if (authType === 'api_token') return next();
+
+  const tenantId = c.get('tenantId');
+  const platformAdmin = c.get('platformAdmin');
+
+  let key: string;
+  let limit: number;
+
+  if (tenantId) {
+    key = `tenant:${tenantId}`;
+    limit = AUTHENTICATED_LIMIT;
+  } else if (platformAdmin) {
+    key = 'platform_admin';
+    limit = AUTHENTICATED_LIMIT;
+  } else {
+    key = `anon:${c.req.header('CF-Connecting-IP') ?? 'unknown'}`;
+    limit = UNAUTHENTICATED_LIMIT;
+  }
+
+  if (checkLimit(key, limit)) {
+    return c.json(
+      { error: { code: 'RATE_LIMITED', message: 'Too many requests. Try again in 60 seconds.' } },
+      429,
+      { 'Retry-After': '60' },
+    );
+  }
+
+  return next();
 });
 
 // Database middleware — injects db into context for API routes only

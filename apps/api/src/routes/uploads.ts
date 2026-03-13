@@ -1,9 +1,10 @@
 import { Hono } from 'hono';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, like, sql } from 'drizzle-orm';
 import type { AppEnv } from '../types.js';
 import { uploadAudit } from '../db/schema.js';
 import { importCSV } from '../services/csv-import.js';
 import { requireAdmin } from '../middleware/rbac.js';
+import { parsePagination } from '../utils/pagination.js';
 
 const uploadsRouter = new Hono<AppEnv>();
 
@@ -48,8 +49,21 @@ uploadsRouter.get('/', async (c) => {
   const db = c.get('db');
   const tenantId = c.get('tenantId');
   if (!tenantId) return c.json([]);
-  const rows = await db.select().from(uploadAudit).where(eq(uploadAudit.tenantId, tenantId)).all();
-  return c.json(rows);
+
+  const { hasPagination, limit, offset, search } = parsePagination(c);
+
+  const conditions: ReturnType<typeof eq>[] = [eq(uploadAudit.tenantId, tenantId)];
+  if (search) conditions.push(like(uploadAudit.fileName, `%${search}%`));
+  const where = and(...conditions);
+
+  if (!hasPagination) {
+    const rows = await db.select().from(uploadAudit).where(where).all();
+    return c.json(rows);
+  }
+
+  const [{ total }] = await db.select({ total: sql<number>`COUNT(*)` }).from(uploadAudit).where(where).all();
+  const data = await db.select().from(uploadAudit).where(where).limit(limit).offset(offset).all();
+  return c.json({ data, total: Number(total), limit, offset });
 });
 
 // GET /uploads/:id — specific upload audit (scoped by tenant)

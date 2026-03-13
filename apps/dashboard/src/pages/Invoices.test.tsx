@@ -1,4 +1,5 @@
 import { screen, waitFor, fireEvent } from '@testing-library/react';
+const emptyPage = { data: [], total: 0, limit: 25, offset: 0 };
 import { http, HttpResponse } from 'msw';
 import { vi } from 'vitest';
 import { useAuth } from '@clerk/clerk-react';
@@ -11,7 +12,7 @@ describe('Invoices page', () => {
     server.use(
       http.get('*/invoices', async () => {
         await new Promise<void>((resolve) => setTimeout(resolve, 100));
-        return HttpResponse.json([]);
+        return HttpResponse.json(emptyPage);
       }),
     );
     renderWithProviders(<Invoices />);
@@ -40,7 +41,7 @@ describe('Invoices page', () => {
   });
 
   it('renders empty state when no invoices', async () => {
-    server.use(http.get('*/invoices', () => HttpResponse.json([])));
+    server.use(http.get('*/invoices', () => HttpResponse.json(emptyPage)));
     renderWithProviders(<Invoices />);
     await waitFor(() => expect(screen.getByText('No invoices found')).toBeInTheDocument());
   });

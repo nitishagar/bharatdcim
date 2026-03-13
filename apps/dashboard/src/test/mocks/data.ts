@@ -175,6 +175,18 @@ export const mockPlatformTenants = [
     name: 'DataCenter Corp',
     stateCode: 'KA',
     gstin: '29ABCDE1234F1Z5',
+    billingAddress: null,
     createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-01-01T00:00:00Z',
   },
 ];
+
+export const mockCreatedTenant = {
+  id: 'tenant-new',
+  name: 'New DC',
+  stateCode: 'DL',
+  gstin: null,
+  billingAddress: null,
+  createdAt: '2026-03-01T00:00:00Z',
+  updatedAt: '2026-03-01T00:00:00Z',
+};

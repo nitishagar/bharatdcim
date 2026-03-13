@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../client';
+import { type PaginationParams, type PaginatedResult, buildPaginationQuery } from './types';
 
 export interface Agent {
   id: string;
@@ -13,10 +14,11 @@ export interface Agent {
   updatedAt: string;
 }
 
-export function useAgents() {
+export function useAgents(params: PaginationParams = { limit: 25, offset: 0 }) {
+  const qs = buildPaginationQuery(params);
   return useQuery({
-    queryKey: ['agents'],
-    queryFn: () => api<Agent[]>('/agents'),
+    queryKey: ['agents', params],
+    queryFn: () => api<PaginatedResult<Agent>>(`/agents?${qs}`),
     refetchInterval: 30_000,
   });
 }

@@ -1,8 +1,9 @@
 import { Hono } from 'hono';
-import { eq, or, isNull, and } from 'drizzle-orm';
+import { eq, or, isNull, and, like, sql } from 'drizzle-orm';
 import type { AppEnv } from '../types.js';
 import { tariffConfigs, meters, bills } from '../db/schema.js';
 import { requireAdmin } from '../middleware/rbac.js';
+import { parsePagination } from '../utils/pagination.js';
 
 const tariffs = new Hono<AppEnv>();
 
@@ -10,18 +11,42 @@ const tariffs = new Hono<AppEnv>();
 tariffs.get('/', async (c) => {
   const db = c.get('db');
   const tenantId = c.get('tenantId');
+  const { hasPagination, limit, offset, search } = parsePagination(c);
 
   if (tenantId) {
     // Return global tariffs (tenantId IS NULL) + tenant-specific overrides
-    const rows = await db.select().from(tariffConfigs)
-      .where(or(isNull(tariffConfigs.tenantId), eq(tariffConfigs.tenantId, tenantId)))
-      .all();
-    return c.json(rows);
+    const scopeWhere = or(isNull(tariffConfigs.tenantId), eq(tariffConfigs.tenantId, tenantId));
+    const conditions = search
+      ? and(scopeWhere, like(tariffConfigs.discom, `%${search}%`))
+      : scopeWhere;
+
+    if (!hasPagination) {
+      const rows = await db.select().from(tariffConfigs).where(conditions).all();
+      return c.json(rows);
+    }
+
+    const [{ total }] = await db.select({ total: sql<number>`COUNT(*)` }).from(tariffConfigs).where(conditions).all();
+    const data = await db.select().from(tariffConfigs).where(conditions).limit(limit).offset(offset).all();
+    return c.json({ data, total: Number(total), limit, offset });
   }
 
   // API_TOKEN or platform admin — return all
-  const rows = await db.select().from(tariffConfigs).all();
-  return c.json(rows);
+  const conditions = search ? like(tariffConfigs.discom, `%${search}%`) : undefined;
+
+  if (!hasPagination) {
+    const rows = conditions
+      ? await db.select().from(tariffConfigs).where(conditions).all()
+      : await db.select().from(tariffConfigs).all();
+    return c.json(rows);
+  }
+
+  const [{ total }] = conditions
+    ? await db.select({ total: sql<number>`COUNT(*)` }).from(tariffConfigs).where(conditions).all()
+    : await db.select({ total: sql<number>`COUNT(*)` }).from(tariffConfigs).all();
+  const data = conditions
+    ? await db.select().from(tariffConfigs).where(conditions).limit(limit).offset(offset).all()
+    : await db.select().from(tariffConfigs).limit(limit).offset(offset).all();
+  return c.json({ data, total: Number(total), limit, offset });
 });
 
 // GET /tariffs/:id — get tariff by ID (global tariffs or own tenant's tariffs)

@@ -20,6 +20,8 @@ function useDebounce<T>(value: T, delay = 300): T {
   return debouncedValue;
 }
 
+const PAGE_SIZE_OPTIONS = [25, 50, 100];
+
 interface DataTableProps<T> {
   columns: ColumnDef<T, unknown>[];
   data: T[];
@@ -28,6 +30,13 @@ interface DataTableProps<T> {
   enableSearch?: boolean;
   pageSize?: number;
   exportFilename?: string;
+  // Server-side (manual) pagination props
+  manualPagination?: boolean;
+  pageIndex?: number;
+  totalRows?: number;
+  onPageChange?: (index: number) => void;
+  onPageSizeChange?: (size: number) => void;
+  onSearch?: (search: string) => void;
 }
 
 export type { ColumnDef };
@@ -40,25 +49,46 @@ export function DataTable<T>({
   enableSearch = true,
   pageSize = 25,
   exportFilename,
+  manualPagination = false,
+  pageIndex = 0,
+  totalRows = 0,
+  onPageChange,
+  onPageSizeChange,
+  onSearch,
 }: DataTableProps<T>) {
-  const [globalFilter, setGlobalFilter] = useState('');
-  const debouncedFilter = useDebounce(globalFilter);
+  const [localFilter, setLocalFilter] = useState('');
+  const debouncedFilter = useDebounce(localFilter);
   const [sorting, setSorting] = useState<SortingState>([]);
+
+  // In manual mode, propagate debounced search to parent
+  useEffect(() => {
+    if (manualPagination) {
+      onSearch?.(debouncedFilter);
+    }
+  }, [debouncedFilter]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const state = manualPagination
+    ? { globalFilter: undefined as string | undefined, sorting, pagination: { pageIndex, pageSize } }
+    : { globalFilter: debouncedFilter, sorting };
 
   const table = useReactTable({
     data,
     columns,
-    state: { globalFilter: debouncedFilter, sorting },
-    onGlobalFilterChange: setGlobalFilter,
+    state,
+    manualPagination,
+    manualFiltering: manualPagination,
+    pageCount: manualPagination ? Math.ceil(totalRows / pageSize) : undefined,
+    onGlobalFilterChange: manualPagination ? undefined : setLocalFilter,
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    initialState: { pagination: { pageSize } },
+    initialState: manualPagination ? undefined : { pagination: { pageSize } },
   });
 
   const rows = table.getRowModel().rows;
+  const serverPageCount = manualPagination ? Math.ceil(totalRows / pageSize) : 0;
 
   function handleExportCSV() {
     const headers = table
@@ -85,8 +115,11 @@ export function DataTable<T>({
         <div className="flex items-center gap-2">
           {enableSearch && (
             <input
-              value={globalFilter}
-              onChange={(e) => setGlobalFilter(e.target.value)}
+              value={localFilter}
+              onChange={(e) => {
+                setLocalFilter(e.target.value);
+                if (manualPagination) onPageChange?.(0); // reset to page 0 on new search
+              }}
               placeholder={searchPlaceholder}
               className="w-full max-w-sm rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-navy focus:outline-none focus:ring-1 focus:ring-navy dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100 dark:placeholder-gray-400 dark:focus:border-navy-light dark:focus:ring-navy-light"
             />
@@ -130,7 +163,7 @@ export function DataTable<T>({
             {rows.length === 0 ? (
               <tr>
                 <td colSpan={columns.length} className="px-4 py-8 text-center text-sm text-gray-400 dark:text-gray-500">
-                  {globalFilter ? 'No results match your search.' : 'No data available.'}
+                  {localFilter ? 'No results match your search.' : 'No data available.'}
                 </td>
               </tr>
             ) : (
@@ -154,7 +187,8 @@ export function DataTable<T>({
         </table>
       </div>
 
-      {table.getPageCount() > 1 && (
+      {/* Client-side pagination footer */}
+      {!manualPagination && table.getPageCount() > 1 && (
         <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
           <span>
             Showing {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}–
@@ -178,6 +212,54 @@ export function DataTable<T>({
             <button
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
+              className="rounded border px-3 py-1 text-sm disabled:opacity-40 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Server-side pagination footer */}
+      {manualPagination && serverPageCount > 0 && (
+        <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+          <div className="flex items-center gap-3">
+            <span>
+              {totalRows === 0
+                ? 'No results'
+                : `Showing ${pageIndex * pageSize + 1}–${Math.min((pageIndex + 1) * pageSize, totalRows)} of ${totalRows}`}
+            </span>
+            {onPageSizeChange && (
+              <select
+                value={pageSize}
+                onChange={(e) => {
+                  onPageSizeChange(parseInt(e.target.value));
+                  onPageChange?.(0);
+                }}
+                className="rounded border border-gray-300 px-2 py-1 text-xs dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300"
+              >
+                {PAGE_SIZE_OPTIONS.map((s) => (
+                  <option key={s} value={s}>
+                    {s} per page
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => onPageChange?.(pageIndex - 1)}
+              disabled={pageIndex === 0}
+              className="rounded border px-3 py-1 text-sm disabled:opacity-40 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+            >
+              Prev
+            </button>
+            <span>
+              Page {pageIndex + 1} of {serverPageCount}
+            </span>
+            <button
+              onClick={() => onPageChange?.(pageIndex + 1)}
+              disabled={pageIndex >= serverPageCount - 1}
               className="rounded border px-3 py-1 text-sm disabled:opacity-40 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
             >
               Next
