@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { eq, and } from 'drizzle-orm';
 import type { AppEnv } from '../types.js';
-import { invoices } from '../db/schema.js';
+import { invoices, invoiceAuditLog } from '../db/schema.js';
 import { createInvoice, cancelInvoice, createCreditNote } from '../services/invoicing.js';
 import { requireAdmin } from '../middleware/rbac.js';
 
@@ -113,6 +113,26 @@ invoicesRouter.post('/credit-notes', async (c) => {
     const message = err instanceof Error ? err.message : 'Unknown error';
     return c.json({ error: { code: 'VALIDATION_ERROR', message } }, 400);
   }
+});
+
+// GET /invoices/:id/audit-log — get audit entries for invoice (tenant-scoped)
+invoicesRouter.get('/:id/audit-log', async (c) => {
+  const db = c.get('db');
+  const tenantId = c.get('tenantId');
+  const id = c.req.param('id');
+
+  // Verify invoice belongs to this tenant
+  const conditions = [eq(invoices.id, id)];
+  if (tenantId) conditions.push(eq(invoices.tenantId, tenantId));
+  const inv = await db.select({ id: invoices.id }).from(invoices).where(and(...conditions)).all();
+  if (inv.length === 0) {
+    return c.json({ error: { code: 'NOT_FOUND', message: `Invoice ${id} not found` } }, 404);
+  }
+
+  const rows = await db.select().from(invoiceAuditLog)
+    .where(eq(invoiceAuditLog.invoiceId, id))
+    .all();
+  return c.json(rows);
 });
 
 export { invoicesRouter };

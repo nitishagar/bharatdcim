@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./styles/print.css";
 
 @theme {
   --color-navy: #1e3a5f;

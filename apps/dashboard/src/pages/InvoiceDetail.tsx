@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useInvoice, useCancelInvoice, useCreateCreditNote } from '../api/hooks/useInvoices';
+import { useAuditLog } from '../api/hooks/useAuditLog';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { StatusBadge } from '../components/StatusBadge';
@@ -18,6 +19,8 @@ export function InvoiceDetail() {
 
   const [showCancel, setShowCancel] = useState(false);
   const [showCreditNote, setShowCreditNote] = useState(false);
+  const [showAudit, setShowAudit] = useState(false);
+  const { data: auditEntries } = useAuditLog(id!);
 
   const cancelForm = useForm<CancelInvoiceForm>({
     resolver: zodResolver(cancelInvoiceSchema),
@@ -60,6 +63,12 @@ export function InvoiceDetail() {
       <div className="flex items-center gap-3 mb-4">
         <h2 className="text-2xl font-bold text-gray-900">{invoice.invoiceNumber}</h2>
         <StatusBadge status={invoice.status} />
+        <button
+          onClick={() => window.print()}
+          className="ml-auto rounded-lg border px-4 py-2 text-sm hover:bg-gray-50 print:hidden"
+        >
+          Print / Save PDF
+        </button>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -176,6 +185,43 @@ export function InvoiceDetail() {
           </button>
         </form>
       )}
+
+      <div className="mt-6">
+        <button
+          onClick={() => setShowAudit(!showAudit)}
+          className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900"
+        >
+          <span>{showAudit ? '▼' : '▶'}</span>
+          Audit History
+          {auditEntries && <span className="text-gray-400">({auditEntries.length})</span>}
+        </button>
+        {showAudit && (
+          <div className="mt-2 bg-white rounded-lg border overflow-hidden">
+            {!auditEntries?.length ? (
+              <p className="px-4 py-3 text-sm text-gray-500">No audit entries found.</p>
+            ) : (
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50 border-b">
+                  <tr>
+                    <th className="px-4 py-2 text-left font-medium text-gray-600">Action</th>
+                    <th className="px-4 py-2 text-left font-medium text-gray-600">Actor</th>
+                    <th className="px-4 py-2 text-left font-medium text-gray-600">Timestamp</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {auditEntries.map((entry) => (
+                    <tr key={entry.id} className="border-b border-gray-100">
+                      <td className="px-4 py-2 font-medium capitalize">{entry.action.replace(/_/g, ' ')}</td>
+                      <td className="px-4 py-2 text-gray-600">{entry.actor ?? '—'}</td>
+                      <td className="px-4 py-2 text-gray-500">{new Date(entry.createdAt).toLocaleString('en-IN')}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -12,5 +12,6 @@ export function useSummary() {
   return useQuery({
     queryKey: ['dashboard', 'summary'],
     queryFn: () => api<Summary>('/dashboard/summary'),
+    refetchInterval: 60_000,
   });
 }

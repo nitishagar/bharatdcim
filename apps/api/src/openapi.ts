@@ -170,6 +170,17 @@ export const openApiSpec = {
         responses: { '200': { description: 'Invoice' }, '404': { description: 'Not found' } },
       },
     },
+    '/invoices/{id}/audit-log': {
+      get: {
+        tags: ['Invoices'],
+        summary: 'Get audit log for invoice',
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: {
+          '200': { description: 'Array of audit log entries' },
+          '404': { description: 'Not found' },
+        },
+      },
+    },
     '/invoices/{id}/cancel': {
       post: {
         tags: ['Invoices'],
