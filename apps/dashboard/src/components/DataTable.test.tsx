@@ -68,4 +68,14 @@ describe('DataTable', () => {
     fireEvent.click(screen.getByText('Alpha'));
     expect(onRowClick).toHaveBeenCalledWith({ id: 'r-001', name: 'Alpha' });
   });
+
+  it('renders Export CSV button when exportFilename is set', () => {
+    render(<DataTable columns={columns} data={data} exportFilename="meters" />);
+    expect(screen.getByRole('button', { name: /export csv/i })).toBeInTheDocument();
+  });
+
+  it('does not render Export CSV button when exportFilename is not set', () => {
+    render(<DataTable columns={columns} data={data} />);
+    expect(screen.queryByRole('button', { name: /export csv/i })).not.toBeInTheDocument();
+  });
 });

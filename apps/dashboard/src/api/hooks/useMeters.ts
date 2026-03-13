@@ -39,3 +39,13 @@ export function useCreateMeter() {
     onError: (e) => { toast.error(e.message); },
   });
 }
+
+export function useUpdateMeter(id: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: Partial<{ name: string; stateCode: string; siteId: string | null; tariffId: string | null; meterType: string | null }>) =>
+      api<Meter>(`/meters/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['meters'] }); toast.success('Meter updated'); },
+    onError: (e) => { toast.error(e.message); },
+  });
+}

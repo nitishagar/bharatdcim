@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useTariffs, useCreateTariff, type Tariff } from '../api/hooks/useTariffs';
+import { useTariffs, useCreateTariff, useUpdateTariff, type Tariff } from '../api/hooks/useTariffs';
 import { DataTable, type ColumnDef } from '../components/DataTable';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { EmptyState } from '../components/EmptyState';
 import { formatPaisa } from '../lib/formatCurrency';
 import { useIsAdmin } from '../hooks/useIsAdmin';
-import { createTariffSchema, type CreateTariffForm } from '../lib/schemas';
+import { createTariffSchema, editTariffSchema, type CreateTariffForm, type EditTariffForm } from '../lib/schemas';
 
 interface TimeSlot {
   name: string;
@@ -34,6 +34,7 @@ const columns: ColumnDef<Tariff, unknown>[] = [
 export function Tariffs() {
   const { data, isLoading, error, refetch } = useTariffs();
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [editingTariffId, setEditingTariffId] = useState<string | null>(null);
   const isAdmin = useIsAdmin();
   const [showForm, setShowForm] = useState(false);
 
@@ -71,6 +72,7 @@ export function Tariffs() {
             data={data}
             onRowClick={(t) => setExpandedId(expandedId === t.id ? null : t.id)}
             searchPlaceholder="Search tariffs..."
+            exportFilename="tariffs"
           />
 
           {expandedId && (() => {
@@ -78,38 +80,56 @@ export function Tariffs() {
             if (!tariff) return null;
             let slots: TimeSlot[] = [];
             try { slots = JSON.parse(tariff.timeSlotsJson); } catch { /* empty */ }
-            if (slots.length === 0) return null;
 
             return (
               <div className="mt-4 bg-white rounded-lg border p-4 dark:bg-gray-800 dark:border-gray-700">
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Time-of-Day Slots — {tariff.stateCode} {tariff.category}
-                </h3>
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b text-left text-gray-500 dark:text-gray-400 dark:border-gray-600">
-                      <th className="pb-2">Slot</th>
-                      <th className="pb-2">Time</th>
-                      <th className="pb-2">Type</th>
-                      <th className="pb-2">Multiplier</th>
-                      <th className="pb-2">Adder</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {slots.map((s, i) => (
-                      <tr key={i} className="border-b border-gray-50 dark:border-gray-700 dark:text-gray-300">
-                        <td className="py-2">{s.name}</td>
-                        <td className="py-2">
-                          {String(s.startHour).padStart(2, '0')}:{String(s.startMinute).padStart(2, '0')} –{' '}
-                          {String(s.endHour).padStart(2, '0')}:{String(s.endMinute).padStart(2, '0')}
-                        </td>
-                        <td className="py-2">{s.type}</td>
-                        <td className="py-2">{(s.multiplierBps / 10000).toFixed(2)}x</td>
-                        <td className="py-2">{formatPaisa(s.adderPaisa)}</td>
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    Time-of-Day Slots — {tariff.stateCode} {tariff.category}
+                  </h3>
+                  {isAdmin && (
+                    <button
+                      onClick={() => setEditingTariffId(editingTariffId === tariff.id ? null : tariff.id)}
+                      className="rounded-lg border border-gray-300 px-3 py-1 text-xs hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                    >
+                      Edit Tariff
+                    </button>
+                  )}
+                </div>
+                {editingTariffId === tariff.id && (
+                  <EditTariffFormComponent
+                    tariff={tariff}
+                    onClose={() => setEditingTariffId(null)}
+                    onSaved={() => { setEditingTariffId(null); refetch(); }}
+                  />
+                )}
+                {slots.length > 0 && (
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b text-left text-gray-500 dark:text-gray-400 dark:border-gray-600">
+                        <th className="pb-2">Slot</th>
+                        <th className="pb-2">Time</th>
+                        <th className="pb-2">Type</th>
+                        <th className="pb-2">Multiplier</th>
+                        <th className="pb-2">Adder</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {slots.map((s, i) => (
+                        <tr key={i} className="border-b border-gray-50 dark:border-gray-700 dark:text-gray-300">
+                          <td className="py-2">{s.name}</td>
+                          <td className="py-2">
+                            {String(s.startHour).padStart(2, '0')}:{String(s.startMinute).padStart(2, '0')} –{' '}
+                            {String(s.endHour).padStart(2, '0')}:{String(s.endMinute).padStart(2, '0')}
+                          </td>
+                          <td className="py-2">{s.type}</td>
+                          <td className="py-2">{(s.multiplierBps / 10000).toFixed(2)}x</td>
+                          <td className="py-2">{formatPaisa(s.adderPaisa)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
               </div>
             );
           })()}
@@ -254,6 +274,97 @@ function CreateTariffFormComponent({ onClose, onCreated }: { onClose: () => void
           onClick={onClose}
           className="rounded-lg border px-4 py-2 text-sm"
         >
+          Cancel
+        </button>
+      </div>
+    </form>
+  );
+}
+
+function EditTariffFormComponent({
+  tariff,
+  onClose,
+  onSaved,
+}: {
+  tariff: Tariff;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const updateTariff = useUpdateTariff(tariff.id);
+
+  const { register, handleSubmit, formState: { errors } } = useForm<EditTariffForm>({
+    resolver: zodResolver(editTariffSchema),
+    defaultValues: {
+      stateCode: tariff.stateCode,
+      discom: tariff.discom,
+      category: tariff.category,
+      baseEnergyRatePaisa: String(tariff.baseEnergyRatePaisa),
+      wheelingChargePaisa: String(tariff.wheelingChargePaisa),
+      demandChargePerKvaPaisa: String(tariff.demandChargePerKvaPaisa),
+      effectiveFrom: tariff.effectiveFrom,
+      effectiveTo: tariff.effectiveTo ?? undefined,
+      billingUnit: (tariff.billingUnit as 'kWh' | 'kVAh') ?? 'kWh',
+    },
+  });
+
+  async function onSubmit(formData: EditTariffForm) {
+    try {
+      await updateTariff.mutateAsync({
+        ...formData,
+        ...(formData.baseEnergyRatePaisa !== undefined && { baseEnergyRatePaisa: parseInt(formData.baseEnergyRatePaisa) }),
+        ...(formData.wheelingChargePaisa !== undefined && { wheelingChargePaisa: parseInt(formData.wheelingChargePaisa) }),
+        ...(formData.demandChargePerKvaPaisa !== undefined && { demandChargePerKvaPaisa: parseInt(formData.demandChargePerKvaPaisa) }),
+      });
+      onSaved();
+    } catch {
+      // error handled by toast
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="mb-3 space-y-3 rounded-lg border border-gray-200 bg-gray-50 p-3 dark:bg-gray-700/30 dark:border-gray-600">
+      <h4 className="text-xs font-semibold text-gray-600 dark:text-gray-400">Edit Tariff</h4>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div>
+          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">State Code</label>
+          <input {...register('stateCode')} className="w-full rounded border border-gray-300 px-2 py-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" />
+          {errors.stateCode && <p className="mt-1 text-xs text-red-500">{errors.stateCode.message}</p>}
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">DISCOM</label>
+          <input {...register('discom')} className="w-full rounded border border-gray-300 px-2 py-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" />
+          {errors.discom && <p className="mt-1 text-xs text-red-500">{errors.discom.message}</p>}
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Category</label>
+          <input {...register('category')} className="w-full rounded border border-gray-300 px-2 py-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" />
+          {errors.category && <p className="mt-1 text-xs text-red-500">{errors.category.message}</p>}
+        </div>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div>
+          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Base Rate (paisa/kWh)</label>
+          <input type="number" {...register('baseEnergyRatePaisa')} className="w-full rounded border border-gray-300 px-2 py-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" />
+          {errors.baseEnergyRatePaisa && <p className="mt-1 text-xs text-red-500">{errors.baseEnergyRatePaisa.message}</p>}
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Wheeling (paisa)</label>
+          <input type="number" {...register('wheelingChargePaisa')} className="w-full rounded border border-gray-300 px-2 py-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" />
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Demand (paisa/KVA)</label>
+          <input type="number" {...register('demandChargePerKvaPaisa')} className="w-full rounded border border-gray-300 px-2 py-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" />
+        </div>
+      </div>
+      <div className="flex gap-2">
+        <button
+          type="submit"
+          className="rounded bg-burgundy px-3 py-1 text-xs text-white hover:bg-burgundy-dark"
+          disabled={updateTariff.isPending}
+        >
+          {updateTariff.isPending ? 'Saving...' : 'Save Changes'}
+        </button>
+        <button type="button" onClick={onClose} className="rounded border px-3 py-1 text-xs">
           Cancel
         </button>
       </div>

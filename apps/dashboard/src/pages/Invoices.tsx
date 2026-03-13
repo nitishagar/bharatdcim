@@ -118,6 +118,7 @@ export function Invoices() {
           data={data}
           onRowClick={(inv) => navigate(`/invoices/${inv.id}`)}
           searchPlaceholder="Search invoices..."
+          exportFilename="invoices"
         />
       )}
     </div>

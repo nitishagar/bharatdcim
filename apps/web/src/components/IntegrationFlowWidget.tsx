@@ -13,8 +13,8 @@ interface MeterReading {
 const dcimSources: Record<DcimSource, { name: string; protocol: string; icon: string }> = {
   nlyte: { name: 'Nlyte Software', protocol: 'REST API v2', icon: 'N' },
   sunbird: { name: 'Sunbird dcTrack', protocol: 'REST API', icon: 'S' },
-  schneider: { name: 'EcoStruxure IT', protocol: 'SNMP v3', icon: 'E' },
-  custom: { name: 'Custom DCIM', protocol: 'CSV / Modbus', icon: 'C' }
+  schneider: { name: 'EcoStruxure IT', protocol: 'SNMP v2c', icon: 'E' },
+  custom: { name: 'Custom DCIM', protocol: 'CSV', icon: 'C' }
 };
 
 const rackNames = ['A-01', 'A-02', 'A-03', 'B-01', 'B-02', 'B-03', 'C-01', 'C-02'];
@@ -346,10 +346,6 @@ export default function IntegrationFlowWidget() {
                   <div className="text-[10px] text-gray-500">Effective Rate</div>
                   <div className="text-sm font-bold text-gray-900">Rs.{bill.effectiveRate.toFixed(2)}/kWh</div>
                 </div>
-                <div className="rounded-lg border border-gray-200 p-2.5">
-                  <div className="text-[10px] text-gray-500">SAC Code</div>
-                  <div className="text-sm font-bold text-gray-900">998315</div>
-                </div>
               </div>
             </>
           ) : (
@@ -372,8 +368,7 @@ export default function IntegrationFlowWidget() {
         <div className="flex items-center gap-3 text-[10px] text-gray-500">
           <span className="font-medium">Protocols:</span>
           <span className="badge-chip !py-0.5 !px-2 !text-[10px]">REST API</span>
-          <span className="badge-chip !py-0.5 !px-2 !text-[10px]">SNMP v2/v3</span>
-          <span className="badge-chip !py-0.5 !px-2 !text-[10px]">Modbus TCP</span>
+          <span className="badge-chip !py-0.5 !px-2 !text-[10px]">SNMP v2c</span>
           <span className="badge-chip !py-0.5 !px-2 !text-[10px]">CSV</span>
         </div>
         <div className="text-[10px] text-gray-400">Simulated data for demonstration</div>

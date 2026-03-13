@@ -62,3 +62,9 @@ export const createTariffSchema = z.object({
 });
 
 export type CreateTariffForm = z.infer<typeof createTariffSchema>;
+
+export const editMeterSchema = createMeterSchema.partial();
+export type EditMeterForm = z.infer<typeof editMeterSchema>;
+
+export const editTariffSchema = createTariffSchema.partial();
+export type EditTariffForm = z.infer<typeof editTariffSchema>;

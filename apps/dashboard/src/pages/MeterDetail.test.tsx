@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, fireEvent } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { server } from '../test/server';
 import { renderWithProviders } from '../test/utils';
@@ -41,5 +41,33 @@ describe('MeterDetail page', () => {
     await waitFor(() =>
       expect(screen.getByText('Meter not found')).toBeInTheDocument(),
     );
+  });
+
+  it('renders Edit Meter button when admin', async () => {
+    renderWithProviders(<MeterDetail />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'Main Grid Meter' })).toBeInTheDocument(),
+    );
+    expect(screen.getByRole('button', { name: /edit meter/i })).toBeInTheDocument();
+  });
+
+  it('shows edit form when Edit Meter button is clicked', async () => {
+    renderWithProviders(<MeterDetail />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'Main Grid Meter' })).toBeInTheDocument(),
+    );
+    fireEvent.click(screen.getByRole('button', { name: /edit meter/i }));
+    expect(screen.getByRole('button', { name: /save changes/i })).toBeInTheDocument();
+  });
+
+  it('hides edit form when Cancel is clicked', async () => {
+    renderWithProviders(<MeterDetail />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'Main Grid Meter' })).toBeInTheDocument(),
+    );
+    fireEvent.click(screen.getByRole('button', { name: /edit meter/i }));
+    expect(screen.getByRole('button', { name: /save changes/i })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
+    expect(screen.queryByRole('button', { name: /save changes/i })).not.toBeInTheDocument();
   });
 });

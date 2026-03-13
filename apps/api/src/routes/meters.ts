@@ -64,4 +64,33 @@ metersRouter.post('/', async (c) => {
   return c.json(row, 201);
 });
 
+// PATCH /meters/:id — update meter fields (admin only, tenant-scoped)
+metersRouter.patch('/:id', async (c) => {
+  requireAdmin(c);
+  const db = c.get('db');
+  const tenantId = c.get('tenantId');
+  const id = c.req.param('id');
+
+  const conditions = [eq(meters.id, id)];
+  if (tenantId) conditions.push(eq(meters.tenantId, tenantId));
+  const existing = await db.select({ id: meters.id }).from(meters).where(and(...conditions)).all();
+  if (existing.length === 0) {
+    return c.json({ error: { code: 'NOT_FOUND', message: `Meter ${id} not found` } }, 404);
+  }
+
+  const body = await c.req.json();
+  const now = new Date().toISOString();
+
+  const updates: Record<string, unknown> = { updatedAt: now };
+  if (body.name !== undefined) updates.name = body.name;
+  if (body.stateCode !== undefined) updates.stateCode = body.stateCode;
+  if ('siteId' in body) updates.siteId = body.siteId ?? null;
+  if ('tariffId' in body) updates.tariffId = body.tariffId ?? null;
+  if ('meterType' in body) updates.meterType = body.meterType ?? null;
+
+  await db.update(meters).set(updates).where(eq(meters.id, id));
+  const updated = await db.select().from(meters).where(eq(meters.id, id)).all();
+  return c.json(updated[0]);
+});
+
 export { metersRouter };

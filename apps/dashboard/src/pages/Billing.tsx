@@ -107,6 +107,7 @@ export function Billing() {
           data={data}
           onRowClick={(b) => navigate(`/billing/${b.id}`)}
           searchPlaceholder="Search bills..."
+          exportFilename="bills"
         />
       )}
     </div>
