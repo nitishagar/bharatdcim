@@ -1,0 +1,46 @@
+import { screen, waitFor } from '@testing-library/react';
+import { http, HttpResponse } from 'msw';
+import { server } from '../test/server';
+import { renderWithProviders } from '../test/utils';
+import { Billing } from './Billing';
+
+describe('Billing page', () => {
+  it('renders loading spinner initially', () => {
+    server.use(
+      http.get('*/bills', async () => {
+        await new Promise<void>((resolve) => setTimeout(resolve, 100));
+        return HttpResponse.json([]);
+      }),
+    );
+    renderWithProviders(<Billing />);
+    expect(document.querySelector('.animate-spin')).toBeInTheDocument();
+  });
+
+  it('renders bill list and admin button on data load', async () => {
+    renderWithProviders(<Billing />);
+    await waitFor(() => expect(screen.getByText('Billing')).toBeInTheDocument());
+    // The table should show the bill period
+    await waitFor(() =>
+      expect(screen.getByText(/2026-01-01/)).toBeInTheDocument(),
+    );
+    expect(screen.getByRole('button', { name: 'Calculate Bill' })).toBeInTheDocument();
+  });
+
+  it('renders error message on API failure', async () => {
+    server.use(
+      http.get('*/bills', () =>
+        HttpResponse.json({ error: { message: 'Billing service down' } }, { status: 503 }),
+      ),
+    );
+    renderWithProviders(<Billing />);
+    await waitFor(() =>
+      expect(screen.getByText('Billing service down')).toBeInTheDocument(),
+    );
+  });
+
+  it('renders empty state when no bills', async () => {
+    server.use(http.get('*/bills', () => HttpResponse.json([])));
+    renderWithProviders(<Billing />);
+    await waitFor(() => expect(screen.getByText('No bills found')).toBeInTheDocument());
+  });
+});

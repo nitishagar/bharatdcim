@@ -31,10 +31,17 @@ export const mockReadings = [
   {
     id: 'reading-001',
     meterId: 'meter-001',
-    tenantId: 'tenant-001',
-    readingKwh: 100,
+    timestamp: '2026-01-15T10:00:00Z',
+    kWh: 100000,
+    kW: null,
+    voltage: null,
+    current: null,
+    powerFactor: null,
+    source: 'csv',
     slotType: 'normal',
-    recordedAt: '2026-01-15T10:00:00Z',
+    slotName: 'Normal',
+    ratePaisa: 700,
+    uploadId: null,
     createdAt: '2026-01-15T10:00:00Z',
   },
 ];
@@ -156,16 +163,18 @@ export const mockAgent: Agent = {
 export const mockAgents: Agent[] = [mockAgent];
 
 export const mockPlatformOverview = {
-  tenants: { total: 5, active: 4 },
+  tenants: { total: 5 },
   meters: { total: 42 },
   bills: { total: 180, totalAmountPaisa: 9000000 },
+  invoices: { total: 75 },
 };
 
 export const mockPlatformTenants = [
   {
     id: 'tenant-001',
     name: 'DataCenter Corp',
-    orgId: 'org_test_001',
+    stateCode: 'KA',
+    gstin: '29ABCDE1234F1Z5',
     createdAt: '2026-01-01T00:00:00Z',
   },
 ];
