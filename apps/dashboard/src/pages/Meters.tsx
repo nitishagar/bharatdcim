@@ -59,6 +59,7 @@ export function Meters() {
           data={data}
           onRowClick={(m) => navigate(`/meters/${m.id}`)}
           searchPlaceholder="Search meters..."
+          exportFilename="meters"
         />
       )}
     </div>

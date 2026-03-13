@@ -36,7 +36,9 @@ export const handlers = [
 
   // Mutation endpoints
   http.post('*/meters',                () => HttpResponse.json(mockMeter, { status: 201 })),
+  http.patch('*/meters/:id',           () => HttpResponse.json(mockMeter)),
   http.post('*/tariffs',               () => HttpResponse.json(mockTariff, { status: 201 })),
+  http.patch('*/tariffs/:id',          () => HttpResponse.json(mockTariff)),
   http.post('*/bills/calculate',       () => HttpResponse.json(mockBill)),
   http.post('*/bills',                 () => HttpResponse.json(mockBill, { status: 201 })),
   http.post('*/invoices',              () => HttpResponse.json(mockInvoice, { status: 201 })),

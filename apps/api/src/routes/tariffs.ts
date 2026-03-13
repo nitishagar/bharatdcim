@@ -85,4 +85,39 @@ tariffs.post('/', async (c) => {
   return c.json(row, 201);
 });
 
+// PATCH /tariffs/:id — update tariff fields (admin only)
+tariffs.patch('/:id', async (c) => {
+  requireAdmin(c);
+  const db = c.get('db');
+  const tenantId = c.get('tenantId');
+  const id = c.req.param('id');
+
+  const conditions = [eq(tariffConfigs.id, id)];
+  if (tenantId) {
+    conditions.push(or(isNull(tariffConfigs.tenantId), eq(tariffConfigs.tenantId, tenantId))!);
+  }
+  const existing = await db.select({ id: tariffConfigs.id }).from(tariffConfigs).where(and(...conditions)).all();
+  if (existing.length === 0) {
+    return c.json({ error: { code: 'NOT_FOUND', message: `Tariff ${id} not found` } }, 404);
+  }
+
+  const body = await c.req.json();
+  const now = new Date().toISOString();
+
+  const updates: Record<string, unknown> = { updatedAt: now };
+  if (body.stateCode !== undefined) updates.stateCode = body.stateCode;
+  if (body.discom !== undefined) updates.discom = body.discom;
+  if (body.category !== undefined) updates.category = body.category;
+  if (body.baseEnergyRatePaisa !== undefined) updates.baseEnergyRatePaisa = Number(body.baseEnergyRatePaisa);
+  if (body.wheelingChargePaisa !== undefined) updates.wheelingChargePaisa = Number(body.wheelingChargePaisa);
+  if (body.demandChargePerKvaPaisa !== undefined) updates.demandChargePerKvaPaisa = Number(body.demandChargePerKvaPaisa);
+  if (body.effectiveFrom !== undefined) updates.effectiveFrom = body.effectiveFrom;
+  if ('effectiveTo' in body) updates.effectiveTo = body.effectiveTo ?? null;
+  if (body.billingUnit !== undefined) updates.billingUnit = body.billingUnit;
+
+  await db.update(tariffConfigs).set(updates).where(eq(tariffConfigs.id, id));
+  const updated = await db.select().from(tariffConfigs).where(eq(tariffConfigs.id, id)).all();
+  return c.json(updated[0]);
+});
+
 export { tariffs };

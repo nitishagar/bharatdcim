@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { http, HttpResponse } from 'msw';
 import { server } from '../../test/server';
-import { useCreateTariff } from './useTariffs';
+import { useCreateTariff, useUpdateTariff } from './useTariffs';
 
 vi.mock('sonner');
 
@@ -38,5 +38,26 @@ describe('useCreateTariff', () => {
     await act(async () => { result.current.mutate(input); });
     await waitFor(() => expect(result.current.isError).toBe(true));
     expect(toast.error).toHaveBeenCalledWith('Tariff already exists for this period');
+  });
+});
+
+describe('useUpdateTariff', () => {
+  it('calls toast.success on successful update', async () => {
+    const { result } = renderHook(() => useUpdateTariff('tariff-001'), { wrapper });
+    await act(async () => { result.current.mutate({ baseEnergyRatePaisa: 800 }); });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(toast.success).toHaveBeenCalledWith('Tariff updated');
+  });
+
+  it('calls toast.error on API failure', async () => {
+    server.use(
+      http.patch('*/tariffs/:id', () =>
+        HttpResponse.json({ error: { message: 'Tariff not found' } }, { status: 404 }),
+      ),
+    );
+    const { result } = renderHook(() => useUpdateTariff('tariff-001'), { wrapper });
+    await act(async () => { result.current.mutate({ baseEnergyRatePaisa: 800 }); });
+    await waitFor(() => expect(result.current.isError).toBe(true));
+    expect(toast.error).toHaveBeenCalledWith('Tariff not found');
   });
 });

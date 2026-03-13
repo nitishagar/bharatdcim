@@ -42,3 +42,13 @@ export function useCreateTariff() {
     onError: (e) => { toast.error(e.message); },
   });
 }
+
+export function useUpdateTariff(id: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: Partial<Record<string, unknown>>) =>
+      api<Tariff>(`/tariffs/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['tariffs'] }); toast.success('Tariff updated'); },
+    onError: (e) => { toast.error(e.message); },
+  });
+}

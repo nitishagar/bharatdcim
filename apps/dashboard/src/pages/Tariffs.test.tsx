@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, fireEvent } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { server } from '../test/server';
 import { renderWithProviders } from '../test/utils';
@@ -40,6 +40,16 @@ describe('Tariffs page', () => {
     renderWithProviders(<Tariffs />);
     await waitFor(() =>
       expect(screen.getByText('No tariffs configured')).toBeInTheDocument(),
+    );
+  });
+
+  it('renders Edit Tariff button in expanded row when admin', async () => {
+    renderWithProviders(<Tariffs />);
+    await waitFor(() => expect(screen.getByText('BESCOM')).toBeInTheDocument());
+    // Click the tariff row to expand it
+    fireEvent.click(screen.getByText('BESCOM'));
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: /edit tariff/i })).toBeInTheDocument(),
     );
   });
 });
