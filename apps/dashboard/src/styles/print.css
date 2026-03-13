@@ -1,0 +1,34 @@
+@media print {
+  /* Hide navigation chrome */
+  aside,
+  header {
+    display: none !important;
+  }
+
+  /* Reset layout for print */
+  .flex.h-screen {
+    display: block !important;
+  }
+
+  main {
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* White background */
+  body,
+  .bg-gray-50 {
+    background: white !important;
+  }
+
+  /* A4 page setup */
+  @page {
+    size: A4;
+    margin: 1.5cm;
+  }
+
+  /* Keep charts from splitting across pages */
+  .recharts-wrapper {
+    break-inside: avoid;
+  }
+}
