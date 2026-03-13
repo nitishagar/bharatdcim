@@ -50,6 +50,7 @@ export const meters = sqliteTable('meters', {
   tariffId: text('tariff_id').references(() => tariffConfigs.id),
   meterType: text('meter_type'), // 'grid' | 'dg' | 'solar'
   metadata: text('metadata'), // JSON
+  status: text('status').notNull().default('active'), // 'active' | 'deleted'
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
 });

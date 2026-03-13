@@ -4,6 +4,15 @@ import { server } from '../test/server';
 import { renderWithProviders } from '../test/utils';
 import { InvoiceDetail } from './InvoiceDetail';
 
+vi.mock('@react-pdf/renderer', () => ({
+  Document: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Page: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Text: ({ children }: { children: React.ReactNode }) => <span>{children}</span>,
+  View: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  StyleSheet: { create: (s: unknown) => s },
+  pdf: vi.fn().mockReturnValue({ toBlob: vi.fn().mockResolvedValue(new Blob(['%PDF'], { type: 'application/pdf' })) }),
+}));
+
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return { ...actual, useParams: () => ({ id: 'invoice-001' }) };
@@ -18,7 +27,7 @@ describe('InvoiceDetail page', () => {
       }),
     );
     renderWithProviders(<InvoiceDetail />);
-    expect(document.querySelector('.animate-spin')).toBeInTheDocument();
+    expect(document.querySelector('[data-testid="loading-skeleton"]')).toBeInTheDocument();
   });
 
   it('renders invoice details on data load', async () => {
@@ -29,6 +38,7 @@ describe('InvoiceDetail page', () => {
     );
     expect(screen.getByText('Supplier GSTIN')).toBeInTheDocument();
     expect(screen.getByText('Cancel Invoice')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Download PDF' })).toBeInTheDocument();
   });
 
   it('renders error message on API failure', async () => {

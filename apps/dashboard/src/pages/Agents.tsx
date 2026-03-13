@@ -1,6 +1,6 @@
 import { useAgents, type Agent } from '../api/hooks/useAgents';
 import { DataTable, type ColumnDef } from '../components/DataTable';
-import { LoadingSpinner } from '../components/LoadingSpinner';
+import { TableSkeleton } from '../components/Skeleton';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { EmptyState } from '../components/EmptyState';
 
@@ -54,7 +54,7 @@ const columns: ColumnDef<Agent, unknown>[] = [
 export function Agents() {
   const { data, isLoading, error, refetch } = useAgents();
 
-  if (isLoading) return <LoadingSpinner />;
+  if (isLoading) return <TableSkeleton />;
   if (error) return <ErrorMessage error={error} onRetry={() => refetch()} />;
   if (!data?.length) return <EmptyState message="No agents registered" />;
 

@@ -1,17 +1,24 @@
-import { useParams } from 'react-router-dom';
-import { useBill } from '../api/hooks/useBills';
-import { LoadingSpinner } from '../components/LoadingSpinner';
+import { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useBill, useDeleteBill } from '../api/hooks/useBills';
+import { DetailSkeleton } from '../components/Skeleton';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { StatusBadge } from '../components/StatusBadge';
 import { Breadcrumb } from '../components/Breadcrumb';
+import { ConfirmDialog } from '../components/ConfirmDialog';
 import { formatPaisa } from '../lib/formatCurrency';
+import { useIsAdmin } from '../hooks/useIsAdmin';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export function BillDetail() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { data: bill, isLoading, error } = useBill(id!);
+  const deleteBill = useDeleteBill();
+  const isAdmin = useIsAdmin();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  if (isLoading) return <LoadingSpinner />;
+  if (isLoading) return <DetailSkeleton />;
   if (error) return <ErrorMessage error={error} />;
   if (!bill) return null;
 
@@ -55,7 +62,23 @@ export function BillDetail() {
         >
           Print / Save PDF
         </button>
+        {isAdmin && bill.status === 'draft' && (
+          <button
+            type="button"
+            onClick={() => setShowDeleteDialog(true)}
+            className="rounded-lg border border-red-300 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/20 print:hidden"
+          >
+            Delete Bill
+          </button>
+        )}
       </div>
+      <ConfirmDialog
+        open={showDeleteDialog}
+        title="Delete Bill"
+        message="Are you sure you want to delete this draft bill? This cannot be undone."
+        onConfirm={() => deleteBill.mutate(id!, { onSuccess: () => navigate('/billing') })}
+        onCancel={() => setShowDeleteDialog(false)}
+      />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="bg-white rounded-lg border p-4 dark:bg-gray-800 dark:border-gray-700">

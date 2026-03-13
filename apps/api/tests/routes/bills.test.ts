@@ -1,6 +1,7 @@
-import { describe, it, expect } from 'vitest';
-import { createAppWithTenant } from '../helpers.js';
+import { describe, it, expect, beforeEach } from 'vitest';
+import { createTestDb, createAppWithTenant } from '../helpers.js';
 import { billsRouter } from '../../src/routes/bills.js';
+import { tenants, tariffConfigs, meters, bills } from '../../src/db/schema.js';
 import type { Database } from '../../src/db/client.js';
 
 // For the /bills/calculate endpoint, we don't need a real DB
@@ -114,5 +115,74 @@ describe('Bills Routes', () => {
     expect(apiResult.totalBillPaisa).toBe(directResult.totalBillPaisa);
     expect(apiResult.totalEnergyChargesPaisa).toBe(directResult.totalEnergyChargesPaisa);
     expect(apiResult.gstPaisa).toBe(directResult.gstPaisa);
+  });
+});
+
+describe('Bills DELETE', () => {
+  let db: Database;
+  let app: ReturnType<typeof createAppWithTenant>;
+  const now = '2026-01-01T00:00:00Z';
+
+  const minimalBill = {
+    id: 'bill-001',
+    tenantId: 'tenant-1',
+    meterId: 'meter-001',
+    tariffId: 'tariff-001',
+    billingPeriodStart: '2026-01-01',
+    billingPeriodEnd: '2026-01-31',
+    peakKwh: 0, normalKwh: 0, offPeakKwh: 0, totalKwh: 0,
+    contractedDemandKva: 0, recordedDemandKva: 0, billedDemandKva: 0,
+    powerFactor: 9000,
+    peakChargesPaisa: 0, normalChargesPaisa: 0, offPeakChargesPaisa: 0,
+    totalEnergyChargesPaisa: 0, wheelingChargesPaisa: 0, demandChargesPaisa: 0,
+    fuelAdjustmentPaisa: 0, electricityDutyPaisa: 0, pfPenaltyPaisa: 0,
+    dgChargesPaisa: 0, subtotalPaisa: 0, gstPaisa: 0, totalBillPaisa: 0,
+    effectiveRatePaisaPerKwh: 0,
+    status: 'draft',
+    createdAt: now, updatedAt: now,
+  };
+
+  beforeEach(async () => {
+    const testDb = await createTestDb();
+    db = testDb.db as unknown as Database;
+    app = createAppWithTenant(db, 'tenant-1');
+    app.route('/bills', billsRouter);
+
+    await (db as any).insert(tenants).values({ id: 'tenant-1', name: 'Test DC', stateCode: 'MH', createdAt: now, updatedAt: now });
+    await (db as any).insert(tariffConfigs).values({
+      id: 'tariff-001', stateCode: 'MH', discom: 'MSEDCL', category: 'HT I',
+      effectiveFrom: now, billingUnit: 'kWh', baseEnergyRatePaisa: 868,
+      wheelingChargePaisa: 0, demandChargePerKvaPaisa: 0, demandRatchetPercent: 100,
+      minimumDemandKva: 0, timeSlotsJson: '[]', fuelAdjustmentPaisa: 0,
+      fuelAdjustmentType: 'absolute', electricityDutyBps: 0, pfThresholdBps: 9000,
+      pfPenaltyRatePaisa: 0, version: 1, createdAt: now, updatedAt: now,
+    });
+    await (db as any).insert(meters).values({
+      id: 'meter-001', tenantId: 'tenant-1', name: 'Grid Meter', stateCode: 'MH',
+      createdAt: now, updatedAt: now,
+    });
+  });
+
+  it('DELETE /bills/:id — not found returns 404', async () => {
+    const res = await app.request('/bills/nonexistent', { method: 'DELETE' });
+    expect(res.status).toBe(404);
+    const body = await res.json();
+    expect(body.error.code).toBe('NOT_FOUND');
+  });
+
+  it('DELETE /bills/:id — hard deletes a draft bill', async () => {
+    await (db as any).insert(bills).values(minimalBill);
+    const res = await app.request('/bills/bill-001', { method: 'DELETE' });
+    expect(res.status).toBe(204);
+    const getRes = await app.request('/bills/bill-001');
+    expect(getRes.status).toBe(404);
+  });
+
+  it('DELETE /bills/:id — 422 when bill is not draft', async () => {
+    await (db as any).insert(bills).values({ ...minimalBill, status: 'invoiced' });
+    const res = await app.request('/bills/bill-001', { method: 'DELETE' });
+    expect(res.status).toBe(422);
+    const body = await res.json();
+    expect(body.error.code).toBe('UNPROCESSABLE_ENTITY');
   });
 });

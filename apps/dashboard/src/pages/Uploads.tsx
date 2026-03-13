@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { useUploads, useUploadCSV, type Upload } from '../api/hooks/useUploads';
 import { DataTable, type ColumnDef } from '../components/DataTable';
 import { StatusBadge } from '../components/StatusBadge';
-import { LoadingSpinner } from '../components/LoadingSpinner';
+import { TableSkeleton } from '../components/Skeleton';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { EmptyState } from '../components/EmptyState';
 import { useIsAdmin } from '../hooks/useIsAdmin';
@@ -104,7 +104,7 @@ export function Uploads() {
       )}
 
       {isLoading ? (
-        <LoadingSpinner />
+        <TableSkeleton />
       ) : error ? (
         <ErrorMessage error={error} onRetry={() => refetch()} />
       ) : !data?.length ? (

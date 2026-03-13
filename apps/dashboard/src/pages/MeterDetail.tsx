@@ -1,13 +1,14 @@
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMeter, useUpdateMeter, type Meter } from '../api/hooks/useMeters';
+import { useMeter, useUpdateMeter, useDeleteMeter, type Meter } from '../api/hooks/useMeters';
 import { useReadings } from '../api/hooks/useReadings';
 import { useTariffs } from '../api/hooks/useTariffs';
-import { LoadingSpinner } from '../components/LoadingSpinner';
+import { DetailSkeleton, Skeleton } from '../components/Skeleton';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { Breadcrumb } from '../components/Breadcrumb';
+import { ConfirmDialog } from '../components/ConfirmDialog';
 import { useIsAdmin } from '../hooks/useIsAdmin';
 import { editMeterSchema, type EditMeterForm } from '../lib/schemas';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -16,9 +17,12 @@ import 'react-day-picker/style.css';
 
 export function MeterDetail() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { data: meter, isLoading: meterLoading, error: meterError, refetch } = useMeter(id!);
+  const deleteMeter = useDeleteMeter();
   const isAdmin = useIsAdmin();
   const [showEditForm, setShowEditForm] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [showPicker, setShowPicker] = useState(false);
@@ -27,7 +31,7 @@ export function MeterDetail() {
   const to = dateRange?.to?.toISOString().split('T')[0];
   const { data: readings, isLoading: readingsLoading } = useReadings(id!, from, to);
 
-  if (meterLoading) return <LoadingSpinner />;
+  if (meterLoading) return <DetailSkeleton />;
   if (meterError) return <ErrorMessage error={meterError} />;
   if (!meter) return null;
 
@@ -42,18 +46,34 @@ export function MeterDetail() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-1">
-        <Breadcrumb items={[{ label: 'Meters', to: '/meters' }, { label: meter.name }]} />
+      <Breadcrumb items={[{ label: 'Meters', to: '/meters' }, { label: meter.name }]} />
+      <div className="flex items-center gap-3 mb-4">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{meter.name}</h2>
         {isAdmin && (
-          <button
-            onClick={() => setShowEditForm(!showEditForm)}
-            className="rounded-lg border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
-          >
-            Edit Meter
-          </button>
+          <div className="ml-auto flex items-center gap-2">
+            <button
+              onClick={() => setShowEditForm(!showEditForm)}
+              className="rounded-lg border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+            >
+              Edit Meter
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowDeleteDialog(true)}
+              className="rounded-lg border border-red-300 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/20"
+            >
+              Delete Meter
+            </button>
+          </div>
         )}
       </div>
-      <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">{meter.name}</h2>
+      <ConfirmDialog
+        open={showDeleteDialog}
+        title="Delete Meter"
+        message={`Are you sure you want to delete "${meter.name}"? This cannot be undone.`}
+        onConfirm={() => deleteMeter.mutate(id!, { onSuccess: () => navigate('/meters') })}
+        onCancel={() => setShowDeleteDialog(false)}
+      />
 
       {showEditForm && (
         <EditMeterFormComponent
@@ -121,7 +141,7 @@ export function MeterDetail() {
       </div>
 
       {readingsLoading ? (
-        <LoadingSpinner />
+        <Skeleton className="h-64 w-full" />
       ) : chartData.length === 0 ? (
         <p className="text-sm text-gray-400 dark:text-gray-500">No readings available{dateRange ? ' for the selected range' : ' for this meter'}.</p>
       ) : (

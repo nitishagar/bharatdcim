@@ -18,7 +18,7 @@ describe('Dashboard page', () => {
       }),
     );
     renderWithProviders(<Dashboard />);
-    expect(document.querySelector('.animate-spin')).toBeInTheDocument();
+    expect(document.querySelector('[data-testid="loading-skeleton"]')).toBeInTheDocument();
   });
 
   it('renders KPI cards and quick action links on data load', async () => {

@@ -33,6 +33,15 @@ export function useTariffs() {
   });
 }
 
+export function useDeleteTariff() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api<void>(`/tariffs/${id}`, { method: 'DELETE' }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['tariffs'] }); toast.success('Tariff deleted'); },
+    onError: (e) => { toast.error(e.message); },
+  });
+}
+
 export function useCreateTariff() {
   const qc = useQueryClient();
   return useMutation({

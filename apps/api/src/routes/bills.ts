@@ -3,7 +3,7 @@ import { eq, and } from 'drizzle-orm';
 import { calculateBill } from '@bharatdcim/billing-engine';
 import type { BillCalculationInput } from '@bharatdcim/billing-engine';
 import type { AppEnv } from '../types.js';
-import { bills } from '../db/schema.js';
+import { bills, invoices } from '../db/schema.js';
 import { requireAdmin } from '../middleware/rbac.js';
 
 const billsRouter = new Hono<AppEnv>();
@@ -111,6 +111,32 @@ billsRouter.post('/', async (c) => {
 
   await db.insert(bills).values(row);
   return c.json(row, 201);
+});
+
+// DELETE /bills/:id — hard-delete draft bill (admin only), refuse 422 if not draft or has invoice
+billsRouter.delete('/:id', async (c) => {
+  requireAdmin(c);
+  const db = c.get('db');
+  const tenantId = c.get('tenantId');
+  const id = c.req.param('id');
+  const conditions = [eq(bills.id, id)];
+  if (tenantId) conditions.push(eq(bills.tenantId, tenantId));
+  const rows = await db.select().from(bills).where(and(...conditions)).all();
+  if (rows.length === 0) {
+    return c.json({ error: { code: 'NOT_FOUND', message: `Bill ${id} not found` } }, 404);
+  }
+
+  const bill = rows[0];
+  if (bill.status !== 'draft') {
+    return c.json({ error: { code: 'UNPROCESSABLE_ENTITY', message: 'Only draft bills can be deleted' } }, 422);
+  }
+  const linkedInvoice = await db.select({ id: invoices.id }).from(invoices).where(eq(invoices.billId, id)).limit(1).all();
+  if (linkedInvoice.length > 0) {
+    return c.json({ error: { code: 'UNPROCESSABLE_ENTITY', message: 'Bill has an associated invoice and cannot be deleted' } }, 422);
+  }
+
+  await db.delete(bills).where(eq(bills.id, id));
+  return new Response(null, { status: 204 });
 });
 
 export { billsRouter };

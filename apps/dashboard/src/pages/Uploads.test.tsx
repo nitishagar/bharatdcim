@@ -1,5 +1,7 @@
 import { screen, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
+import { vi } from 'vitest';
+import { useAuth } from '@clerk/clerk-react';
 import { server } from '../test/server';
 import { renderWithProviders } from '../test/utils';
 import { Uploads } from './Uploads';
@@ -13,7 +15,7 @@ describe('Uploads page', () => {
       }),
     );
     renderWithProviders(<Uploads />);
-    expect(document.querySelector('.animate-spin')).toBeInTheDocument();
+    expect(document.querySelector('[data-testid="loading-skeleton"]')).toBeInTheDocument();
   });
 
   it('renders upload list and admin button on data load', async () => {
@@ -41,5 +43,28 @@ describe('Uploads page', () => {
     server.use(http.get('*/uploads', () => HttpResponse.json([])));
     renderWithProviders(<Uploads />);
     await waitFor(() => expect(screen.getByText('No uploads found')).toBeInTheDocument());
+  });
+});
+
+describe('Uploads page – admin gating', () => {
+  afterEach(() => {
+    vi.mocked(useAuth).mockImplementation(() => ({
+      orgRole: 'org:admin',
+      isSignedIn: true,
+      getToken: vi.fn(() => Promise.resolve('mock-test-token')),
+      sessionClaims: { platformAdmin: false },
+    } as unknown as ReturnType<typeof useAuth>));
+  });
+
+  it('hides Upload CSV button for non-admin users', async () => {
+    vi.mocked(useAuth).mockImplementation(() => ({
+      orgRole: 'org:member',
+      isSignedIn: true,
+      getToken: vi.fn(() => Promise.resolve('mock-test-token')),
+      sessionClaims: { platformAdmin: false },
+    } as unknown as ReturnType<typeof useAuth>));
+    renderWithProviders(<Uploads />);
+    await waitFor(() => expect(screen.getByText('Uploads')).toBeInTheDocument());
+    expect(screen.queryByRole('button', { name: 'Upload CSV' })).not.toBeInTheDocument();
   });
 });

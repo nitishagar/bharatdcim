@@ -13,7 +13,7 @@ describe('PlatformOverview page', () => {
       }),
     );
     renderWithProviders(<PlatformOverview />);
-    expect(document.querySelector('.animate-spin')).toBeInTheDocument();
+    expect(document.querySelector('[data-testid="loading-skeleton"]')).toBeInTheDocument();
   });
 
   it('renders overview cards on data load', async () => {

@@ -13,7 +13,7 @@ describe('PlatformTenants page', () => {
       }),
     );
     renderWithProviders(<PlatformTenants />);
-    expect(document.querySelector('.animate-spin')).toBeInTheDocument();
+    expect(document.querySelector('[data-testid="loading-skeleton"]')).toBeInTheDocument();
   });
 
   it('renders tenant list on data load', async () => {

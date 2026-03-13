@@ -60,6 +60,7 @@ export async function createTestDb() {
       tariff_id TEXT REFERENCES tariff_configs(id),
       meter_type TEXT,
       metadata TEXT,
+      status TEXT NOT NULL DEFAULT 'active',
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );

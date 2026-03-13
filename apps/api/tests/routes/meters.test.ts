@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createTestDb, createAppWithTenant } from '../helpers.js';
 import { metersRouter } from '../../src/routes/meters.js';
-import { tenants } from '../../src/db/schema.js';
+import { tenants, powerReadings } from '../../src/db/schema.js';
 import type { Database } from '../../src/db/client.js';
 
 describe('Meter Routes', () => {
@@ -83,5 +83,45 @@ describe('Meter Routes', () => {
     expect(res.status).toBe(404);
     const body = await res.json();
     expect(body.error.code).toBe('NOT_FOUND');
+  });
+
+  it('DELETE /meters/:id — not found returns 404', async () => {
+    const res = await app.request('/meters/nonexistent', { method: 'DELETE' });
+    expect(res.status).toBe(404);
+    const body = await res.json();
+    expect(body.error.code).toBe('NOT_FOUND');
+  });
+
+  it('DELETE /meters/:id — hard deletes meter with no readings', async () => {
+    await app.request('/meters', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: 'meter-del', name: 'Delete Me', stateCode: 'MH' }),
+    });
+    const res = await app.request('/meters/meter-del', { method: 'DELETE' });
+    expect(res.status).toBe(204);
+    const getRes = await app.request('/meters/meter-del');
+    expect(getRes.status).toBe(404);
+  });
+
+  it('DELETE /meters/:id — soft deletes meter that has readings', async () => {
+    await app.request('/meters', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: 'meter-soft', name: 'Soft Delete Me', stateCode: 'MH' }),
+    });
+    const now = new Date().toISOString();
+    await (db as any).insert(powerReadings).values({
+      id: 'reading-001', meterId: 'meter-soft', timestamp: now, createdAt: now,
+    });
+    const res = await app.request('/meters/meter-soft', { method: 'DELETE' });
+    expect(res.status).toBe(204);
+    // Not in list
+    const listRes = await app.request('/meters');
+    const list = await listRes.json();
+    expect(list.find((m: { id: string }) => m.id === 'meter-soft')).toBeUndefined();
+    // GET by ID returns 404
+    const getRes = await app.request('/meters/meter-soft');
+    expect(getRes.status).toBe(404);
   });
 });

@@ -1,5 +1,7 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, fireEvent } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
+import { vi } from 'vitest';
+import { useAuth } from '@clerk/clerk-react';
 import { server } from '../test/server';
 import { renderWithProviders } from '../test/utils';
 import { Billing } from './Billing';
@@ -13,7 +15,7 @@ describe('Billing page', () => {
       }),
     );
     renderWithProviders(<Billing />);
-    expect(document.querySelector('.animate-spin')).toBeInTheDocument();
+    expect(document.querySelector('[data-testid="loading-skeleton"]')).toBeInTheDocument();
   });
 
   it('renders bill list and admin button on data load', async () => {
@@ -42,5 +44,54 @@ describe('Billing page', () => {
     server.use(http.get('*/bills', () => HttpResponse.json([])));
     renderWithProviders(<Billing />);
     await waitFor(() => expect(screen.getByText('No bills found')).toBeInTheDocument());
+  });
+});
+
+describe('Billing page – Calculate Bill form', () => {
+  it('shows form when Calculate Bill button is clicked', async () => {
+    renderWithProviders(<Billing />);
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Calculate Bill' })).toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button', { name: 'Calculate Bill' }));
+    expect(screen.getByText('Period Start')).toBeInTheDocument();
+    expect(screen.getByText('Period End')).toBeInTheDocument();
+  });
+
+  it('hides form when Cancel is clicked', async () => {
+    renderWithProviders(<Billing />);
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Calculate Bill' })).toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button', { name: 'Calculate Bill' }));
+    expect(screen.getByText('Period Start')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    expect(screen.queryByText('Period Start')).not.toBeInTheDocument();
+  });
+
+  it('shows Meter select input in form', async () => {
+    renderWithProviders(<Billing />);
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Calculate Bill' })).toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button', { name: 'Calculate Bill' }));
+    expect(screen.getByRole('option', { name: 'Select meter...' })).toBeInTheDocument();
+  });
+});
+
+describe('Billing page – admin gating', () => {
+  afterEach(() => {
+    vi.mocked(useAuth).mockImplementation(() => ({
+      orgRole: 'org:admin',
+      isSignedIn: true,
+      getToken: vi.fn(() => Promise.resolve('mock-test-token')),
+      sessionClaims: { platformAdmin: false },
+    } as unknown as ReturnType<typeof useAuth>));
+  });
+
+  it('hides Calculate Bill button for non-admin users', async () => {
+    vi.mocked(useAuth).mockImplementation(() => ({
+      orgRole: 'org:member',
+      isSignedIn: true,
+      getToken: vi.fn(() => Promise.resolve('mock-test-token')),
+      sessionClaims: { platformAdmin: false },
+    } as unknown as ReturnType<typeof useAuth>));
+    renderWithProviders(<Billing />);
+    await waitFor(() => expect(screen.getByText('Billing')).toBeInTheDocument());
+    expect(screen.queryByRole('button', { name: 'Calculate Bill' })).not.toBeInTheDocument();
   });
 });

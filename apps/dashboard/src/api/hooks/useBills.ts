@@ -61,6 +61,15 @@ export function useBill(id: string) {
   });
 }
 
+export function useDeleteBill() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api<void>(`/bills/${id}`, { method: 'DELETE' }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['bills'] }); toast.success('Bill deleted'); },
+    onError: (e) => { toast.error(e.message); },
+  });
+}
+
 export function useCalculateBill() {
   return useMutation({
     mutationFn: (data: BillCalculation) =>
