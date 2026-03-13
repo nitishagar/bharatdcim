@@ -47,7 +47,7 @@ export function BillDetail() {
     <div>
       <Breadcrumb items={[{ label: 'Billing', to: '/billing' }, { label: 'Bill Detail' }]} />
       <div className="flex items-center gap-3 mb-4">
-        <h2 className="text-2xl font-bold text-gray-900">Bill Detail</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Bill Detail</h2>
         <StatusBadge status={bill.status} />
         <button
           onClick={() => window.print()}
@@ -58,28 +58,28 @@ export function BillDetail() {
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-lg border p-4">
-          <span className="text-xs text-gray-500">Meter</span>
-          <p className="font-medium">{bill.meterId}</p>
+        <div className="bg-white rounded-lg border p-4 dark:bg-gray-800 dark:border-gray-700">
+          <span className="text-xs text-gray-500 dark:text-gray-400">Meter</span>
+          <p className="font-medium dark:text-gray-200">{bill.meterId}</p>
         </div>
-        <div className="bg-white rounded-lg border p-4">
-          <span className="text-xs text-gray-500">Period</span>
-          <p className="font-medium">{bill.billingPeriodStart} – {bill.billingPeriodEnd}</p>
+        <div className="bg-white rounded-lg border p-4 dark:bg-gray-800 dark:border-gray-700">
+          <span className="text-xs text-gray-500 dark:text-gray-400">Period</span>
+          <p className="font-medium dark:text-gray-200">{bill.billingPeriodStart} – {bill.billingPeriodEnd}</p>
         </div>
-        <div className="bg-white rounded-lg border p-4">
-          <span className="text-xs text-gray-500">Total kWh</span>
-          <p className="font-medium">{bill.totalKwh.toLocaleString('en-IN')}</p>
+        <div className="bg-white rounded-lg border p-4 dark:bg-gray-800 dark:border-gray-700">
+          <span className="text-xs text-gray-500 dark:text-gray-400">Total kWh</span>
+          <p className="font-medium dark:text-gray-200">{bill.totalKwh.toLocaleString('en-IN')}</p>
         </div>
-        <div className="bg-white rounded-lg border p-4">
-          <span className="text-xs text-gray-500">Effective Rate</span>
-          <p className="font-medium">{formatPaisa(bill.effectiveRatePaisaPerKwh)}/kWh</p>
+        <div className="bg-white rounded-lg border p-4 dark:bg-gray-800 dark:border-gray-700">
+          <span className="text-xs text-gray-500 dark:text-gray-400">Effective Rate</span>
+          <p className="font-medium dark:text-gray-200">{formatPaisa(bill.effectiveRatePaisaPerKwh)}/kWh</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-3">Charge Breakdown</h3>
-          <div className="bg-white rounded-lg border p-4" style={{ height: 300 }}>
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">Charge Breakdown</h3>
+          <div className="bg-white rounded-lg border p-4 dark:bg-gray-800 dark:border-gray-700" style={{ height: 300 }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={breakdownData}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -93,19 +93,19 @@ export function BillDetail() {
         </div>
 
         <div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-3">Line Items</h3>
-          <div className="bg-white rounded-lg border overflow-hidden">
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">Line Items</h3>
+          <div className="bg-white rounded-lg border overflow-hidden dark:bg-gray-800 dark:border-gray-700">
             <table className="w-full text-sm">
               <tbody>
                 {lineItems.map(([label, paisa], i) => (
                   <tr
                     key={i}
-                    className={`border-b border-gray-100 ${
-                      label === 'Subtotal' || label === 'Total' ? 'font-semibold bg-gray-50' : ''
+                    className={`border-b border-gray-100 dark:border-gray-700 ${
+                      label === 'Subtotal' || label === 'Total' ? 'font-semibold bg-gray-50 dark:bg-gray-700' : ''
                     }`}
                   >
-                    <td className="px-4 py-2">{label}</td>
-                    <td className="px-4 py-2 text-right">{formatPaisa(paisa)}</td>
+                    <td className="px-4 py-2 dark:text-gray-300">{label}</td>
+                    <td className="px-4 py-2 text-right dark:text-gray-300">{formatPaisa(paisa)}</td>
                   </tr>
                 ))}
               </tbody>

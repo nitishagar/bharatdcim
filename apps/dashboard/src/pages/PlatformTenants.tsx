@@ -34,7 +34,7 @@ export function PlatformTenants() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-900 mb-4">Tenants</h2>
+      <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Tenants</h2>
       <DataTable
         columns={columns}
         data={data}

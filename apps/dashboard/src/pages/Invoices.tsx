@@ -47,7 +47,7 @@ export function Invoices() {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold text-gray-900">Invoices</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Invoices</h2>
         {isAdmin && (
           <button
             onClick={() => setShowForm(!showForm)}
@@ -59,12 +59,12 @@ export function Invoices() {
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-lg border p-4 mb-4 space-y-3">
+        <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-lg border p-4 mb-4 space-y-3 dark:bg-gray-800 dark:border-gray-700">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Bill</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bill</label>
             <select
               {...register('billId')}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
             >
               <option value="">Select a bill...</option>
               {uninvoicedBills.map((b: Bill) => (
@@ -77,19 +77,19 @@ export function Invoices() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Supplier GSTIN</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Supplier GSTIN</label>
               <input
                 {...register('supplierGSTIN')}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
                 placeholder="e.g., 29ABCDE1234F1Z5"
               />
               {errors.supplierGSTIN && <p className="mt-1 text-sm text-red-500">{errors.supplierGSTIN.message}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Recipient GSTIN</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Recipient GSTIN</label>
               <input
                 {...register('recipientGSTIN')}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
                 placeholder="e.g., 29ABCDE1234F1Z5"
               />
               {errors.recipientGSTIN && <p className="mt-1 text-sm text-red-500">{errors.recipientGSTIN.message}</p>}

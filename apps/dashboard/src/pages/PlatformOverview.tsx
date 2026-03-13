@@ -31,12 +31,12 @@ export function PlatformOverview() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-900 mb-4">Platform Overview</h2>
+      <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Platform Overview</h2>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         {cards.map(({ label, value }) => (
-          <div key={label} className="bg-white rounded-lg border p-4">
-            <span className="text-xs text-gray-500 uppercase tracking-wider">{label}</span>
-            <p className="text-2xl font-bold text-gray-900 mt-1">{value}</p>
+          <div key={label} className="bg-white rounded-lg border p-4 dark:bg-gray-800 dark:border-gray-700">
+            <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">{label}</span>
+            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">{value}</p>
           </div>
         ))}
       </div>

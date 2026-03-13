@@ -8,5 +8,9 @@
   --color-burgundy: #8b2e3e;
   --color-burgundy-dark: #6d2331;
   --color-rose: #e8a0ad;
+  --color-surface-dark: #111827;
+  --color-surface-dark-2: #1f2937;
   --font-sans: "Inter", sans-serif;
 }
+
+@variant dark (&.dark);

@@ -29,7 +29,7 @@ export function Meters() {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold text-gray-900">Meters</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Meters</h2>
         {isAdmin && (
           <button
             onClick={() => setShowForm(!showForm)}
@@ -91,22 +91,22 @@ function CreateMeterFormComponent({ onClose, onCreated }: { onClose: () => void;
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-lg border p-4 mb-4 space-y-3">
+    <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-lg border p-4 mb-4 space-y-3 dark:bg-gray-800 dark:border-gray-700">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Meter Name</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Meter Name</label>
           <input
             {...register('name')}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
             placeholder="e.g., Main Grid Meter"
           />
           {errors.name && <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>}
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">State Code</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">State Code</label>
           <input
             {...register('stateCode')}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
             placeholder="e.g., MH, KA, TN"
           />
           {errors.stateCode && <p className="mt-1 text-sm text-red-500">{errors.stateCode.message}</p>}
@@ -115,18 +115,18 @@ function CreateMeterFormComponent({ onClose, onCreated }: { onClose: () => void;
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Site ID (optional)</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Site ID (optional)</label>
           <input
             {...register('siteId')}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
             placeholder="Site identifier"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Tariff</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tariff</label>
           <select
             {...register('tariffId')}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
           >
             <option value="">None</option>
             {tariffs?.map((t) => (
@@ -135,10 +135,10 @@ function CreateMeterFormComponent({ onClose, onCreated }: { onClose: () => void;
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Meter Type</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Meter Type</label>
           <select
             {...register('meterType')}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
           >
             <option value="">Select type...</option>
             <option value="grid">Grid</option>
