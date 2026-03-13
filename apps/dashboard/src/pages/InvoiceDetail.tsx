@@ -2,12 +2,14 @@ import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { pdf } from '@react-pdf/renderer';
 import { useInvoice, useCancelInvoice, useCreateCreditNote } from '../api/hooks/useInvoices';
 import { useAuditLog } from '../api/hooks/useAuditLog';
 import { DetailSkeleton } from '../components/Skeleton';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { StatusBadge } from '../components/StatusBadge';
 import { Breadcrumb } from '../components/Breadcrumb';
+import { InvoicePDF } from '../components/InvoicePDF';
 import { formatPaisa } from '../lib/formatCurrency';
 import { cancelInvoiceSchema, creditNoteSchema, type CancelInvoiceForm, type CreditNoteForm } from '../lib/schemas';
 
@@ -33,6 +35,32 @@ export function InvoiceDetail() {
   if (isLoading) return <DetailSkeleton />;
   if (error) return <ErrorMessage error={error} />;
   if (!invoice) return null;
+
+  async function handleDownloadPDF() {
+    const blob = await pdf(
+      <InvoicePDF
+        invoiceNumber={invoice!.invoiceNumber}
+        invoiceDate={invoice!.invoiceDate}
+        supplierGstin={invoice!.supplierGstin}
+        recipientGstin={invoice!.recipientGstin}
+        taxType={invoice!.taxType}
+        taxableAmountPaisa={invoice!.taxableAmountPaisa}
+        cgstPaisa={invoice!.cgstPaisa}
+        sgstPaisa={invoice!.sgstPaisa}
+        igstPaisa={invoice!.igstPaisa}
+        totalTaxPaisa={invoice!.totalTaxPaisa}
+        totalAmountPaisa={invoice!.totalAmountPaisa}
+        status={invoice!.status}
+        financialYear={invoice!.financialYear}
+      />
+    ).toBlob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${invoice!.invoiceNumber}.pdf`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 
   async function handleCancel(data: CancelInvoiceForm) {
     await cancelInvoice.mutateAsync({ id: id!, reason: data.reason });
@@ -64,10 +92,10 @@ export function InvoiceDetail() {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{invoice.invoiceNumber}</h2>
         <StatusBadge status={invoice.status} />
         <button
-          onClick={() => window.print()}
-          className="ml-auto rounded-lg border px-4 py-2 text-sm hover:bg-gray-50 print:hidden"
+          onClick={handleDownloadPDF}
+          className="ml-auto rounded-lg border px-4 py-2 text-sm hover:bg-gray-50 print:hidden dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
         >
-          Print / Save PDF
+          Download PDF
         </button>
       </div>
 
