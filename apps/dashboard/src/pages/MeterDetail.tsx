@@ -36,35 +36,35 @@ export function MeterDetail() {
   return (
     <div>
       <Breadcrumb items={[{ label: 'Meters', to: '/meters' }, { label: meter.name }]} />
-      <h2 className="text-2xl font-bold text-gray-900 mb-4">{meter.name}</h2>
+      <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">{meter.name}</h2>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-lg border p-4">
-          <span className="text-xs text-gray-500">State</span>
-          <p className="font-medium">{meter.stateCode}</p>
+        <div className="bg-white rounded-lg border p-4 dark:bg-gray-800 dark:border-gray-700">
+          <span className="text-xs text-gray-500 dark:text-gray-400">State</span>
+          <p className="font-medium dark:text-gray-200">{meter.stateCode}</p>
         </div>
-        <div className="bg-white rounded-lg border p-4">
-          <span className="text-xs text-gray-500">Type</span>
-          <p className="font-medium">{meter.meterType ?? '—'}</p>
+        <div className="bg-white rounded-lg border p-4 dark:bg-gray-800 dark:border-gray-700">
+          <span className="text-xs text-gray-500 dark:text-gray-400">Type</span>
+          <p className="font-medium dark:text-gray-200">{meter.meterType ?? '—'}</p>
         </div>
-        <div className="bg-white rounded-lg border p-4">
-          <span className="text-xs text-gray-500">Tariff</span>
-          <p className="font-medium">{meter.tariffId ?? '—'}</p>
+        <div className="bg-white rounded-lg border p-4 dark:bg-gray-800 dark:border-gray-700">
+          <span className="text-xs text-gray-500 dark:text-gray-400">Tariff</span>
+          <p className="font-medium dark:text-gray-200">{meter.tariffId ?? '—'}</p>
         </div>
-        <div className="bg-white rounded-lg border p-4">
-          <span className="text-xs text-gray-500">Tenant</span>
-          <p className="font-medium">{meter.tenantId}</p>
+        <div className="bg-white rounded-lg border p-4 dark:bg-gray-800 dark:border-gray-700">
+          <span className="text-xs text-gray-500 dark:text-gray-400">Tenant</span>
+          <p className="font-medium dark:text-gray-200">{meter.tenantId}</p>
         </div>
       </div>
 
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-lg font-semibold text-gray-800">Readings</h3>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Readings</h3>
         <div className="relative">
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => setShowPicker(!showPicker)}
-              className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
+              className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
             >
               {rangeLabel}
             </button>
@@ -72,7 +72,7 @@ export function MeterDetail() {
               <button
                 type="button"
                 onClick={() => { setDateRange(undefined); setShowPicker(false); }}
-                className="rounded-lg border border-gray-300 px-2 py-1.5 text-sm text-gray-500 hover:bg-gray-50"
+                className="rounded-lg border border-gray-300 px-2 py-1.5 text-sm text-gray-500 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700"
                 title="Clear date filter"
               >
                 Clear
@@ -80,7 +80,7 @@ export function MeterDetail() {
             )}
           </div>
           {showPicker && (
-            <div className="absolute right-0 top-full z-20 mt-1 rounded-lg border border-gray-200 bg-white p-3 shadow-lg">
+            <div className="absolute right-0 top-full z-20 mt-1 rounded-lg border border-gray-200 bg-white p-3 shadow-lg dark:bg-gray-800 dark:border-gray-700">
               <DayPicker
                 mode="range"
                 selected={dateRange}
@@ -98,9 +98,9 @@ export function MeterDetail() {
       {readingsLoading ? (
         <LoadingSpinner />
       ) : chartData.length === 0 ? (
-        <p className="text-sm text-gray-400">No readings available{dateRange ? ' for the selected range' : ' for this meter'}.</p>
+        <p className="text-sm text-gray-400 dark:text-gray-500">No readings available{dateRange ? ' for the selected range' : ' for this meter'}.</p>
       ) : (
-        <div className="bg-white rounded-lg border p-4" style={{ height: 300 }}>
+        <div className="bg-white rounded-lg border p-4 dark:bg-gray-800 dark:border-gray-700" style={{ height: 300 }}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" />

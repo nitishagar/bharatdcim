@@ -4,6 +4,7 @@ import { DataTable, type ColumnDef } from '../components/DataTable';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { EmptyState } from '../components/EmptyState';
+import { formatDate } from '../lib/formatDate';
 
 interface Tenant {
   id: string;
@@ -18,7 +19,7 @@ const columns: ColumnDef<Tenant, unknown>[] = [
   { accessorKey: 'id', header: 'ID' },
   { accessorKey: 'stateCode', header: 'State' },
   { id: 'gstin', header: 'GSTIN', accessorFn: (t) => t.gstin ?? '—' },
-  { id: 'created', header: 'Created', accessorFn: (t) => t.createdAt, cell: ({ row }) => new Date(row.original.createdAt).toLocaleDateString('en-IN') },
+  { id: 'created', header: 'Created', accessorFn: (t) => t.createdAt, cell: ({ row }) => formatDate(row.original.createdAt) },
 ];
 
 export function PlatformTenants() {
@@ -33,7 +34,7 @@ export function PlatformTenants() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-900 mb-4">Tenants</h2>
+      <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Tenants</h2>
       <DataTable
         columns={columns}
         data={data}

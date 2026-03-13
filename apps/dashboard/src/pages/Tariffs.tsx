@@ -40,7 +40,7 @@ export function Tariffs() {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold text-gray-900">Tariffs</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Tariffs</h2>
         {isAdmin && (
           <button
             onClick={() => setShowForm(!showForm)}
@@ -81,13 +81,13 @@ export function Tariffs() {
             if (slots.length === 0) return null;
 
             return (
-              <div className="mt-4 bg-white rounded-lg border p-4">
-                <h3 className="text-sm font-semibold text-gray-700 mb-2">
+              <div className="mt-4 bg-white rounded-lg border p-4 dark:bg-gray-800 dark:border-gray-700">
+                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                   Time-of-Day Slots — {tariff.stateCode} {tariff.category}
                 </h3>
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b text-left text-gray-500">
+                    <tr className="border-b text-left text-gray-500 dark:text-gray-400 dark:border-gray-600">
                       <th className="pb-2">Slot</th>
                       <th className="pb-2">Time</th>
                       <th className="pb-2">Type</th>
@@ -97,7 +97,7 @@ export function Tariffs() {
                   </thead>
                   <tbody>
                     {slots.map((s, i) => (
-                      <tr key={i} className="border-b border-gray-50">
+                      <tr key={i} className="border-b border-gray-50 dark:border-gray-700 dark:text-gray-300">
                         <td className="py-2">{s.name}</td>
                         <td className="py-2">
                           {String(s.startHour).padStart(2, '0')}:{String(s.startMinute).padStart(2, '0')} –{' '}
@@ -149,31 +149,31 @@ function CreateTariffFormComponent({ onClose, onCreated }: { onClose: () => void
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-lg border p-4 mb-4 space-y-3">
+    <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-lg border p-4 mb-4 space-y-3 dark:bg-gray-800 dark:border-gray-700">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">State Code</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">State Code</label>
           <input
             {...register('stateCode')}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
             placeholder="e.g., MH, KA, TN"
           />
           {errors.stateCode && <p className="mt-1 text-sm text-red-500">{errors.stateCode.message}</p>}
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">DISCOM</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">DISCOM</label>
           <input
             {...register('discom')}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
             placeholder="e.g., MSEDCL, BESCOM"
           />
           {errors.discom && <p className="mt-1 text-sm text-red-500">{errors.discom.message}</p>}
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
           <input
             {...register('category')}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
             placeholder="e.g., HT-Industrial"
           />
           {errors.category && <p className="mt-1 text-sm text-red-500">{errors.category.message}</p>}
@@ -182,30 +182,30 @@ function CreateTariffFormComponent({ onClose, onCreated }: { onClose: () => void
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Base Energy Rate (paisa/kWh)</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Base Energy Rate (paisa/kWh)</label>
           <input
             type="number"
             {...register('baseEnergyRatePaisa')}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
             placeholder="e.g., 750"
           />
           {errors.baseEnergyRatePaisa && <p className="mt-1 text-sm text-red-500">{errors.baseEnergyRatePaisa.message}</p>}
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Wheeling Charge (paisa)</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Wheeling Charge (paisa)</label>
           <input
             type="number"
             {...register('wheelingChargePaisa')}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
             placeholder="0"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Demand Charge (paisa/KVA)</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Demand Charge (paisa/KVA)</label>
           <input
             type="number"
             {...register('demandChargePerKvaPaisa')}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
             placeholder="0"
           />
         </div>
@@ -213,27 +213,27 @@ function CreateTariffFormComponent({ onClose, onCreated }: { onClose: () => void
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Effective From</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Effective From</label>
           <input
             type="date"
             {...register('effectiveFrom')}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
           />
           {errors.effectiveFrom && <p className="mt-1 text-sm text-red-500">{errors.effectiveFrom.message}</p>}
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Effective To (optional)</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Effective To (optional)</label>
           <input
             type="date"
             {...register('effectiveTo')}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Billing Unit</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Billing Unit</label>
           <select
             {...register('billingUnit')}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
           >
             <option value="kWh">kWh</option>
             <option value="kVAh">kVAh</option>

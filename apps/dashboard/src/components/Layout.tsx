@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
-import { UserButton, OrganizationSwitcher } from '@clerk/clerk-react';
+import { UserButton, OrganizationSwitcher, useAuth } from '@clerk/clerk-react';
 import { usePlatformAdmin } from '../hooks/usePlatformAdmin';
+import { DarkModeToggle } from './DarkModeToggle';
 
 const NAV_ITEMS = [
   { to: '/', label: 'Overview', icon: '◎' },
@@ -74,7 +75,7 @@ export function Layout() {
   const closeSidebar = () => setSidebarOpen(false);
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
       {/* Backdrop overlay — mobile only */}
       {sidebarOpen && (
         <div
@@ -124,11 +125,11 @@ export function Layout() {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-6">
+        <header className="h-14 bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700 flex items-center justify-between px-4 lg:px-6">
           <div className="flex items-center gap-3">
             <button
               type="button"
-              className="lg:hidden p-1.5 -ml-1 rounded-md text-gray-600 hover:bg-gray-100"
+              className="lg:hidden p-1.5 -ml-1 rounded-md text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
               onClick={() => setSidebarOpen(true)}
               aria-label="Open sidebar"
             >
@@ -136,11 +137,14 @@ export function Layout() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
               </svg>
             </button>
-            <h1 className="text-lg font-semibold text-gray-800">{title}</h1>
+            <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{title}</h1>
           </div>
-          <UserButton />
+          <div className="flex items-center gap-2">
+            <DarkModeToggle />
+            <UserButton />
+          </div>
         </header>
-        <main className="flex-1 overflow-auto p-4 lg:p-6">
+        <main className="flex-1 overflow-auto p-4 lg:p-6 dark:bg-gray-900">
           <Outlet />
         </main>
       </div>

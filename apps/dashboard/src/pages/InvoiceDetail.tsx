@@ -61,7 +61,7 @@ export function InvoiceDetail() {
     <div>
       <Breadcrumb items={[{ label: 'Invoices', to: '/invoices' }, { label: invoice.invoiceNumber }]} />
       <div className="flex items-center gap-3 mb-4">
-        <h2 className="text-2xl font-bold text-gray-900">{invoice.invoiceNumber}</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{invoice.invoiceNumber}</h2>
         <StatusBadge status={invoice.status} />
         <button
           onClick={() => window.print()}
@@ -72,42 +72,42 @@ export function InvoiceDetail() {
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-lg border p-4">
-          <span className="text-xs text-gray-500">Bill ID</span>
-          <p className="font-medium text-sm">{invoice.billId}</p>
+        <div className="bg-white rounded-lg border p-4 dark:bg-gray-800 dark:border-gray-700">
+          <span className="text-xs text-gray-500 dark:text-gray-400">Bill ID</span>
+          <p className="font-medium text-sm dark:text-gray-200">{invoice.billId}</p>
         </div>
-        <div className="bg-white rounded-lg border p-4">
-          <span className="text-xs text-gray-500">Supplier GSTIN</span>
-          <p className="font-medium text-sm">{invoice.supplierGstin}</p>
+        <div className="bg-white rounded-lg border p-4 dark:bg-gray-800 dark:border-gray-700">
+          <span className="text-xs text-gray-500 dark:text-gray-400">Supplier GSTIN</span>
+          <p className="font-medium text-sm dark:text-gray-200">{invoice.supplierGstin}</p>
         </div>
-        <div className="bg-white rounded-lg border p-4">
-          <span className="text-xs text-gray-500">Recipient GSTIN</span>
-          <p className="font-medium text-sm">{invoice.recipientGstin}</p>
+        <div className="bg-white rounded-lg border p-4 dark:bg-gray-800 dark:border-gray-700">
+          <span className="text-xs text-gray-500 dark:text-gray-400">Recipient GSTIN</span>
+          <p className="font-medium text-sm dark:text-gray-200">{invoice.recipientGstin}</p>
         </div>
-        <div className="bg-white rounded-lg border p-4">
-          <span className="text-xs text-gray-500">Invoice Date</span>
-          <p className="font-medium text-sm">{invoice.invoiceDate}</p>
+        <div className="bg-white rounded-lg border p-4 dark:bg-gray-800 dark:border-gray-700">
+          <span className="text-xs text-gray-500 dark:text-gray-400">Invoice Date</span>
+          <p className="font-medium text-sm dark:text-gray-200">{invoice.invoiceDate}</p>
         </div>
       </div>
 
-      <div className="bg-white rounded-lg border overflow-hidden mb-6">
+      <div className="bg-white rounded-lg border overflow-hidden mb-6 dark:bg-gray-800 dark:border-gray-700">
         <table className="w-full text-sm">
           <tbody>
-            <tr className="border-b border-gray-100">
-              <td className="px-4 py-2 text-gray-600">Taxable Amount</td>
+            <tr className="border-b border-gray-100 dark:border-gray-700">
+              <td className="px-4 py-2 text-gray-600 dark:text-gray-400">Taxable Amount</td>
               <td className="px-4 py-2 text-right">{formatPaisa(invoice.taxableAmountPaisa)}</td>
             </tr>
             {taxRows.map(([label, paisa], i) => (
-              <tr key={i} className="border-b border-gray-100">
-                <td className="px-4 py-2 text-gray-600">{label}</td>
+              <tr key={i} className="border-b border-gray-100 dark:border-gray-700">
+                <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{label}</td>
                 <td className="px-4 py-2 text-right">{formatPaisa(paisa as number)}</td>
               </tr>
             ))}
-            <tr className="border-b border-gray-100">
-              <td className="px-4 py-2 text-gray-600">Total Tax</td>
+            <tr className="border-b border-gray-100 dark:border-gray-700">
+              <td className="px-4 py-2 text-gray-600 dark:text-gray-400">Total Tax</td>
               <td className="px-4 py-2 text-right">{formatPaisa(invoice.totalTaxPaisa)}</td>
             </tr>
-            <tr className="bg-gray-50 font-semibold">
+            <tr className="bg-gray-50 font-semibold dark:bg-gray-700">
               <td className="px-4 py-2">Total Amount</td>
               <td className="px-4 py-2 text-right">{formatPaisa(invoice.totalAmountPaisa)}</td>
             </tr>
@@ -119,13 +119,13 @@ export function InvoiceDetail() {
         <div className="flex gap-3">
           <button
             onClick={() => setShowCancel(!showCancel)}
-            className="rounded-lg border border-red-300 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+            className="rounded-lg border border-red-300 px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/20"
           >
             Cancel Invoice
           </button>
           <button
             onClick={() => setShowCreditNote(!showCreditNote)}
-            className="rounded-lg border px-4 py-2 text-sm hover:bg-gray-50"
+            className="rounded-lg border px-4 py-2 text-sm hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
           >
             Credit Note
           </button>
@@ -133,11 +133,11 @@ export function InvoiceDetail() {
       )}
 
       {showCancel && (
-        <form onSubmit={cancelForm.handleSubmit(handleCancel)} className="mt-4 bg-white rounded-lg border p-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Cancellation Reason</label>
+        <form onSubmit={cancelForm.handleSubmit(handleCancel)} className="mt-4 bg-white rounded-lg border p-4 dark:bg-gray-800 dark:border-gray-700">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cancellation Reason</label>
           <input
             {...cancelForm.register('reason')}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm mb-1"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm mb-1 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
           />
           {cancelForm.formState.errors.reason && (
             <p className="text-sm text-red-500 mb-2">{cancelForm.formState.errors.reason.message}</p>
@@ -153,24 +153,24 @@ export function InvoiceDetail() {
       )}
 
       {showCreditNote && (
-        <form onSubmit={creditForm.handleSubmit(handleCreditNote)} className="mt-4 bg-white rounded-lg border p-4 space-y-2">
+        <form onSubmit={creditForm.handleSubmit(handleCreditNote)} className="mt-4 bg-white rounded-lg border p-4 space-y-2 dark:bg-gray-800 dark:border-gray-700">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Amount (₹)</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Amount (₹)</label>
             <input
               type="number"
               step="0.01"
               {...creditForm.register('amount')}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
             />
             {creditForm.formState.errors.amount && (
               <p className="mt-1 text-sm text-red-500">{creditForm.formState.errors.amount.message}</p>
             )}
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Reason</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Reason</label>
             <input
               {...creditForm.register('reason')}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
             />
             {creditForm.formState.errors.reason && (
               <p className="mt-1 text-sm text-red-500">{creditForm.formState.errors.reason.message}</p>

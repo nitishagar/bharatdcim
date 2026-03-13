@@ -63,8 +63,8 @@ export function Agents() {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold text-gray-900">SNMP Agents</h2>
-        <span className="text-sm text-gray-500">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">SNMP Agents</h2>
+        <span className="text-sm text-gray-500 dark:text-gray-400">
           {online}/{data.length} online &middot; Auto-refreshes every 30s
         </span>
       </div>

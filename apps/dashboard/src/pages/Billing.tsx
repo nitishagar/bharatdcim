@@ -74,7 +74,7 @@ export function Billing() {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold text-gray-900">Billing</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Billing</h2>
         {isAdmin && (
           <button
             onClick={() => setShowForm(!showForm)}
@@ -249,14 +249,14 @@ function CalculateBillFormComponent({ onClose, onSaved }: { onClose: () => void;
   }
 
   return (
-    <div className="bg-white rounded-lg border p-4 mb-4 space-y-4">
+    <div className="bg-white rounded-lg border p-4 mb-4 space-y-4 dark:bg-gray-800 dark:border-gray-700">
       <form onSubmit={handleSubmit(onCalculate)} className="space-y-3" onChange={() => setResult(null)}>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Meter</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Meter</label>
             <select
               {...register('meterId')}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
             >
               <option value="">Select meter...</option>
               {meters?.map((m: Meter) => (
@@ -266,27 +266,27 @@ function CalculateBillFormComponent({ onClose, onSaved }: { onClose: () => void;
             {errors.meterId && <p className="mt-1 text-sm text-red-500">{errors.meterId.message}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Period Start</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Period Start</label>
             <input
               type="date"
               {...register('periodStart')}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
             />
             {errors.periodStart && <p className="mt-1 text-sm text-red-500">{errors.periodStart.message}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Period End</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Period End</label>
             <input
               type="date"
               {...register('periodEnd')}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
             />
             {errors.periodEnd && <p className="mt-1 text-sm text-red-500">{errors.periodEnd.message}</p>}
           </div>
         </div>
 
         {selectedTariff && (
-          <div className="rounded-lg bg-gray-50 px-3 py-2 text-xs text-gray-600">
+          <div className="rounded-lg bg-gray-50 px-3 py-2 text-xs text-gray-600 dark:bg-gray-700 dark:text-gray-300">
             Tariff: {selectedTariff.stateCode} — {selectedTariff.discom} — {selectedTariff.category}
             {' '}(Base rate: {formatPaisa(selectedTariff.baseEnergyRatePaisa)}/kWh)
           </div>
@@ -302,30 +302,30 @@ function CalculateBillFormComponent({ onClose, onSaved }: { onClose: () => void;
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Peak kWh</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Peak kWh</label>
             <input type="number" step="0.01" {...register('peakKwh')} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" placeholder="0" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Normal kWh</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Normal kWh</label>
             <input type="number" step="0.01" {...register('normalKwh')} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" placeholder="0" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Off-Peak kWh</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Off-Peak kWh</label>
             <input type="number" step="0.01" {...register('offPeakKwh')} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" placeholder="0" />
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Contracted Demand (KVA)</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contracted Demand (KVA)</label>
             <input type="number" step="0.01" {...register('contractedDemandKva')} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" placeholder="0" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Recorded Demand (KVA)</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Recorded Demand (KVA)</label>
             <input type="number" step="0.01" {...register('recordedDemandKva')} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" placeholder="0" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Power Factor</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Power Factor</label>
             <input type="number" step="0.01" min="0" max="1" {...register('powerFactor')} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" />
           </div>
         </div>
@@ -348,7 +348,7 @@ function CalculateBillFormComponent({ onClose, onSaved }: { onClose: () => void;
         </div>
 
         {!selectedTariff && meterId && (
-          <p className="text-sm text-amber-600">
+          <p className="text-sm text-amber-600 dark:text-amber-400">
             No tariff configured for this meter. Assign a tariff first.
           </p>
         )}
@@ -392,34 +392,34 @@ function BillPreview({
 
   return (
     <div className="border-t pt-4">
-      <h4 className="text-sm font-semibold text-gray-800 mb-2">Bill Preview</h4>
+      <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">Bill Preview</h4>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-3">
-        <div className="rounded-lg bg-gray-50 p-3">
-          <span className="text-xs text-gray-500">Total kWh</span>
-          <p className="font-semibold">{(r.totalKWh ?? 0).toLocaleString('en-IN')}</p>
+        <div className="rounded-lg bg-gray-50 p-3 dark:bg-gray-700">
+          <span className="text-xs text-gray-500 dark:text-gray-400">Total kWh</span>
+          <p className="font-semibold dark:text-gray-100">{(r.totalKWh ?? 0).toLocaleString('en-IN')}</p>
         </div>
-        <div className="rounded-lg bg-gray-50 p-3">
-          <span className="text-xs text-gray-500">Effective Rate</span>
-          <p className="font-semibold">{formatPaisa(r.effectiveRatePaisaPerKWh ?? 0)}/kWh</p>
+        <div className="rounded-lg bg-gray-50 p-3 dark:bg-gray-700">
+          <span className="text-xs text-gray-500 dark:text-gray-400">Effective Rate</span>
+          <p className="font-semibold dark:text-gray-100">{formatPaisa(r.effectiveRatePaisaPerKWh ?? 0)}/kWh</p>
         </div>
-        <div className="rounded-lg bg-burgundy/10 p-3">
+        <div className="rounded-lg bg-burgundy/10 p-3 dark:bg-burgundy-dark/20">
           <span className="text-xs text-burgundy">Total Bill</span>
           <p className="font-bold text-burgundy">{formatPaisa(r.totalBillPaisa ?? 0)}</p>
         </div>
       </div>
 
-      <div className="bg-white rounded-lg border overflow-hidden mb-3">
+      <div className="bg-white rounded-lg border overflow-hidden mb-3 dark:bg-gray-800 dark:border-gray-700">
         <table className="w-full text-sm">
           <tbody>
             {lineItems.map(([label, paisa], i) => (
-              <tr key={i} className={`border-b border-gray-100 ${label === 'Subtotal' ? 'font-semibold bg-gray-50' : ''}`}>
-                <td className="px-4 py-1.5 text-gray-600">{label as string}</td>
+              <tr key={i} className={`border-b border-gray-100 dark:border-gray-700 ${label === 'Subtotal' ? 'font-semibold bg-gray-50 dark:bg-gray-700' : ''}`}>
+                <td className="px-4 py-1.5 text-gray-600 dark:text-gray-400">{label as string}</td>
                 <td className="px-4 py-1.5 text-right">{formatPaisa(paisa as number)}</td>
               </tr>
             ))}
-            <tr className="font-bold bg-gray-50">
-              <td className="px-4 py-2">Total</td>
+            <tr className="font-bold bg-gray-50 dark:bg-gray-700">
+              <td className="px-4 py-2 dark:text-gray-200">Total</td>
               <td className="px-4 py-2 text-right">{formatPaisa(r.totalBillPaisa ?? 0)}</td>
             </tr>
           </tbody>
