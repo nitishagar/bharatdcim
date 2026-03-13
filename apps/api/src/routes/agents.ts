@@ -1,7 +1,8 @@
 import { Hono } from 'hono';
-import { eq } from 'drizzle-orm';
+import { eq, like, sql } from 'drizzle-orm';
 import type { AppEnv } from '../types.js';
 import { agentHeartbeats } from '../db/schema.js';
+import { parsePagination } from '../utils/pagination.js';
 
 const agentsRouter = new Hono<AppEnv>();
 
@@ -58,15 +59,30 @@ agentsRouter.post('/heartbeat', async (c) => {
 agentsRouter.get('/', async (c) => {
   const db = c.get('db');
   const tenantId = c.get('tenantId');
+  const { hasPagination, limit, offset } = parsePagination(c);
 
   if (tenantId) {
-    const rows = await db.select().from(agentHeartbeats).where(eq(agentHeartbeats.tenantId, tenantId)).all();
-    return c.json(rows);
+    const scopeWhere = eq(agentHeartbeats.tenantId, tenantId);
+
+    if (!hasPagination) {
+      const rows = await db.select().from(agentHeartbeats).where(scopeWhere).all();
+      return c.json(rows);
+    }
+
+    const [{ total }] = await db.select({ total: sql<number>`COUNT(*)` }).from(agentHeartbeats).where(scopeWhere).all();
+    const data = await db.select().from(agentHeartbeats).where(scopeWhere).limit(limit).offset(offset).all();
+    return c.json({ data, total: Number(total), limit, offset });
   }
 
   // API_TOKEN or platform admin — return all
-  const rows = await db.select().from(agentHeartbeats).all();
-  return c.json(rows);
+  if (!hasPagination) {
+    const rows = await db.select().from(agentHeartbeats).all();
+    return c.json(rows);
+  }
+
+  const [{ total }] = await db.select({ total: sql<number>`COUNT(*)` }).from(agentHeartbeats).all();
+  const data = await db.select().from(agentHeartbeats).limit(limit).offset(offset).all();
+  return c.json({ data, total: Number(total), limit, offset });
 });
 
 export { agentsRouter };

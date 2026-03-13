@@ -1,8 +1,9 @@
 import { Hono } from 'hono';
-import { eq, and, ne } from 'drizzle-orm';
+import { eq, and, ne, like, sql } from 'drizzle-orm';
 import type { AppEnv } from '../types.js';
 import { meters, powerReadings } from '../db/schema.js';
 import { requireAdmin } from '../middleware/rbac.js';
+import { parsePagination } from '../utils/pagination.js';
 
 const metersRouter = new Hono<AppEnv>();
 
@@ -11,8 +12,21 @@ metersRouter.get('/', async (c) => {
   const db = c.get('db');
   const tenantId = c.get('tenantId');
   if (!tenantId) return c.json([]);
-  const rows = await db.select().from(meters).where(and(eq(meters.tenantId, tenantId), ne(meters.status, 'deleted'))).all();
-  return c.json(rows);
+
+  const { hasPagination, limit, offset, search } = parsePagination(c);
+
+  const conditions: ReturnType<typeof eq>[] = [eq(meters.tenantId, tenantId), ne(meters.status, 'deleted')];
+  if (search) conditions.push(like(meters.name, `%${search}%`));
+  const where = and(...conditions);
+
+  if (!hasPagination) {
+    const rows = await db.select().from(meters).where(where).all();
+    return c.json(rows);
+  }
+
+  const [{ total }] = await db.select({ total: sql<number>`COUNT(*)` }).from(meters).where(where).all();
+  const data = await db.select().from(meters).where(where).limit(limit).offset(offset).all();
+  return c.json({ data, total: Number(total), limit, offset });
 });
 
 // GET /meters/:id — get meter by ID (verify tenant ownership)

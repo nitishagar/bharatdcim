@@ -1,10 +1,11 @@
 import { Hono } from 'hono';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, sql } from 'drizzle-orm';
 import { calculateBill } from '@bharatdcim/billing-engine';
 import type { BillCalculationInput } from '@bharatdcim/billing-engine';
 import type { AppEnv } from '../types.js';
 import { bills, invoices } from '../db/schema.js';
 import { requireAdmin } from '../middleware/rbac.js';
+import { parsePagination } from '../utils/pagination.js';
 
 const billsRouter = new Hono<AppEnv>();
 
@@ -13,8 +14,18 @@ billsRouter.get('/', async (c) => {
   const db = c.get('db');
   const tenantId = c.get('tenantId');
   if (!tenantId) return c.json([]);
-  const rows = await db.select().from(bills).where(eq(bills.tenantId, tenantId)).all();
-  return c.json(rows);
+
+  const { hasPagination, limit, offset } = parsePagination(c);
+  const where = eq(bills.tenantId, tenantId);
+
+  if (!hasPagination) {
+    const rows = await db.select().from(bills).where(where).all();
+    return c.json(rows);
+  }
+
+  const [{ total }] = await db.select({ total: sql<number>`COUNT(*)` }).from(bills).where(where).all();
+  const data = await db.select().from(bills).where(where).limit(limit).offset(offset).all();
+  return c.json({ data, total: Number(total), limit, offset });
 });
 
 // GET /bills/:id — get bill by ID (verify tenant ownership)
