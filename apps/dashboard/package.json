@@ -28,11 +28,13 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.18",
+    "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16",
     "@types/react": "^19.2.13",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^4",
     "jsdom": "^26",
+    "msw": "^2.12.10",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.7",
     "vite": "^6",
