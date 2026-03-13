@@ -172,7 +172,8 @@ function EditMeterFormComponent({
   onSaved: () => void;
 }) {
   const updateMeter = useUpdateMeter(meter.id);
-  const { data: tariffs } = useTariffs();
+  const { data: tariffsData } = useTariffs({ limit: 100 });
+  const tariffs = tariffsData?.data;
 
   const { register, handleSubmit, formState: { errors } } = useForm<EditMeterForm>({
     resolver: zodResolver(editMeterSchema),
