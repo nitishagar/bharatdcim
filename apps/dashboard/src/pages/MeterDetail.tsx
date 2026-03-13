@@ -29,7 +29,8 @@ export function MeterDetail() {
 
   const from = dateRange?.from?.toISOString().split('T')[0];
   const to = dateRange?.to?.toISOString().split('T')[0];
-  const { data: readings, isLoading: readingsLoading } = useReadings(id!, from, to);
+  const { data: readingsData, isLoading: readingsLoading } = useReadings(id!, from, to, { limit: 500 });
+  const readings = readingsData?.data;
 
   if (meterLoading) return <DetailSkeleton />;
   if (meterError) return <ErrorMessage error={meterError} />;

@@ -1,4 +1,5 @@
 import { screen, waitFor, fireEvent } from '@testing-library/react';
+const emptyPage = { data: [], total: 0, limit: 25, offset: 0 };
 import { http, HttpResponse } from 'msw';
 import { server } from '../test/server';
 import { renderWithProviders } from '../test/utils';
@@ -9,7 +10,7 @@ describe('Tariffs page', () => {
     server.use(
       http.get('*/tariffs', async () => {
         await new Promise<void>((resolve) => setTimeout(resolve, 100));
-        return HttpResponse.json([]);
+        return HttpResponse.json(emptyPage);
       }),
     );
     renderWithProviders(<Tariffs />);
@@ -36,7 +37,7 @@ describe('Tariffs page', () => {
   });
 
   it('renders empty state when no tariffs', async () => {
-    server.use(http.get('*/tariffs', () => HttpResponse.json([])));
+    server.use(http.get('*/tariffs', () => HttpResponse.json(emptyPage)));
     renderWithProviders(<Tariffs />);
     await waitFor(() =>
       expect(screen.getByText('No tariffs configured')).toBeInTheDocument(),

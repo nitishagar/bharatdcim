@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { api, uploadCSV } from '../client';
+import { type PaginationParams, type PaginatedResult, buildPaginationQuery } from './types';
 
 export interface Upload {
   id: string;
@@ -17,10 +18,11 @@ export interface Upload {
   createdAt: string;
 }
 
-export function useUploads() {
+export function useUploads(params: PaginationParams = { limit: 25, offset: 0 }) {
+  const qs = buildPaginationQuery(params);
   return useQuery({
-    queryKey: ['uploads'],
-    queryFn: () => api<Upload[]>('/uploads'),
+    queryKey: ['uploads', params],
+    queryFn: () => api<PaginatedResult<Upload>>(`/uploads?${qs}`),
   });
 }
 

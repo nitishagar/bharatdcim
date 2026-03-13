@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { api } from '../client';
+import { type PaginationParams, type PaginatedResult, buildPaginationQuery } from './types';
 
 export interface Tariff {
   id: string;
@@ -26,10 +27,11 @@ export interface Tariff {
   updatedAt: string;
 }
 
-export function useTariffs() {
+export function useTariffs(params: PaginationParams = { limit: 25, offset: 0 }) {
+  const qs = buildPaginationQuery(params);
   return useQuery({
-    queryKey: ['tariffs'],
-    queryFn: () => api<Tariff[]>('/tariffs'),
+    queryKey: ['tariffs', params],
+    queryFn: () => api<PaginatedResult<Tariff>>(`/tariffs?${qs}`),
   });
 }
 

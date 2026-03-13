@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useAgents, type Agent } from '../api/hooks/useAgents';
 import { DataTable, type ColumnDef } from '../components/DataTable';
 import { TableSkeleton } from '../components/Skeleton';
@@ -52,27 +53,35 @@ const columns: ColumnDef<Agent, unknown>[] = [
 ];
 
 export function Agents() {
-  const { data, isLoading, error, refetch } = useAgents();
+  const [pageIndex, setPageIndex] = useState(0);
+  const [pageSize, setPageSize] = useState(25);
+  const { data, isLoading, error, refetch } = useAgents({ limit: pageSize, offset: pageIndex * pageSize });
 
   if (isLoading) return <TableSkeleton />;
   if (error) return <ErrorMessage error={error} onRetry={() => refetch()} />;
-  if (!data?.length) return <EmptyState message="No agents registered" />;
+  if (!data?.data?.length) return <EmptyState message="No agents registered" />;
 
-  const online = data.filter((a) => a.status === 'online').length;
+  const online = data.data.filter((a) => a.status === 'online').length;
 
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">SNMP Agents</h2>
         <span className="text-sm text-gray-500 dark:text-gray-400">
-          {online}/{data.length} online &middot; Auto-refreshes every 30s
+          {online}/{data.total} online &middot; Auto-refreshes every 30s
         </span>
       </div>
       <DataTable
         columns={columns}
-        data={data}
+        data={data.data}
         searchPlaceholder="Search agents..."
         exportFilename="agents"
+        manualPagination
+        pageIndex={pageIndex}
+        pageSize={pageSize}
+        totalRows={data.total}
+        onPageChange={setPageIndex}
+        onPageSizeChange={setPageSize}
       />
     </div>
   );

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { api } from '../client';
+import { type PaginationParams, type PaginatedResult, buildPaginationQuery } from './types';
 
 export interface Invoice {
   id: string;
@@ -23,10 +24,11 @@ export interface Invoice {
   updatedAt: string;
 }
 
-export function useInvoices() {
+export function useInvoices(params: PaginationParams = { limit: 25, offset: 0 }) {
+  const qs = buildPaginationQuery(params);
   return useQuery({
-    queryKey: ['invoices'],
-    queryFn: () => api<Invoice[]>('/invoices'),
+    queryKey: ['invoices', params],
+    queryFn: () => api<PaginatedResult<Invoice>>(`/invoices?${qs}`),
   });
 }
 

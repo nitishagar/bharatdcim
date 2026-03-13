@@ -33,7 +33,10 @@ const columns: ColumnDef<Tariff, unknown>[] = [
 ];
 
 export function Tariffs() {
-  const { data, isLoading, error, refetch } = useTariffs();
+  const [pageIndex, setPageIndex] = useState(0);
+  const [pageSize, setPageSize] = useState(25);
+  const [search, setSearch] = useState('');
+  const { data, isLoading, error, refetch } = useTariffs({ limit: pageSize, offset: pageIndex * pageSize, search });
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [editingTariffId, setEditingTariffId] = useState<string | null>(null);
   const isAdmin = useIsAdmin();
@@ -66,16 +69,23 @@ export function Tariffs() {
         <TableSkeleton />
       ) : error ? (
         <ErrorMessage error={error} onRetry={() => refetch()} />
-      ) : !data?.length ? (
+      ) : !data?.data?.length ? (
         <EmptyState message="No tariffs configured" />
       ) : (
         <>
           <DataTable
             columns={columns}
-            data={data}
+            data={data.data}
             onRowClick={(t) => setExpandedId(expandedId === t.id ? null : t.id)}
             searchPlaceholder="Search tariffs..."
             exportFilename="tariffs"
+            manualPagination
+            pageIndex={pageIndex}
+            pageSize={pageSize}
+            totalRows={data.total}
+            onPageChange={setPageIndex}
+            onPageSizeChange={setPageSize}
+            onSearch={(s) => { setSearch(s); setPageIndex(0); }}
           />
 
           <ConfirmDialog
@@ -94,7 +104,7 @@ export function Tariffs() {
           />
 
           {expandedId && (() => {
-            const tariff = data.find((t) => t.id === expandedId);
+            const tariff = data.data.find((t) => t.id === expandedId);
             if (!tariff) return null;
             let slots: TimeSlot[] = [];
             try { slots = JSON.parse(tariff.timeSlotsJson); } catch { /* empty */ }

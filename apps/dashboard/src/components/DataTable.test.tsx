@@ -79,3 +79,113 @@ describe('DataTable', () => {
     expect(screen.queryByRole('button', { name: /export csv/i })).not.toBeInTheDocument();
   });
 });
+
+describe('DataTable — manualPagination mode', () => {
+  const pagedData: Row[] = [
+    { id: 'r-001', name: 'Alpha' },
+    { id: 'r-002', name: 'Beta' },
+  ];
+
+  it('renders server-side pagination footer with correct row range', () => {
+    render(
+      <DataTable
+        columns={columns}
+        data={pagedData}
+        manualPagination
+        pageIndex={0}
+        pageSize={25}
+        totalRows={52}
+        onPageChange={vi.fn()}
+      />,
+    );
+    expect(screen.getByText(/Showing 1–25 of 52/)).toBeInTheDocument();
+    expect(screen.getByText(/Page 1 of 3/)).toBeInTheDocument();
+  });
+
+  it('disables Prev button on first page', () => {
+    render(
+      <DataTable
+        columns={columns}
+        data={pagedData}
+        manualPagination
+        pageIndex={0}
+        pageSize={25}
+        totalRows={52}
+        onPageChange={vi.fn()}
+      />,
+    );
+    expect(screen.getByText('Prev')).toBeDisabled();
+    expect(screen.getByText('Next')).not.toBeDisabled();
+  });
+
+  it('disables Next button on last page', () => {
+    render(
+      <DataTable
+        columns={columns}
+        data={pagedData}
+        manualPagination
+        pageIndex={2}
+        pageSize={25}
+        totalRows={52}
+        onPageChange={vi.fn()}
+      />,
+    );
+    expect(screen.getByText('Next')).toBeDisabled();
+    expect(screen.getByText('Prev')).not.toBeDisabled();
+  });
+
+  it('calls onPageChange with next index when Next is clicked', () => {
+    const onPageChange = vi.fn();
+    render(
+      <DataTable
+        columns={columns}
+        data={pagedData}
+        manualPagination
+        pageIndex={0}
+        pageSize={25}
+        totalRows={52}
+        onPageChange={onPageChange}
+      />,
+    );
+    fireEvent.click(screen.getByText('Next'));
+    expect(onPageChange).toHaveBeenCalledWith(1);
+  });
+
+  it('calls onPageChange with prev index when Prev is clicked', () => {
+    const onPageChange = vi.fn();
+    render(
+      <DataTable
+        columns={columns}
+        data={pagedData}
+        manualPagination
+        pageIndex={1}
+        pageSize={25}
+        totalRows={52}
+        onPageChange={onPageChange}
+      />,
+    );
+    fireEvent.click(screen.getByText('Prev'));
+    expect(onPageChange).toHaveBeenCalledWith(0);
+  });
+
+  it('renders page size selector and calls onPageSizeChange', () => {
+    const onPageSizeChange = vi.fn();
+    const onPageChange = vi.fn();
+    render(
+      <DataTable
+        columns={columns}
+        data={pagedData}
+        manualPagination
+        pageIndex={1}
+        pageSize={25}
+        totalRows={52}
+        onPageChange={onPageChange}
+        onPageSizeChange={onPageSizeChange}
+      />,
+    );
+    const select = screen.getByRole('combobox');
+    fireEvent.change(select, { target: { value: '50' } });
+    expect(onPageSizeChange).toHaveBeenCalledWith(50);
+    expect(onPageChange).toHaveBeenCalledWith(0); // reset to first page
+  });
+});

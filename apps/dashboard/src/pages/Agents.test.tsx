@@ -1,4 +1,5 @@
 import { screen, waitFor } from '@testing-library/react';
+const emptyPage = { data: [], total: 0, limit: 25, offset: 0 };
 import { http, HttpResponse } from 'msw';
 import { server } from '../test/server';
 import { renderWithProviders } from '../test/utils';
@@ -9,7 +10,7 @@ describe('Agents page', () => {
     server.use(
       http.get('*/agents', async () => {
         await new Promise<void>((resolve) => setTimeout(resolve, 100));
-        return HttpResponse.json([]);
+        return HttpResponse.json(emptyPage);
       }),
     );
     renderWithProviders(<Agents />);
@@ -40,7 +41,7 @@ describe('Agents page', () => {
   });
 
   it('renders empty state when no agents', async () => {
-    server.use(http.get('*/agents', () => HttpResponse.json([])));
+    server.use(http.get('*/agents', () => HttpResponse.json(emptyPage)));
     renderWithProviders(<Agents />);
     await waitFor(() =>
       expect(screen.getByText('No agents registered')).toBeInTheDocument(),

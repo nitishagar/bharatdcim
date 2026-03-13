@@ -34,7 +34,10 @@ function formatFileSize(bytes: number): string {
 }
 
 export function Uploads() {
-  const { data, isLoading, error, refetch } = useUploads();
+  const [pageIndex, setPageIndex] = useState(0);
+  const [pageSize, setPageSize] = useState(25);
+  const [search, setSearch] = useState('');
+  const { data, isLoading, error, refetch } = useUploads({ limit: pageSize, offset: pageIndex * pageSize, search });
   const upload = useUploadCSV();
   const fileRef = useRef<HTMLInputElement>(null);
   const isAdmin = useIsAdmin();
@@ -107,18 +110,25 @@ export function Uploads() {
         <TableSkeleton />
       ) : error ? (
         <ErrorMessage error={error} onRetry={() => refetch()} />
-      ) : !data?.length ? (
+      ) : !data?.data?.length ? (
         <EmptyState message="No uploads found" />
       ) : (
         <>
           <DataTable
             columns={columns}
-            data={data}
+            data={data.data}
             onRowClick={(u) => setExpandedId(expandedId === u.id ? null : u.id)}
             searchPlaceholder="Search uploads..."
             exportFilename="uploads"
+            manualPagination
+            pageIndex={pageIndex}
+            pageSize={pageSize}
+            totalRows={data.total}
+            onPageChange={setPageIndex}
+            onPageSizeChange={setPageSize}
+            onSearch={(s) => { setSearch(s); setPageIndex(0); }}
           />
-          {expandedId && <UploadErrors upload={data.find((u) => u.id === expandedId)} />}
+          {expandedId && <UploadErrors upload={data.data.find((u) => u.id === expandedId)} />}
         </>
       )}
     </div>
