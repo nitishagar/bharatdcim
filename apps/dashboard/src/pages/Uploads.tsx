@@ -6,6 +6,7 @@ import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { EmptyState } from '../components/EmptyState';
 import { useIsAdmin } from '../hooks/useIsAdmin';
+import { formatDate } from '../lib/formatDate';
 
 const columns: ColumnDef<Upload, unknown>[] = [
   { accessorKey: 'fileName', header: 'File' },
@@ -23,7 +24,7 @@ const columns: ColumnDef<Upload, unknown>[] = [
   },
   { id: 'size', header: 'Size', accessorFn: (u) => u.fileSize, cell: ({ row }) => formatFileSize(row.original.fileSize) },
   { id: 'time', header: 'Time', accessorFn: (u) => u.processingTimeMs, cell: ({ row }) => `${row.original.processingTimeMs}ms` },
-  { id: 'date', header: 'Date', accessorFn: (u) => u.createdAt, cell: ({ row }) => new Date(row.original.createdAt).toLocaleDateString('en-IN') },
+  { id: 'date', header: 'Date', accessorFn: (u) => u.createdAt, cell: ({ row }) => formatDate(row.original.createdAt) },
 ];
 
 function formatFileSize(bytes: number): string {
