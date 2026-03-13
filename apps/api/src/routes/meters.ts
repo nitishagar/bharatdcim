@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, ne } from 'drizzle-orm';
 import type { AppEnv } from '../types.js';
-import { meters } from '../db/schema.js';
+import { meters, powerReadings } from '../db/schema.js';
 import { requireAdmin } from '../middleware/rbac.js';
 
 const metersRouter = new Hono<AppEnv>();
@@ -11,7 +11,7 @@ metersRouter.get('/', async (c) => {
   const db = c.get('db');
   const tenantId = c.get('tenantId');
   if (!tenantId) return c.json([]);
-  const rows = await db.select().from(meters).where(eq(meters.tenantId, tenantId)).all();
+  const rows = await db.select().from(meters).where(and(eq(meters.tenantId, tenantId), ne(meters.status, 'deleted'))).all();
   return c.json(rows);
 });
 
@@ -20,7 +20,7 @@ metersRouter.get('/:id', async (c) => {
   const db = c.get('db');
   const tenantId = c.get('tenantId');
   const id = c.req.param('id');
-  const conditions = [eq(meters.id, id)];
+  const conditions = [eq(meters.id, id), ne(meters.status, 'deleted')];
   if (tenantId) conditions.push(eq(meters.tenantId, tenantId));
   const rows = await db.select().from(meters).where(and(...conditions)).all();
   if (rows.length === 0) {
@@ -91,6 +91,28 @@ metersRouter.patch('/:id', async (c) => {
   await db.update(meters).set(updates).where(eq(meters.id, id));
   const updated = await db.select().from(meters).where(eq(meters.id, id)).all();
   return c.json(updated[0]);
+});
+
+// DELETE /meters/:id — soft-delete if readings exist, hard-delete otherwise (admin only)
+metersRouter.delete('/:id', async (c) => {
+  requireAdmin(c);
+  const db = c.get('db');
+  const tenantId = c.get('tenantId');
+  const id = c.req.param('id');
+  const conditions = [eq(meters.id, id), ne(meters.status, 'deleted')];
+  if (tenantId) conditions.push(eq(meters.tenantId, tenantId));
+  const rows = await db.select().from(meters).where(and(...conditions)).all();
+  if (rows.length === 0) {
+    return c.json({ error: { code: 'NOT_FOUND', message: `Meter ${id} not found` } }, 404);
+  }
+
+  const reading = await db.select({ id: powerReadings.id }).from(powerReadings).where(eq(powerReadings.meterId, id)).limit(1).all();
+  if (reading.length > 0) {
+    await db.update(meters).set({ status: 'deleted', updatedAt: new Date().toISOString() }).where(eq(meters.id, id));
+  } else {
+    await db.delete(meters).where(eq(meters.id, id));
+  }
+  return new Response(null, { status: 204 });
 });
 
 export { metersRouter };

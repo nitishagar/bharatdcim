@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createTestDb, createAppWithTenant } from '../helpers.js';
 import { tariffs } from '../../src/routes/tariffs.js';
-import { tariffConfigs, tenants } from '../../src/db/schema.js';
+import { tariffConfigs, tenants, meters } from '../../src/db/schema.js';
 import type { Database } from '../../src/db/client.js';
 
 const now = '2026-03-01T00:00:00Z';
@@ -113,6 +113,48 @@ describe('Tariff Routes', () => {
     expect(res.status).toBe(404);
     const body = await res.json();
     expect(body.error.code).toBe('NOT_FOUND');
+  });
+
+  it('DELETE /tariffs/:id — not found returns 404', async () => {
+    const res = await app.request('/tariffs/nonexistent', { method: 'DELETE' });
+    expect(res.status).toBe(404);
+    const body = await res.json();
+    expect(body.error.code).toBe('NOT_FOUND');
+  });
+
+  it('DELETE /tariffs/:id — hard deletes unreferenced tariff', async () => {
+    await app.request('/tariffs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: 'tariff-del', stateCode: 'MH', discom: 'MSEDCL', category: 'HT I',
+        baseEnergyRatePaisa: 868, billingUnit: 'kWh', timeSlots: [],
+      }),
+    });
+    const res = await app.request('/tariffs/tariff-del', { method: 'DELETE' });
+    expect(res.status).toBe(204);
+    const getRes = await app.request('/tariffs/tariff-del');
+    expect(getRes.status).toBe(404);
+  });
+
+  it('DELETE /tariffs/:id — 409 when referenced by a meter', async () => {
+    await app.request('/tariffs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: 'tariff-ref', stateCode: 'MH', discom: 'MSEDCL', category: 'HT I',
+        baseEnergyRatePaisa: 868, billingUnit: 'kWh', timeSlots: [],
+      }),
+    });
+    const now = new Date().toISOString();
+    await (db as any).insert(meters).values({
+      id: 'meter-ref', tenantId: 'tenant-1', name: 'Ref Meter', stateCode: 'MH',
+      tariffId: 'tariff-ref', createdAt: now, updatedAt: now,
+    });
+    const res = await app.request('/tariffs/tariff-ref', { method: 'DELETE' });
+    expect(res.status).toBe(409);
+    const body = await res.json();
+    expect(body.error.code).toBe('CONFLICT');
   });
 
   it('GET /tariffs — lists created tariffs', async () => {

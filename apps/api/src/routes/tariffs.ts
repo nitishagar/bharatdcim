@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { eq, or, isNull, and } from 'drizzle-orm';
 import type { AppEnv } from '../types.js';
-import { tariffConfigs } from '../db/schema.js';
+import { tariffConfigs, meters, bills } from '../db/schema.js';
 import { requireAdmin } from '../middleware/rbac.js';
 
 const tariffs = new Hono<AppEnv>();
@@ -118,6 +118,35 @@ tariffs.patch('/:id', async (c) => {
   await db.update(tariffConfigs).set(updates).where(eq(tariffConfigs.id, id));
   const updated = await db.select().from(tariffConfigs).where(eq(tariffConfigs.id, id)).all();
   return c.json(updated[0]);
+});
+
+// DELETE /tariffs/:id — hard-delete (admin only), refuse 409 if referenced
+tariffs.delete('/:id', async (c) => {
+  requireAdmin(c);
+  const db = c.get('db');
+  const tenantId = c.get('tenantId');
+  const id = c.req.param('id');
+
+  const conditions = [eq(tariffConfigs.id, id)];
+  if (tenantId) {
+    conditions.push(or(isNull(tariffConfigs.tenantId), eq(tariffConfigs.tenantId, tenantId))!);
+  }
+  const rows = await db.select().from(tariffConfigs).where(and(...conditions)).all();
+  if (rows.length === 0) {
+    return c.json({ error: { code: 'NOT_FOUND', message: `Tariff ${id} not found` } }, 404);
+  }
+
+  const linkedMeter = await db.select({ id: meters.id }).from(meters).where(eq(meters.tariffId, id)).limit(1).all();
+  if (linkedMeter.length > 0) {
+    return c.json({ error: { code: 'CONFLICT', message: 'Tariff is referenced by one or more meters' } }, 409);
+  }
+  const linkedBill = await db.select({ id: bills.id }).from(bills).where(eq(bills.tariffId, id)).limit(1).all();
+  if (linkedBill.length > 0) {
+    return c.json({ error: { code: 'CONFLICT', message: 'Tariff is referenced by one or more bills' } }, 409);
+  }
+
+  await db.delete(tariffConfigs).where(eq(tariffConfigs.id, id));
+  return new Response(null, { status: 204 });
 });
 
 export { tariffs };
