@@ -71,6 +71,7 @@ export function Tariffs() {
             data={data}
             onRowClick={(t) => setExpandedId(expandedId === t.id ? null : t.id)}
             searchPlaceholder="Search tariffs..."
+            exportFilename="tariffs"
           />
 
           {expandedId && (() => {

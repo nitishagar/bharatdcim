@@ -72,6 +72,7 @@ export function Agents() {
         columns={columns}
         data={data}
         searchPlaceholder="Search agents..."
+        exportFilename="agents"
       />
     </div>
   );

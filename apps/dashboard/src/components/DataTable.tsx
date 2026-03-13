@@ -1,4 +1,5 @@
 import { useState, useEffect, type ReactNode } from 'react';
+import { exportToCSV } from '../lib/csvExport';
 import {
   useReactTable,
   getCoreRowModel,
@@ -26,6 +27,7 @@ interface DataTableProps<T> {
   searchPlaceholder?: string;
   enableSearch?: boolean;
   pageSize?: number;
+  exportFilename?: string;
 }
 
 export type { ColumnDef };
@@ -37,6 +39,7 @@ export function DataTable<T>({
   searchPlaceholder = 'Search...',
   enableSearch = true,
   pageSize = 25,
+  exportFilename,
 }: DataTableProps<T>) {
   const [globalFilter, setGlobalFilter] = useState('');
   const debouncedFilter = useDebounce(globalFilter);
@@ -57,15 +60,46 @@ export function DataTable<T>({
 
   const rows = table.getRowModel().rows;
 
+  function handleExportCSV() {
+    const headers = table
+      .getAllColumns()
+      .filter((col) => col.getIsVisible())
+      .map((col) => {
+        const h = col.columnDef.header;
+        return typeof h === 'string' ? h : col.id;
+      });
+
+    const csvRows = table.getFilteredRowModel().rows.map((row) =>
+      row.getAllCells().map((cell) => {
+        const val = cell.getValue();
+        return val == null ? '' : String(val);
+      }),
+    );
+
+    exportToCSV(exportFilename!, headers, csvRows);
+  }
+
   return (
     <div className="space-y-3">
-      {enableSearch && (
-        <input
-          value={globalFilter}
-          onChange={(e) => setGlobalFilter(e.target.value)}
-          placeholder={searchPlaceholder}
-          className="w-full max-w-sm rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-navy focus:outline-none focus:ring-1 focus:ring-navy dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100 dark:placeholder-gray-400 dark:focus:border-navy-light dark:focus:ring-navy-light"
-        />
+      {(enableSearch || exportFilename) && (
+        <div className="flex items-center gap-2">
+          {enableSearch && (
+            <input
+              value={globalFilter}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              placeholder={searchPlaceholder}
+              className="w-full max-w-sm rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-navy focus:outline-none focus:ring-1 focus:ring-navy dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100 dark:placeholder-gray-400 dark:focus:border-navy-light dark:focus:ring-navy-light"
+            />
+          )}
+          {exportFilename && (
+            <button
+              onClick={handleExportCSV}
+              className="ml-auto shrink-0 rounded-lg border border-gray-300 px-3 py-2 text-sm hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+            >
+              Export CSV
+            </button>
+          )}
+        </div>
       )}
 
       <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">

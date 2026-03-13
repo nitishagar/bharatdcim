@@ -116,6 +116,7 @@ export function Uploads() {
             data={data}
             onRowClick={(u) => setExpandedId(expandedId === u.id ? null : u.id)}
             searchPlaceholder="Search uploads..."
+            exportFilename="uploads"
           />
           {expandedId && <UploadErrors upload={data.find((u) => u.id === expandedId)} />}
         </>
