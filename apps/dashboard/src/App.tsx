@@ -19,6 +19,7 @@ import { Settings } from './pages/Settings';
 import { PlatformOverview } from './pages/PlatformOverview';
 import { PlatformTenants } from './pages/PlatformTenants';
 import { RequirePlatformAdmin } from './components/RequirePlatformAdmin';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 /** Wires Clerk's session token into the API client */
 function AuthBridge() {
@@ -53,23 +54,25 @@ export function App() {
         <AuthBridge />
         <OrgBridge />
         <Toaster position="top-right" richColors />
-        <Routes>
-          <Route element={<Layout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="meters" element={<Meters />} />
-            <Route path="meters/:id" element={<MeterDetail />} />
-            <Route path="billing" element={<Billing />} />
-            <Route path="billing/:id" element={<BillDetail />} />
-            <Route path="invoices" element={<Invoices />} />
-            <Route path="invoices/:id" element={<InvoiceDetail />} />
-            <Route path="uploads" element={<Uploads />} />
-            <Route path="agents" element={<Agents />} />
-            <Route path="tariffs" element={<Tariffs />} />
-            <Route path="settings" element={<Settings />} />
-            <Route path="platform" element={<RequirePlatformAdmin><PlatformOverview /></RequirePlatformAdmin>} />
-            <Route path="platform/tenants" element={<RequirePlatformAdmin><PlatformTenants /></RequirePlatformAdmin>} />
-          </Route>
-        </Routes>
+        <ErrorBoundary>
+          <Routes>
+            <Route element={<Layout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="meters" element={<Meters />} />
+              <Route path="meters/:id" element={<MeterDetail />} />
+              <Route path="billing" element={<Billing />} />
+              <Route path="billing/:id" element={<BillDetail />} />
+              <Route path="invoices" element={<Invoices />} />
+              <Route path="invoices/:id" element={<InvoiceDetail />} />
+              <Route path="uploads" element={<Uploads />} />
+              <Route path="agents" element={<Agents />} />
+              <Route path="tariffs" element={<Tariffs />} />
+              <Route path="settings" element={<Settings />} />
+              <Route path="platform" element={<RequirePlatformAdmin><PlatformOverview /></RequirePlatformAdmin>} />
+              <Route path="platform/tenants" element={<RequirePlatformAdmin><PlatformTenants /></RequirePlatformAdmin>} />
+            </Route>
+          </Routes>
+        </ErrorBoundary>
       </SignedIn>
     </>
   );
