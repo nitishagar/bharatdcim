@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
-import { UserButton, OrganizationSwitcher, useAuth } from '@clerk/clerk-react';
+import { UserButton, OrganizationSwitcher } from '@clerk/clerk-react';
+import { usePlatformAdmin } from '../hooks/usePlatformAdmin';
 
 const NAV_ITEMS = [
   { to: '/', label: 'Overview', icon: '◎' },
@@ -37,12 +38,6 @@ function getPageTitle(pathname: string): string {
   if (pathname.startsWith('/billing/')) return 'Bill Detail';
   if (pathname.startsWith('/invoices/')) return 'Invoice Detail';
   return 'Dashboard';
-}
-
-function usePlatformAdmin(): boolean {
-  const { sessionClaims } = useAuth();
-  return (sessionClaims as Record<string, unknown> | null)?.platformAdmin === true
-    || (sessionClaims as Record<string, unknown> | null)?.platformAdmin === 'true';
 }
 
 function NavItem({ to, label, icon, end, onClick }: { to: string; label: string; icon: string; end?: boolean; onClick?: () => void }) {

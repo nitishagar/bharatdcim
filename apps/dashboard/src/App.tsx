@@ -18,6 +18,7 @@ import { Tariffs } from './pages/Tariffs';
 import { Settings } from './pages/Settings';
 import { PlatformOverview } from './pages/PlatformOverview';
 import { PlatformTenants } from './pages/PlatformTenants';
+import { RequirePlatformAdmin } from './components/RequirePlatformAdmin';
 
 /** Wires Clerk's session token into the API client */
 function AuthBridge() {
@@ -65,8 +66,8 @@ export function App() {
             <Route path="agents" element={<Agents />} />
             <Route path="tariffs" element={<Tariffs />} />
             <Route path="settings" element={<Settings />} />
-            <Route path="platform" element={<PlatformOverview />} />
-            <Route path="platform/tenants" element={<PlatformTenants />} />
+            <Route path="platform" element={<RequirePlatformAdmin><PlatformOverview /></RequirePlatformAdmin>} />
+            <Route path="platform/tenants" element={<RequirePlatformAdmin><PlatformTenants /></RequirePlatformAdmin>} />
           </Route>
         </Routes>
       </SignedIn>
