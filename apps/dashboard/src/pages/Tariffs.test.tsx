@@ -52,4 +52,26 @@ describe('Tariffs page', () => {
       expect(screen.getByRole('button', { name: /edit tariff/i })).toBeInTheDocument(),
     );
   });
+
+  it('shows Delete Tariff button in expanded view and opens confirm dialog', async () => {
+    renderWithProviders(<Tariffs />);
+    await waitFor(() => expect(screen.getByText('BESCOM')).toBeInTheDocument());
+    // Click the row to expand it
+    fireEvent.click(screen.getByText('BESCOM'));
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Delete Tariff' })).toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button', { name: 'Delete Tariff' }));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+  });
+
+  it('calls DELETE API on confirm delete tariff', async () => {
+    let deleted = false;
+    server.use(http.delete('*/tariffs/:id', () => { deleted = true; return new HttpResponse(null, { status: 204 }); }));
+    renderWithProviders(<Tariffs />);
+    await waitFor(() => expect(screen.getByText('BESCOM')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('BESCOM'));
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Delete Tariff' })).toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button', { name: 'Delete Tariff' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
+    await waitFor(() => expect(deleted).toBe(true));
+  });
 });

@@ -34,6 +34,11 @@ export const handlers = [
   http.get('*/platform/overview', () => HttpResponse.json(mockPlatformOverview)),
   http.get('*/platform/tenants',  () => HttpResponse.json(mockPlatformTenants)),
 
+  // Delete endpoints
+  http.delete('*/meters/:id',          () => new HttpResponse(null, { status: 204 })),
+  http.delete('*/tariffs/:id',         () => new HttpResponse(null, { status: 204 })),
+  http.delete('*/bills/:id',           () => new HttpResponse(null, { status: 204 })),
+
   // Mutation endpoints
   http.post('*/meters',                () => HttpResponse.json(mockMeter, { status: 201 })),
   http.patch('*/meters/:id',           () => HttpResponse.json(mockMeter)),

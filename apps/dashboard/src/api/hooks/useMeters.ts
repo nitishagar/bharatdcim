@@ -30,6 +30,15 @@ export function useMeter(id: string) {
   });
 }
 
+export function useDeleteMeter() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api<void>(`/meters/${id}`, { method: 'DELETE' }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['meters'] }); toast.success('Meter deleted'); },
+    onError: (e) => { toast.error(e.message); },
+  });
+}
+
 export function useCreateMeter() {
   const qc = useQueryClient();
   return useMutation({

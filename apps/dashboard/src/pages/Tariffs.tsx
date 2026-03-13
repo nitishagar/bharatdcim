@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useTariffs, useCreateTariff, useUpdateTariff, type Tariff } from '../api/hooks/useTariffs';
+import { useTariffs, useCreateTariff, useUpdateTariff, useDeleteTariff, type Tariff } from '../api/hooks/useTariffs';
 import { DataTable, type ColumnDef } from '../components/DataTable';
 import { TableSkeleton } from '../components/Skeleton';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { EmptyState } from '../components/EmptyState';
+import { ConfirmDialog } from '../components/ConfirmDialog';
 import { formatPaisa } from '../lib/formatCurrency';
 import { useIsAdmin } from '../hooks/useIsAdmin';
 import { createTariffSchema, editTariffSchema, type CreateTariffForm, type EditTariffForm } from '../lib/schemas';
@@ -37,6 +38,8 @@ export function Tariffs() {
   const [editingTariffId, setEditingTariffId] = useState<string | null>(null);
   const isAdmin = useIsAdmin();
   const [showForm, setShowForm] = useState(false);
+  const deleteTariff = useDeleteTariff();
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
   return (
     <div>
@@ -75,6 +78,21 @@ export function Tariffs() {
             exportFilename="tariffs"
           />
 
+          <ConfirmDialog
+            open={deleteTargetId !== null}
+            title="Delete Tariff"
+            message="Are you sure you want to delete this tariff? This cannot be undone."
+            onConfirm={() => {
+              if (deleteTargetId) {
+                deleteTariff.mutate(deleteTargetId, {
+                  onSuccess: () => { setDeleteTargetId(null); setExpandedId(null); refetch(); },
+                  onError: () => setDeleteTargetId(null),
+                });
+              }
+            }}
+            onCancel={() => setDeleteTargetId(null)}
+          />
+
           {expandedId && (() => {
             const tariff = data.find((t) => t.id === expandedId);
             if (!tariff) return null;
@@ -88,12 +106,21 @@ export function Tariffs() {
                     Time-of-Day Slots — {tariff.stateCode} {tariff.category}
                   </h3>
                   {isAdmin && (
-                    <button
-                      onClick={() => setEditingTariffId(editingTariffId === tariff.id ? null : tariff.id)}
-                      className="rounded-lg border border-gray-300 px-3 py-1 text-xs hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
-                    >
-                      Edit Tariff
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setEditingTariffId(editingTariffId === tariff.id ? null : tariff.id)}
+                        className="rounded-lg border border-gray-300 px-3 py-1 text-xs hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                      >
+                        Edit Tariff
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDeleteTargetId(tariff.id)}
+                        className="rounded-lg border border-red-300 px-3 py-1 text-xs text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/20"
+                      >
+                        Delete Tariff
+                      </button>
+                    </div>
                   )}
                 </div>
                 {editingTariffId === tariff.id && (

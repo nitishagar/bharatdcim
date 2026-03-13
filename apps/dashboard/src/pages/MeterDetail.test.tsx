@@ -4,9 +4,10 @@ import { server } from '../test/server';
 import { renderWithProviders } from '../test/utils';
 import { MeterDetail } from './MeterDetail';
 
+const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
-  return { ...actual, useParams: () => ({ id: 'meter-001' }) };
+  return { ...actual, useParams: () => ({ id: 'meter-001' }), useNavigate: () => mockNavigate };
 });
 
 describe('MeterDetail page', () => {
@@ -69,5 +70,24 @@ describe('MeterDetail page', () => {
     expect(screen.getByRole('button', { name: /save changes/i })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
     expect(screen.queryByRole('button', { name: /save changes/i })).not.toBeInTheDocument();
+  });
+
+  it('shows Delete Meter button for admin and opens confirm dialog', async () => {
+    renderWithProviders(<MeterDetail />);
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Main Grid Meter' })).toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button', { name: 'Delete Meter' }));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByText(/Are you sure you want to delete/)).toBeInTheDocument();
+  });
+
+  it('calls DELETE API and navigates to /meters on confirm', async () => {
+    let deleted = false;
+    server.use(http.delete('*/meters/:id', () => { deleted = true; return new HttpResponse(null, { status: 204 }); }));
+    renderWithProviders(<MeterDetail />);
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Delete Meter' })).toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button', { name: 'Delete Meter' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
+    await waitFor(() => expect(deleted).toBe(true));
+    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/meters'));
   });
 });
