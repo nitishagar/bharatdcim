@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTariffs, useCreateTariff, useUpdateTariff, type Tariff } from '../api/hooks/useTariffs';
 import { DataTable, type ColumnDef } from '../components/DataTable';
-import { LoadingSpinner } from '../components/LoadingSpinner';
+import { TableSkeleton } from '../components/Skeleton';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { EmptyState } from '../components/EmptyState';
 import { formatPaisa } from '../lib/formatCurrency';
@@ -60,7 +60,7 @@ export function Tariffs() {
       )}
 
       {isLoading ? (
-        <LoadingSpinner />
+        <TableSkeleton />
       ) : error ? (
         <ErrorMessage error={error} onRetry={() => refetch()} />
       ) : !data?.length ? (

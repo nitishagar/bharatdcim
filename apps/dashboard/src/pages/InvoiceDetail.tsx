@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useInvoice, useCancelInvoice, useCreateCreditNote } from '../api/hooks/useInvoices';
 import { useAuditLog } from '../api/hooks/useAuditLog';
-import { LoadingSpinner } from '../components/LoadingSpinner';
+import { DetailSkeleton } from '../components/Skeleton';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { StatusBadge } from '../components/StatusBadge';
 import { Breadcrumb } from '../components/Breadcrumb';
@@ -30,7 +30,7 @@ export function InvoiceDetail() {
     resolver: zodResolver(creditNoteSchema),
   });
 
-  if (isLoading) return <LoadingSpinner />;
+  if (isLoading) return <DetailSkeleton />;
   if (error) return <ErrorMessage error={error} />;
   if (!invoice) return null;
 

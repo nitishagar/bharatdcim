@@ -18,7 +18,7 @@ describe('MeterDetail page', () => {
       }),
     );
     renderWithProviders(<MeterDetail />);
-    expect(document.querySelector('.animate-spin')).toBeInTheDocument();
+    expect(document.querySelector('[data-testid="loading-skeleton"]')).toBeInTheDocument();
   });
 
   it('renders meter details on data load', async () => {

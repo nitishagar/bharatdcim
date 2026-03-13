@@ -6,7 +6,7 @@ import { useInvoices, useCreateInvoice, type Invoice } from '../api/hooks/useInv
 import { useBills, type Bill } from '../api/hooks/useBills';
 import { DataTable, type ColumnDef } from '../components/DataTable';
 import { StatusBadge } from '../components/StatusBadge';
-import { LoadingSpinner } from '../components/LoadingSpinner';
+import { TableSkeleton } from '../components/Skeleton';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { EmptyState } from '../components/EmptyState';
 import { formatPaisa } from '../lib/formatCurrency';
@@ -107,7 +107,7 @@ export function Invoices() {
       )}
 
       {isLoading ? (
-        <LoadingSpinner />
+        <TableSkeleton />
       ) : error ? (
         <ErrorMessage error={error} onRetry={() => refetch()} />
       ) : !data?.length ? (

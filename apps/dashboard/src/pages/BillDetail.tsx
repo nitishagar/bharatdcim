@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { useBill } from '../api/hooks/useBills';
-import { LoadingSpinner } from '../components/LoadingSpinner';
+import { DetailSkeleton } from '../components/Skeleton';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { StatusBadge } from '../components/StatusBadge';
 import { Breadcrumb } from '../components/Breadcrumb';
@@ -11,7 +11,7 @@ export function BillDetail() {
   const { id } = useParams<{ id: string }>();
   const { data: bill, isLoading, error } = useBill(id!);
 
-  if (isLoading) return <LoadingSpinner />;
+  if (isLoading) return <DetailSkeleton />;
   if (error) return <ErrorMessage error={error} />;
   if (!bill) return null;
 

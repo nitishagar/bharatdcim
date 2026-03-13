@@ -18,7 +18,7 @@ describe('InvoiceDetail page', () => {
       }),
     );
     renderWithProviders(<InvoiceDetail />);
-    expect(document.querySelector('.animate-spin')).toBeInTheDocument();
+    expect(document.querySelector('[data-testid="loading-skeleton"]')).toBeInTheDocument();
   });
 
   it('renders invoice details on data load', async () => {

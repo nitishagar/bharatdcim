@@ -1,14 +1,14 @@
 import { Link } from 'react-router-dom';
 import { useSummary } from '../api/hooks/useSummary';
 import { KPICard } from '../components/KPICard';
-import { LoadingSpinner } from '../components/LoadingSpinner';
+import { DashboardSkeleton } from '../components/Skeleton';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { formatPaisa } from '../lib/formatCurrency';
 
 export function Dashboard() {
   const { data, isLoading, error, refetch } = useSummary();
 
-  if (isLoading) return <LoadingSpinner />;
+  if (isLoading) return <DashboardSkeleton />;
   if (error) return <ErrorMessage error={error} onRetry={() => refetch()} />;
   if (!data) return null;
 

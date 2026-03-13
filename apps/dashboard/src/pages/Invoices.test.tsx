@@ -13,7 +13,7 @@ describe('Invoices page', () => {
       }),
     );
     renderWithProviders(<Invoices />);
-    expect(document.querySelector('.animate-spin')).toBeInTheDocument();
+    expect(document.querySelector('[data-testid="loading-skeleton"]')).toBeInTheDocument();
   });
 
   it('renders invoice list and admin button on data load', async () => {

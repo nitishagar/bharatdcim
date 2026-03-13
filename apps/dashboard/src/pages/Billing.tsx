@@ -8,7 +8,7 @@ import { useTariffs, type Tariff } from '../api/hooks/useTariffs';
 import { useReadings, type Reading } from '../api/hooks/useReadings';
 import { DataTable, type ColumnDef } from '../components/DataTable';
 import { StatusBadge } from '../components/StatusBadge';
-import { LoadingSpinner } from '../components/LoadingSpinner';
+import { TableSkeleton } from '../components/Skeleton';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { EmptyState } from '../components/EmptyState';
 import { formatPaisa } from '../lib/formatCurrency';
@@ -96,7 +96,7 @@ export function Billing() {
       )}
 
       {isLoading ? (
-        <LoadingSpinner />
+        <TableSkeleton />
       ) : error ? (
         <ErrorMessage error={error} onRetry={() => refetch()} />
       ) : !data?.length ? (

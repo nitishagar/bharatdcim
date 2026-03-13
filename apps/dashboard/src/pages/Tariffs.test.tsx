@@ -13,7 +13,7 @@ describe('Tariffs page', () => {
       }),
     );
     renderWithProviders(<Tariffs />);
-    expect(document.querySelector('.animate-spin')).toBeInTheDocument();
+    expect(document.querySelector('[data-testid="loading-skeleton"]')).toBeInTheDocument();
   });
 
   it('renders tariff list and admin button on data load', async () => {

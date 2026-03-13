@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../api/client';
-import { LoadingSpinner } from '../components/LoadingSpinner';
+import { DashboardSkeleton } from '../components/Skeleton';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { formatPaisa } from '../lib/formatCurrency';
 
@@ -17,7 +17,7 @@ export function PlatformOverview() {
     queryFn: () => api('/platform/overview'),
   });
 
-  if (isLoading) return <LoadingSpinner />;
+  if (isLoading) return <DashboardSkeleton />;
   if (error) return <ErrorMessage error={error} onRetry={() => refetch()} />;
   if (!data) return null;
 

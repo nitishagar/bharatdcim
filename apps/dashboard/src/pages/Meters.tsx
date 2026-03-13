@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMeters, useCreateMeter } from '../api/hooks/useMeters';
 import { useTariffs } from '../api/hooks/useTariffs';
 import { DataTable, type ColumnDef } from '../components/DataTable';
-import { LoadingSpinner } from '../components/LoadingSpinner';
+import { TableSkeleton } from '../components/Skeleton';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { EmptyState } from '../components/EmptyState';
 import { useIsAdmin } from '../hooks/useIsAdmin';
@@ -48,7 +48,7 @@ export function Meters() {
       )}
 
       {isLoading ? (
-        <LoadingSpinner />
+        <TableSkeleton />
       ) : error ? (
         <ErrorMessage error={error} onRetry={() => refetch()} />
       ) : !data?.length ? (

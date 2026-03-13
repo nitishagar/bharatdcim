@@ -13,7 +13,7 @@ describe('Meters page', () => {
       }),
     );
     renderWithProviders(<Meters />);
-    expect(document.querySelector('.animate-spin')).toBeInTheDocument();
+    expect(document.querySelector('[data-testid="loading-skeleton"]')).toBeInTheDocument();
   });
 
   it('renders meter list on data load', async () => {

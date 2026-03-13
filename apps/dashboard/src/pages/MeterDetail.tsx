@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMeter, useUpdateMeter, type Meter } from '../api/hooks/useMeters';
 import { useReadings } from '../api/hooks/useReadings';
 import { useTariffs } from '../api/hooks/useTariffs';
-import { LoadingSpinner } from '../components/LoadingSpinner';
+import { DetailSkeleton, Skeleton } from '../components/Skeleton';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { Breadcrumb } from '../components/Breadcrumb';
 import { useIsAdmin } from '../hooks/useIsAdmin';
@@ -27,7 +27,7 @@ export function MeterDetail() {
   const to = dateRange?.to?.toISOString().split('T')[0];
   const { data: readings, isLoading: readingsLoading } = useReadings(id!, from, to);
 
-  if (meterLoading) return <LoadingSpinner />;
+  if (meterLoading) return <DetailSkeleton />;
   if (meterError) return <ErrorMessage error={meterError} />;
   if (!meter) return null;
 
@@ -121,7 +121,7 @@ export function MeterDetail() {
       </div>
 
       {readingsLoading ? (
-        <LoadingSpinner />
+        <Skeleton className="h-64 w-full" />
       ) : chartData.length === 0 ? (
         <p className="text-sm text-gray-400 dark:text-gray-500">No readings available{dateRange ? ' for the selected range' : ' for this meter'}.</p>
       ) : (

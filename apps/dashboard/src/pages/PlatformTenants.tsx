@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../api/client';
 import { DataTable, type ColumnDef } from '../components/DataTable';
-import { LoadingSpinner } from '../components/LoadingSpinner';
+import { TableSkeleton } from '../components/Skeleton';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { EmptyState } from '../components/EmptyState';
 import { formatDate } from '../lib/formatDate';
@@ -28,7 +28,7 @@ export function PlatformTenants() {
     queryFn: () => api('/platform/tenants'),
   });
 
-  if (isLoading) return <LoadingSpinner />;
+  if (isLoading) return <TableSkeleton />;
   if (error) return <ErrorMessage error={error} onRetry={() => refetch()} />;
   if (!data?.length) return <EmptyState message="No tenants found" />;
 
