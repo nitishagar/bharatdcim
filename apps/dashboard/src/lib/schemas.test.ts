@@ -5,6 +5,7 @@ import {
   creditNoteSchema,
   createMeterSchema,
   createTariffSchema,
+  createTenantSchema,
 } from './schemas';
 
 const validGSTIN = '29ABCDE1234F1Z5';
@@ -182,5 +183,45 @@ describe('createTariffSchema', () => {
 
   it('rejects invalid billingUnit', () => {
     expect(createTariffSchema.safeParse({ ...valid, billingUnit: 'MW' }).success).toBe(false);
+  });
+});
+
+// ─── createTenantSchema ───────────────────────────────────────────────────
+
+describe('createTenantSchema', () => {
+  const valid = { name: 'Delhi DC', stateCode: 'DL' };
+
+  it('accepts required fields only', () => {
+    expect(createTenantSchema.safeParse(valid).success).toBe(true);
+  });
+
+  it('accepts optional gstin and billingAddress', () => {
+    expect(
+      createTenantSchema.safeParse({
+        ...valid,
+        gstin: '07AABCU9603R1ZP',
+        billingAddress: '123 Connaught Place, New Delhi',
+      }).success,
+    ).toBe(true);
+  });
+
+  it('rejects missing name', () => {
+    expect(createTenantSchema.safeParse({ ...valid, name: '' }).success).toBe(false);
+  });
+
+  it('rejects missing stateCode', () => {
+    expect(createTenantSchema.safeParse({ ...valid, stateCode: '' }).success).toBe(false);
+  });
+
+  it('accepts undefined gstin (optional)', () => {
+    expect(createTenantSchema.safeParse({ ...valid, gstin: undefined }).success).toBe(true);
+  });
+
+  it('rejects malformed gstin when provided', () => {
+    expect(createTenantSchema.safeParse({ ...valid, gstin: 'INVALID' }).success).toBe(false);
+  });
+
+  it('accepts empty string gstin (treated as not provided)', () => {
+    expect(createTenantSchema.safeParse({ ...valid, gstin: '' }).success).toBe(true);
   });
 });

@@ -15,6 +15,7 @@ import {
   mockAgents,
   mockPlatformOverview,
   mockPlatformTenants,
+  mockCreatedTenant,
 } from './mocks/data';
 
 function paginatedResponse<T>(items: T[], request: Request) {
@@ -47,6 +48,8 @@ export const handlers = [
   http.delete('*/bills/:id',           () => new HttpResponse(null, { status: 204 })),
 
   // Mutation endpoints
+  http.post('*/platform/tenants',      () => HttpResponse.json(mockCreatedTenant, { status: 201 })),
+  http.patch('*/platform/tenants/:id', () => HttpResponse.json(mockPlatformTenants[0])),
   http.post('*/meters',                () => HttpResponse.json(mockMeter, { status: 201 })),
   http.patch('*/meters/:id',           () => HttpResponse.json(mockMeter)),
   http.post('*/tariffs',               () => HttpResponse.json(mockTariff, { status: 201 })),
