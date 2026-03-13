@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useBills, useCalculateBill, useSaveBill, type Bill } from '../api/hooks/useBills';
 import { useMeters, type Meter } from '../api/hooks/useMeters';
 import { useTariffs, type Tariff } from '../api/hooks/useTariffs';
+import { useReadings, type Reading } from '../api/hooks/useReadings';
 import { DataTable, type ColumnDef } from '../components/DataTable';
 import { StatusBadge } from '../components/StatusBadge';
 import { LoadingSpinner } from '../components/LoadingSpinner';
@@ -119,7 +120,7 @@ function CalculateBillFormComponent({ onClose, onSaved }: { onClose: () => void;
   const saveBill = useSaveBill();
   const [result, setResult] = useState<Record<string, unknown> | null>(null);
 
-  const { register, handleSubmit, watch, formState: { errors }, getValues } = useForm<CalculateBillForm>({
+  const { register, handleSubmit, watch, setValue, formState: { errors }, getValues } = useForm<CalculateBillForm>({
     resolver: zodResolver(calculateBillSchema),
     defaultValues: {
       meterId: '', periodStart: '', periodEnd: '',
@@ -129,8 +130,34 @@ function CalculateBillFormComponent({ onClose, onSaved }: { onClose: () => void;
   });
 
   const meterId = watch('meterId');
+  const periodStart = watch('periodStart');
+  const periodEnd = watch('periodEnd');
   const selectedMeter = meters?.find((m: Meter) => m.id === meterId);
   const selectedTariff = tariffs?.find((t: Tariff) => t.id === selectedMeter?.tariffId);
+
+  const { data: readings } = useReadings(
+    meterId,
+    periodStart || undefined,
+    periodEnd || undefined,
+  );
+
+  useEffect(() => {
+    if (!readings || !periodStart || !periodEnd) return;
+
+    const peakKwh = readings
+      .filter((r: Reading) => r.slotType === 'peak' && r.kWh !== null)
+      .reduce((sum: number, r: Reading) => sum + (r.kWh ?? 0), 0);
+    const normalKwh = readings
+      .filter((r: Reading) => r.slotType === 'normal' && r.kWh !== null)
+      .reduce((sum: number, r: Reading) => sum + (r.kWh ?? 0), 0);
+    const offPeakKwh = readings
+      .filter((r: Reading) => r.slotType === 'off-peak' && r.kWh !== null)
+      .reduce((sum: number, r: Reading) => sum + (r.kWh ?? 0), 0);
+
+    if (peakKwh > 0) setValue('peakKwh', peakKwh.toFixed(2));
+    if (normalKwh > 0) setValue('normalKwh', normalKwh.toFixed(2));
+    if (offPeakKwh > 0) setValue('offPeakKwh', offPeakKwh.toFixed(2));
+  }, [readings, periodStart, periodEnd, setValue]);
 
   async function onCalculate(formData: CalculateBillForm) {
     if (!selectedTariff) return;
@@ -262,6 +289,14 @@ function CalculateBillFormComponent({ onClose, onSaved }: { onClose: () => void;
           <div className="rounded-lg bg-gray-50 px-3 py-2 text-xs text-gray-600">
             Tariff: {selectedTariff.stateCode} — {selectedTariff.discom} — {selectedTariff.category}
             {' '}(Base rate: {formatPaisa(selectedTariff.baseEnergyRatePaisa)}/kWh)
+          </div>
+        )}
+
+        {meterId && periodStart && periodEnd && readings !== undefined && (
+          <div className={`rounded-lg px-3 py-2 text-xs ${readings.length > 0 ? 'bg-blue-50 text-blue-700' : 'bg-amber-50 text-amber-700'}`}>
+            {readings.length > 0
+              ? `Auto-filled from ${readings.length} readings`
+              : 'No readings found for this period — enter kWh manually'}
           </div>
         )}
 
