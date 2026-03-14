@@ -13,4 +13,4 @@
   --font-sans: "Inter", sans-serif;
 }
 
-@variant dark (&.dark);
+@custom-variant dark (&:where(.dark *));

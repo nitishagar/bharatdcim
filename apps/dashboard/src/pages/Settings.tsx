@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { UserProfile, useOrganization } from '@clerk/clerk-react';
-
-const API_BASE = import.meta.env.VITE_API_URL ?? 'https://api.bharatdcim.com';
+import { API_BASE } from '../api/client';
 
 export function Settings() {
   const { organization, memberships } = useOrganization({ memberships: true });
