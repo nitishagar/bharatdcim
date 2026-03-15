@@ -41,7 +41,18 @@ describe('RBAC Enforcement', () => {
       const res = await app.request('/bills', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: 'b1', meterId: 'm1', tariffId: 't1' }),
+        body: JSON.stringify({
+          id: 'b1', meterId: 'm1', tariffId: 't1',
+          billingPeriodStart: '2026-01-01', billingPeriodEnd: '2026-01-31',
+          peakKwh: 0, normalKwh: 0, offPeakKwh: 0, totalKwh: 0,
+          contractedDemandKva: 0, recordedDemandKva: 0, billedDemandKva: 0,
+          powerFactor: 9000,
+          peakChargesPaisa: 0, normalChargesPaisa: 0, offPeakChargesPaisa: 0,
+          totalEnergyChargesPaisa: 0, wheelingChargesPaisa: 0, demandChargesPaisa: 0,
+          fuelAdjustmentPaisa: 0, electricityDutyPaisa: 0, pfPenaltyPaisa: 0,
+          dgChargesPaisa: 0, subtotalPaisa: 0, gstPaisa: 0, totalBillPaisa: 0,
+          effectiveRatePaisaPerKwh: 0,
+        }),
       });
       expect(res.status).toBe(403);
     });
@@ -73,7 +84,7 @@ describe('RBAC Enforcement', () => {
       const res = await app.request('/invoices', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ billId: 'b1', supplierGSTIN: 'X', recipientGSTIN: 'Y' }),
+        body: JSON.stringify({ billId: 'b1', supplierGSTIN: '27AABCU9603R1ZX', recipientGSTIN: '36AABCU9603R1ZX' }),
       });
       expect(res.status).toBe(403);
     });

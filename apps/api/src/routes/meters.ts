@@ -1,9 +1,12 @@
 import { Hono } from 'hono';
+import { zValidator } from '@hono/zod-validator';
 import { eq, and, ne, like, sql } from 'drizzle-orm';
 import type { AppEnv } from '../types.js';
 import { meters, powerReadings } from '../db/schema.js';
 import { requireAdmin } from '../middleware/rbac.js';
 import { parsePagination } from '../utils/pagination.js';
+import { CreateMeterSchema, UpdateMeterSchema } from '../schemas/meters.js';
+import { validationHook } from '../utils/validationHook.js';
 
 const metersRouter = new Hono<AppEnv>();
 
@@ -44,31 +47,24 @@ metersRouter.get('/:id', async (c) => {
 });
 
 // POST /meters — create meter (tenant from JWT, admin only)
-metersRouter.post('/', async (c) => {
+metersRouter.post('/', zValidator('json', CreateMeterSchema, validationHook), async (c) => {
   requireAdmin(c);
   const db = c.get('db');
   const tenantId = c.get('tenantId');
   if (!tenantId) {
     return c.json({ error: { code: 'FORBIDDEN', message: 'Tenant context required' } }, 403);
   }
-  const body = await c.req.json();
+  const body = c.req.valid('json');
   const now = new Date().toISOString();
 
-  if (!body.id || !body.name || !body.stateCode) {
-    return c.json(
-      { error: { code: 'VALIDATION_ERROR', message: 'Missing required fields: id, name, stateCode' } },
-      400,
-    );
-  }
-
   const row = {
-    id: body.id as string,
+    id: body.id,
     tenantId: tenantId,
-    name: body.name as string,
-    siteId: (body.siteId as string) ?? null,
-    stateCode: body.stateCode as string,
-    tariffId: (body.tariffId as string) ?? null,
-    meterType: (body.meterType as string) ?? null,
+    name: body.name,
+    siteId: body.siteId ?? null,
+    stateCode: body.stateCode,
+    tariffId: body.tariffId ?? null,
+    meterType: body.meterType ?? null,
     metadata: body.metadata ? JSON.stringify(body.metadata) : null,
     createdAt: now,
     updatedAt: now,
@@ -79,7 +75,7 @@ metersRouter.post('/', async (c) => {
 });
 
 // PATCH /meters/:id — update meter fields (admin only, tenant-scoped)
-metersRouter.patch('/:id', async (c) => {
+metersRouter.patch('/:id', zValidator('json', UpdateMeterSchema, validationHook), async (c) => {
   requireAdmin(c);
   const db = c.get('db');
   const tenantId = c.get('tenantId');
@@ -92,7 +88,7 @@ metersRouter.patch('/:id', async (c) => {
     return c.json({ error: { code: 'NOT_FOUND', message: `Meter ${id} not found` } }, 404);
   }
 
-  const body = await c.req.json();
+  const body = c.req.valid('json');
   const now = new Date().toISOString();
 
   const updates: Record<string, unknown> = { updatedAt: now };

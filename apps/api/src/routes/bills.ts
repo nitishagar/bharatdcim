@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { zValidator } from '@hono/zod-validator';
 import { eq, and, sql } from 'drizzle-orm';
 import { calculateBill } from '@bharatdcim/billing-engine';
 import type { BillCalculationInput } from '@bharatdcim/billing-engine';
@@ -6,6 +7,8 @@ import type { AppEnv } from '../types.js';
 import { bills, invoices } from '../db/schema.js';
 import { requireAdmin } from '../middleware/rbac.js';
 import { parsePagination } from '../utils/pagination.js';
+import { CalculateBillSchema, CreateBillSchema } from '../schemas/bills.js';
+import { validationHook } from '../utils/validationHook.js';
 
 const billsRouter = new Hono<AppEnv>();
 
@@ -43,24 +46,17 @@ billsRouter.get('/:id', async (c) => {
 });
 
 // POST /bills/calculate — calculate bill from readings + tariff (stateless)
-billsRouter.post('/calculate', async (c) => {
-  const body = await c.req.json();
-
-  if (!body.readings || !body.tariff) {
-    return c.json(
-      { error: { code: 'VALIDATION_ERROR', message: 'Missing required fields: readings, tariff' } },
-      400,
-    );
-  }
+billsRouter.post('/calculate', zValidator('json', CalculateBillSchema, validationHook), async (c) => {
+  const body = c.req.valid('json');
 
   const input: BillCalculationInput = {
-    readings: body.readings,
-    tariff: body.tariff,
-    contractedDemandKVA: body.contractedDemandKVA ?? 0,
-    recordedDemandKVA: body.recordedDemandKVA ?? 0,
-    powerFactor: body.powerFactor ?? 1.0,
-    dgKWh: body.dgKWh ?? 0,
-    dgRatePaisa: body.dgRatePaisa ?? 0,
+    readings: body.readings as unknown as BillCalculationInput['readings'],
+    tariff: body.tariff as unknown as BillCalculationInput['tariff'],
+    contractedDemandKVA: body.contractedDemandKVA,
+    recordedDemandKVA: body.recordedDemandKVA,
+    powerFactor: body.powerFactor,
+    dgKWh: body.dgKWh,
+    dgRatePaisa: body.dgRatePaisa,
   };
 
   const result = calculateBill(input);
@@ -68,54 +64,47 @@ billsRouter.post('/calculate', async (c) => {
 });
 
 // POST /bills — store a calculated bill (tenant from JWT, admin only)
-billsRouter.post('/', async (c) => {
+billsRouter.post('/', zValidator('json', CreateBillSchema, validationHook), async (c) => {
   requireAdmin(c);
   const db = c.get('db');
   const tenantId = c.get('tenantId');
   if (!tenantId) {
     return c.json({ error: { code: 'FORBIDDEN', message: 'Tenant context required' } }, 403);
   }
-  const body = await c.req.json();
+  const body = c.req.valid('json');
   const now = new Date().toISOString();
 
-  if (!body.id || !body.meterId || !body.tariffId) {
-    return c.json(
-      { error: { code: 'VALIDATION_ERROR', message: 'Missing required fields: id, meterId, tariffId' } },
-      400,
-    );
-  }
-
   const row = {
-    id: body.id as string,
+    id: body.id,
     tenantId: tenantId,
-    meterId: body.meterId as string,
-    tariffId: body.tariffId as string,
-    billingPeriodStart: body.billingPeriodStart as string,
-    billingPeriodEnd: body.billingPeriodEnd as string,
-    peakKwh: body.peakKwh as number,
-    normalKwh: body.normalKwh as number,
-    offPeakKwh: body.offPeakKwh as number,
-    totalKwh: body.totalKwh as number,
-    billedKvah: (body.billedKvah as number) ?? null,
-    contractedDemandKva: body.contractedDemandKva as number,
-    recordedDemandKva: body.recordedDemandKva as number,
-    billedDemandKva: body.billedDemandKva as number,
-    powerFactor: body.powerFactor as number,
-    peakChargesPaisa: body.peakChargesPaisa as number,
-    normalChargesPaisa: body.normalChargesPaisa as number,
-    offPeakChargesPaisa: body.offPeakChargesPaisa as number,
-    totalEnergyChargesPaisa: body.totalEnergyChargesPaisa as number,
-    wheelingChargesPaisa: body.wheelingChargesPaisa as number,
-    demandChargesPaisa: body.demandChargesPaisa as number,
-    fuelAdjustmentPaisa: body.fuelAdjustmentPaisa as number,
-    electricityDutyPaisa: body.electricityDutyPaisa as number,
-    pfPenaltyPaisa: body.pfPenaltyPaisa as number,
-    dgChargesPaisa: body.dgChargesPaisa as number,
-    subtotalPaisa: body.subtotalPaisa as number,
-    gstPaisa: body.gstPaisa as number,
-    totalBillPaisa: body.totalBillPaisa as number,
-    effectiveRatePaisaPerKwh: body.effectiveRatePaisaPerKwh as number,
-    status: (body.status as string) ?? 'draft',
+    meterId: body.meterId,
+    tariffId: body.tariffId,
+    billingPeriodStart: body.billingPeriodStart,
+    billingPeriodEnd: body.billingPeriodEnd,
+    peakKwh: body.peakKwh,
+    normalKwh: body.normalKwh,
+    offPeakKwh: body.offPeakKwh,
+    totalKwh: body.totalKwh,
+    billedKvah: body.billedKvah ?? null,
+    contractedDemandKva: body.contractedDemandKva,
+    recordedDemandKva: body.recordedDemandKva,
+    billedDemandKva: body.billedDemandKva,
+    powerFactor: body.powerFactor,
+    peakChargesPaisa: body.peakChargesPaisa,
+    normalChargesPaisa: body.normalChargesPaisa,
+    offPeakChargesPaisa: body.offPeakChargesPaisa,
+    totalEnergyChargesPaisa: body.totalEnergyChargesPaisa,
+    wheelingChargesPaisa: body.wheelingChargesPaisa,
+    demandChargesPaisa: body.demandChargesPaisa,
+    fuelAdjustmentPaisa: body.fuelAdjustmentPaisa,
+    electricityDutyPaisa: body.electricityDutyPaisa,
+    pfPenaltyPaisa: body.pfPenaltyPaisa,
+    dgChargesPaisa: body.dgChargesPaisa,
+    subtotalPaisa: body.subtotalPaisa,
+    gstPaisa: body.gstPaisa,
+    totalBillPaisa: body.totalBillPaisa,
+    effectiveRatePaisaPerKwh: body.effectiveRatePaisaPerKwh,
+    status: body.status,
     createdAt: now,
     updatedAt: now,
   };

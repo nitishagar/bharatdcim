@@ -1,8 +1,11 @@
 import { Hono } from 'hono';
+import { zValidator } from '@hono/zod-validator';
 import { eq, and, gte, lte, inArray, sql } from 'drizzle-orm';
 import type { AppEnv } from '../types.js';
 import { powerReadings, meters } from '../db/schema.js';
 import { parsePagination } from '../utils/pagination.js';
+import { CreateReadingsSchema, BatchReadingsSchema } from '../schemas/readings.js';
+import { validationHook } from '../utils/validationHook.js';
 
 const readingsRouter = new Hono<AppEnv>();
 
@@ -51,21 +54,14 @@ readingsRouter.get('/', async (c) => {
 });
 
 // POST /readings — batch insert readings
-readingsRouter.post('/', async (c) => {
+readingsRouter.post('/', zValidator('json', CreateReadingsSchema, validationHook), async (c) => {
   const db = c.get('db');
   const tenantId = c.get('tenantId');
-  const body = await c.req.json();
-
-  if (!Array.isArray(body.readings) || body.readings.length === 0) {
-    return c.json(
-      { error: { code: 'VALIDATION_ERROR', message: 'Body must contain a non-empty readings array' } },
-      400,
-    );
-  }
+  const body = c.req.valid('json');
 
   // Verify all referenced meters belong to the caller's tenant
   if (tenantId) {
-    const meterIds = [...new Set((body.readings as Array<Record<string, unknown>>).map((r) => r.meterId as string))];
+    const meterIds = [...new Set(body.readings.map((r) => r.meterId))];
     for (const meterId of meterIds) {
       const meterRows = await db.select({ tenantId: meters.tenantId })
         .from(meters).where(eq(meters.id, meterId)).all();
@@ -79,20 +75,20 @@ readingsRouter.post('/', async (c) => {
   }
 
   const now = new Date().toISOString();
-  const rows = (body.readings as Array<Record<string, unknown>>).map((r) => ({
-    id: r.id as string,
-    meterId: r.meterId as string,
-    timestamp: r.timestamp as string,
-    kWh: (r.kWh as number) ?? null,
-    kW: (r.kW as number) ?? null,
-    voltage: (r.voltage as number) ?? null,
-    current: (r.current as number) ?? null,
-    powerFactor: (r.powerFactor as number) ?? null,
-    source: (r.source as string) ?? null,
-    slotType: (r.slotType as string) ?? null,
-    slotName: (r.slotName as string) ?? null,
-    ratePaisa: (r.ratePaisa as number) ?? null,
-    uploadId: (r.uploadId as string) ?? null,
+  const rows = body.readings.map((r) => ({
+    id: r.id,
+    meterId: r.meterId,
+    timestamp: r.timestamp,
+    kWh: r.kWh ?? null,
+    kW: r.kW ?? null,
+    voltage: r.voltage ?? null,
+    current: r.current ?? null,
+    powerFactor: r.powerFactor ?? null,
+    source: r.source ?? null,
+    slotType: r.slotType ?? null,
+    slotName: r.slotName ?? null,
+    ratePaisa: r.ratePaisa ?? null,
+    uploadId: r.uploadId ?? null,
     createdAt: now,
   }));
 
@@ -107,21 +103,12 @@ readingsRouter.post('/', async (c) => {
 });
 
 // POST /readings/batch — SNMP agent batch upload format
-readingsRouter.post('/batch', async (c) => {
+readingsRouter.post('/batch', zValidator('json', BatchReadingsSchema, validationHook), async (c) => {
   const db = c.get('db');
   const tenantId = c.get('tenantId');
-  const body = await c.req.json();
+  const body = c.req.valid('json');
 
-  if (!Array.isArray(body.readings) || body.readings.length === 0) {
-    return c.json(
-      { error: { code: 'VALIDATION_ERROR', message: 'Body must contain a non-empty readings array' } },
-      400,
-    );
-  }
-
-  const meterIds = [...new Set((body.readings as Array<Record<string, unknown>>).map(
-    (r) => (r.meter_id || r.meterId) as string
-  ))];
+  const meterIds = [...new Set(body.readings.map((r) => (r.meter_id || r.meterId) as string))];
 
   // Defense-in-depth: verify all meter IDs exist (applies to all callers including api_token)
   const existingMeters = await db.select({ id: meters.id, tenantId: meters.tenantId })
@@ -148,13 +135,13 @@ readingsRouter.post('/batch', async (c) => {
   }
 
   const now = new Date().toISOString();
-  const rows = (body.readings as Array<Record<string, unknown>>).map((r) => ({
+  const rows = body.readings.map((r) => ({
     id: crypto.randomUUID(),
     meterId: (r.meter_id || r.meterId) as string,
-    timestamp: r.timestamp as string,
-    kWh: r.kWh != null ? Math.round((r.kWh as number) * 1000) : null, // Convert kWh to paisa-equiv
-    kW: r.kW != null ? Math.round((r.kW as number) * 1000) : null,    // Convert kW to milliwatts
-    powerFactor: r.powerFactor != null ? Math.round((r.powerFactor as number) * 10000) : null, // to BPS
+    timestamp: r.timestamp,
+    kWh: r.kWh != null ? Math.round(r.kWh * 1000) : null, // Convert kWh to paisa-equiv
+    kW: r.kW != null ? Math.round(r.kW * 1000) : null,    // Convert kW to milliwatts
+    powerFactor: r.powerFactor != null ? Math.round(r.powerFactor * 10000) : null, // to BPS
     source: 'snmp' as const,
     createdAt: now,
   }));
@@ -165,7 +152,7 @@ readingsRouter.post('/batch', async (c) => {
     await db.insert(powerReadings).values(batch);
   }
 
-  return c.json({ accepted: rows.length, agentId: body.agentId || body.agent_id }, 201);
+  return c.json({ accepted: rows.length, agentId: body.agentId || body.agent_id || null }, 201);
 });
 
 export { readingsRouter };

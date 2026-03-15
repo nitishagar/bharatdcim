@@ -17,7 +17,7 @@ export const CreateTariffSchema = z.object({
     name: z.string(),
     startHour: z.number().int().min(0).max(23),
     endHour: z.number().int().min(0).max(23),
-    ratePaisa: z.number().int().min(0),
+    ratePaisa: z.number().int().min(0).optional(),
   }).passthrough()).optional().default([]),
   timeSlotsJson: z.string().optional(),
   fuelAdjustmentPaisa: z.number().int().min(0).optional().default(0),

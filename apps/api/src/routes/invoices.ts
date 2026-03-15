@@ -1,10 +1,13 @@
 import { Hono } from 'hono';
+import { zValidator } from '@hono/zod-validator';
 import { eq, and, like, sql } from 'drizzle-orm';
 import type { AppEnv } from '../types.js';
 import { invoices, invoiceAuditLog } from '../db/schema.js';
 import { createInvoice, cancelInvoice, createCreditNote } from '../services/invoicing.js';
 import { requireAdmin } from '../middleware/rbac.js';
 import { parsePagination } from '../utils/pagination.js';
+import { CreateInvoiceSchema, CancelInvoiceSchema, CreateCreditNoteSchema } from '../schemas/invoices.js';
+import { validationHook } from '../utils/validationHook.js';
 
 const invoicesRouter = new Hono<AppEnv>();
 
@@ -31,21 +34,14 @@ invoicesRouter.get('/', async (c) => {
 });
 
 // POST /invoices — create invoice from bill (admin only)
-invoicesRouter.post('/', async (c) => {
+invoicesRouter.post('/', zValidator('json', CreateInvoiceSchema, validationHook), async (c) => {
   requireAdmin(c);
   const db = c.get('db');
   const tenantId = c.get('tenantId');
   if (!tenantId) {
     return c.json({ error: { code: 'FORBIDDEN', message: 'Tenant context required' } }, 403);
   }
-  const body = await c.req.json();
-
-  if (!body.billId || !body.supplierGSTIN || !body.recipientGSTIN) {
-    return c.json(
-      { error: { code: 'VALIDATION_ERROR', message: 'Missing required fields: billId, supplierGSTIN, recipientGSTIN' } },
-      400,
-    );
-  }
+  const body = c.req.valid('json');
 
   try {
     const result = await createInvoice(body.billId, body.supplierGSTIN, body.recipientGSTIN, db, tenantId);
@@ -74,7 +70,7 @@ invoicesRouter.get('/:id', async (c) => {
 });
 
 // POST /invoices/:id/cancel — cancel invoice (admin only)
-invoicesRouter.post('/:id/cancel', async (c) => {
+invoicesRouter.post('/:id/cancel', zValidator('json', CancelInvoiceSchema, validationHook), async (c) => {
   requireAdmin(c);
   const db = c.get('db');
   const tenantId = c.get('tenantId');
@@ -82,14 +78,7 @@ invoicesRouter.post('/:id/cancel', async (c) => {
     return c.json({ error: { code: 'FORBIDDEN', message: 'Tenant context required' } }, 403);
   }
   const id = c.req.param('id');
-  const body = await c.req.json();
-
-  if (!body.reason) {
-    return c.json(
-      { error: { code: 'VALIDATION_ERROR', message: 'Missing required field: reason' } },
-      400,
-    );
-  }
+  const body = c.req.valid('json');
 
   try {
     const result = await cancelInvoice(id, body.reason, db, tenantId);
@@ -104,21 +93,14 @@ invoicesRouter.post('/:id/cancel', async (c) => {
 });
 
 // POST /credit-notes — create credit note (admin only)
-invoicesRouter.post('/credit-notes', async (c) => {
+invoicesRouter.post('/credit-notes', zValidator('json', CreateCreditNoteSchema, validationHook), async (c) => {
   requireAdmin(c);
   const db = c.get('db');
   const tenantId = c.get('tenantId');
   if (!tenantId) {
     return c.json({ error: { code: 'FORBIDDEN', message: 'Tenant context required' } }, 403);
   }
-  const body = await c.req.json();
-
-  if (!body.invoiceId || !body.amountPaisa || !body.reason) {
-    return c.json(
-      { error: { code: 'VALIDATION_ERROR', message: 'Missing required fields: invoiceId, amountPaisa, reason' } },
-      400,
-    );
-  }
+  const body = c.req.valid('json');
 
   try {
     const result = await createCreditNote(body.invoiceId, body.amountPaisa, body.reason, db, tenantId);

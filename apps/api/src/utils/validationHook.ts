@@ -1,17 +1,12 @@
-import type { Context } from 'hono';
-import type { ZodError } from 'zod';
-
-type ValidationResult =
-  | { success: true; data: unknown }
-  | { success: false; error: ZodError; data: unknown };
+import type { Hook } from '@hono/zod-validator';
 
 /**
  * Shared hook for @hono/zod-validator that returns structured 400 errors
  * matching the existing { error: { code, message } } format with added field-level issues.
  */
-export function validationHook(result: ValidationResult, c: Context) {
+export const validationHook: Hook<any, any, any> = (result, c) => {
   if (!result.success) {
-    const issues = result.error.issues.map((i) => ({
+    const issues = (result.error.issues as Array<{ path: (string | number)[]; message: string; code: string }>).map((i) => ({
       field: i.path.join('.') || '_root',
       message: i.message,
       code: i.code,
@@ -27,4 +22,4 @@ export function validationHook(result: ValidationResult, c: Context) {
       400,
     );
   }
-}
+};

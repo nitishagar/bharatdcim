@@ -1,8 +1,11 @@
 import { Hono } from 'hono';
+import { zValidator } from '@hono/zod-validator';
 import { HTTPException } from 'hono/http-exception';
 import { eq, sql } from 'drizzle-orm';
 import type { AppEnv } from '../types.js';
 import { tenants, meters, bills, invoices } from '../db/schema.js';
+import { CreateTenantSchema, UpdateTenantSchema } from '../schemas/platform.js';
+import { validationHook } from '../utils/validationHook.js';
 
 const platformRouter = new Hono<AppEnv>();
 
@@ -22,25 +25,18 @@ platformRouter.get('/tenants', async (c) => {
 });
 
 // POST /platform/tenants — create a new tenant (platform admin only)
-platformRouter.post('/tenants', async (c) => {
+platformRouter.post('/tenants', zValidator('json', CreateTenantSchema, validationHook), async (c) => {
   requirePlatformAdmin(c);
   const db = c.get('db');
-  const body = await c.req.json();
-
-  if (!body.name || !body.stateCode) {
-    return c.json(
-      { error: { code: 'VALIDATION_ERROR', message: 'Missing required fields: name, stateCode' } },
-      400,
-    );
-  }
+  const body = c.req.valid('json');
 
   const now = new Date().toISOString();
   const row = {
     id: crypto.randomUUID(),
-    name: body.name as string,
-    stateCode: body.stateCode as string,
-    gstin: (body.gstin as string) ?? null,
-    billingAddress: (body.billingAddress as string) ?? null,
+    name: body.name,
+    stateCode: body.stateCode,
+    gstin: body.gstin ?? null,
+    billingAddress: body.billingAddress ?? null,
     createdAt: now,
     updatedAt: now,
   };
@@ -50,7 +46,7 @@ platformRouter.post('/tenants', async (c) => {
 });
 
 // PATCH /platform/tenants/:id — update tenant fields (platform admin only)
-platformRouter.patch('/tenants/:id', async (c) => {
+platformRouter.patch('/tenants/:id', zValidator('json', UpdateTenantSchema, validationHook), async (c) => {
   requirePlatformAdmin(c);
   const db = c.get('db');
   const id = c.req.param('id');
@@ -60,14 +56,14 @@ platformRouter.patch('/tenants/:id', async (c) => {
     return c.json({ error: { code: 'NOT_FOUND', message: `Tenant ${id} not found` } }, 404);
   }
 
-  const body = await c.req.json();
+  const body = c.req.valid('json');
   const now = new Date().toISOString();
   const updates: Partial<typeof tenants.$inferInsert> = { updatedAt: now };
 
-  if (body.name !== undefined) updates.name = body.name as string;
-  if (body.stateCode !== undefined) updates.stateCode = body.stateCode as string;
-  if (body.gstin !== undefined) updates.gstin = body.gstin as string;
-  if (body.billingAddress !== undefined) updates.billingAddress = body.billingAddress as string;
+  if (body.name !== undefined) updates.name = body.name;
+  if (body.stateCode !== undefined) updates.stateCode = body.stateCode;
+  if (body.gstin !== undefined) updates.gstin = body.gstin ?? undefined;
+  if (body.billingAddress !== undefined) updates.billingAddress = body.billingAddress ?? undefined;
 
   await db.update(tenants).set(updates).where(eq(tenants.id, id));
 

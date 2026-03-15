@@ -1,9 +1,12 @@
 import { Hono } from 'hono';
+import { zValidator } from '@hono/zod-validator';
 import { eq, or, isNull, and, like, sql } from 'drizzle-orm';
 import type { AppEnv } from '../types.js';
 import { tariffConfigs, meters, bills } from '../db/schema.js';
 import { requireAdmin } from '../middleware/rbac.js';
 import { parsePagination } from '../utils/pagination.js';
+import { CreateTariffSchema, UpdateTariffSchema } from '../schemas/tariffs.js';
+import { validationHook } from '../utils/validationHook.js';
 
 const tariffs = new Hono<AppEnv>();
 
@@ -67,41 +70,34 @@ tariffs.get('/:id', async (c) => {
 });
 
 // POST /tariffs — create tariff config (admin only)
-tariffs.post('/', async (c) => {
+tariffs.post('/', zValidator('json', CreateTariffSchema, validationHook), async (c) => {
   requireAdmin(c);
   const db = c.get('db');
   const tenantId = c.get('tenantId');
-  const body = await c.req.json();
+  const body = c.req.valid('json');
   const now = new Date().toISOString();
 
-  if (!body.id || !body.stateCode || !body.baseEnergyRatePaisa) {
-    return c.json(
-      { error: { code: 'VALIDATION_ERROR', message: 'Missing required fields: id, stateCode, baseEnergyRatePaisa' } },
-      400,
-    );
-  }
-
   const row = {
-    id: body.id as string,
+    id: body.id,
     tenantId: tenantId ?? null, // tenant-specific if created by tenant, global if API_TOKEN
-    stateCode: body.stateCode as string,
-    discom: body.discom as string ?? '',
-    category: body.category as string ?? '',
-    effectiveFrom: body.effectiveFrom as string ?? now,
-    effectiveTo: (body.effectiveTo as string) ?? null,
-    billingUnit: body.billingUnit as string ?? 'kWh',
-    baseEnergyRatePaisa: body.baseEnergyRatePaisa as number,
-    wheelingChargePaisa: (body.wheelingChargePaisa as number) ?? 0,
-    demandChargePerKvaPaisa: (body.demandChargePerKvaPaisa as number) ?? 0,
-    demandRatchetPercent: (body.demandRatchetPercent as number) ?? 100,
-    minimumDemandKva: (body.minimumDemandKva as number) ?? 0,
-    timeSlotsJson: typeof body.timeSlotsJson === 'string' ? body.timeSlotsJson : JSON.stringify(body.timeSlots ?? []),
-    fuelAdjustmentPaisa: (body.fuelAdjustmentPaisa as number) ?? 0,
-    fuelAdjustmentType: body.fuelAdjustmentType as string ?? 'absolute',
-    electricityDutyBps: (body.electricityDutyBps as number) ?? 0,
-    pfThresholdBps: (body.pfThresholdBps as number) ?? 9000,
-    pfPenaltyRatePaisa: (body.pfPenaltyRatePaisa as number) ?? 0,
-    version: (body.version as number) ?? 1,
+    stateCode: body.stateCode,
+    discom: body.discom,
+    category: body.category,
+    effectiveFrom: body.effectiveFrom ?? now,
+    effectiveTo: body.effectiveTo ?? null,
+    billingUnit: body.billingUnit,
+    baseEnergyRatePaisa: body.baseEnergyRatePaisa,
+    wheelingChargePaisa: body.wheelingChargePaisa,
+    demandChargePerKvaPaisa: body.demandChargePerKvaPaisa,
+    demandRatchetPercent: body.demandRatchetPercent,
+    minimumDemandKva: body.minimumDemandKva,
+    timeSlotsJson: typeof body.timeSlotsJson === 'string' ? body.timeSlotsJson : JSON.stringify(body.timeSlots),
+    fuelAdjustmentPaisa: body.fuelAdjustmentPaisa,
+    fuelAdjustmentType: body.fuelAdjustmentType,
+    electricityDutyBps: body.electricityDutyBps,
+    pfThresholdBps: body.pfThresholdBps,
+    pfPenaltyRatePaisa: body.pfPenaltyRatePaisa,
+    version: body.version,
     createdAt: now,
     updatedAt: now,
   };
@@ -111,7 +107,7 @@ tariffs.post('/', async (c) => {
 });
 
 // PATCH /tariffs/:id — update tariff fields (admin only)
-tariffs.patch('/:id', async (c) => {
+tariffs.patch('/:id', zValidator('json', UpdateTariffSchema, validationHook), async (c) => {
   requireAdmin(c);
   const db = c.get('db');
   const tenantId = c.get('tenantId');
@@ -126,7 +122,7 @@ tariffs.patch('/:id', async (c) => {
     return c.json({ error: { code: 'NOT_FOUND', message: `Tariff ${id} not found` } }, 404);
   }
 
-  const body = await c.req.json();
+  const body = c.req.valid('json');
   const now = new Date().toISOString();
 
   const updates: Record<string, unknown> = { updatedAt: now };

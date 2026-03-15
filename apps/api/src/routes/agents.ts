@@ -1,25 +1,21 @@
 import { Hono } from 'hono';
+import { zValidator } from '@hono/zod-validator';
 import { eq, like, sql } from 'drizzle-orm';
 import type { AppEnv } from '../types.js';
 import { agentHeartbeats } from '../db/schema.js';
 import { parsePagination } from '../utils/pagination.js';
+import { HeartbeatSchema } from '../schemas/agents.js';
+import { validationHook } from '../utils/validationHook.js';
 
 const agentsRouter = new Hono<AppEnv>();
 
 // POST /agents/heartbeat — record agent heartbeat
-agentsRouter.post('/heartbeat', async (c) => {
+agentsRouter.post('/heartbeat', zValidator('json', HeartbeatSchema, validationHook), async (c) => {
   const db = c.get('db');
-  const body = await c.req.json();
+  const body = c.req.valid('json');
   const now = new Date().toISOString();
 
-  const agentId = body.agent_id || body.agentId;
-  if (!agentId) {
-    return c.json(
-      { error: { code: 'VALIDATION_ERROR', message: 'agent_id is required' } },
-      400,
-    );
-  }
-
+  const agentId = (body.agent_id || body.agentId) as string;
   const tenantId = body.tenant_id || body.tenantId || null;
 
   // Upsert: check if agent exists
