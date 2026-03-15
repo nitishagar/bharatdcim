@@ -6,6 +6,11 @@ import { BrowserRouter } from 'react-router-dom';
 import { App } from './App';
 import './index.css';
 
+// Handle stale chunk errors after deployment (old chunks deleted)
+window.addEventListener('vite:preloadError', () => {
+  window.location.reload();
+});
+
 const clerkKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as string;
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 30_000, retry: 1 } },
