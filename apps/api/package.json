@@ -15,10 +15,12 @@
   "dependencies": {
     "@bharatdcim/billing-engine": "workspace:*",
     "@hono/swagger-ui": "^0.5.3",
+    "@hono/zod-validator": "^0.7.6",
     "@libsql/client": "^0.14",
     "drizzle-orm": "^0.38",
     "hono": "^4.7",
-    "jose": "^6"
+    "jose": "^6",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.0",
