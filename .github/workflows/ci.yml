@@ -95,7 +95,7 @@ jobs:
       - run: pnpm --filter @bharatdcim/dashboard run build
         env:
           VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
-          VITE_API_URL: https://bharatdcim-api.nitishagar.workers.dev
+          VITE_API_URL: https://api.bharatdcim.com
       - name: Create Pages project if needed
         run: npx wrangler pages project create bharatdcim-dashboard --production-branch main 2>/dev/null || true
         env:

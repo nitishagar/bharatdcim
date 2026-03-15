@@ -59,7 +59,7 @@ export function Settings() {
             {apiStatus === 'ok' && (
               <>
                 <span className="inline-block w-2 h-2 rounded-full bg-green-500" />
-                <span className="text-green-700 dark:text-green-400">Connected — {API_BASE}</span>
+                <span className="text-green-700 dark:text-green-400">Connected</span>
               </>
             )}
             {apiStatus === 'error' && (
