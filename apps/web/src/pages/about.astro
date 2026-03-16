@@ -3,9 +3,25 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout
-  title="About Us"
+  title="About BharatDCIM - Indian DCIM Platform"
   description="BharatDCIM is building India's first DCIM with native ToD tariff billing. Learn about our mission to modernize Indian data center operations."
 >
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "AboutPage",
+      "name": "About BharatDCIM",
+      "description": "India's first DCIM with native ToD tariff billing. Learn about our mission to modernize Indian data center operations.",
+      "url": "https://bharatdcim.com/about",
+      "mainEntity": {
+        "@type": "Organization",
+        "name": "BharatDCIM",
+        "url": "https://bharatdcim.com",
+        "foundingDate": "2025",
+        "description": "India's first DCIM with native Time-of-Day tariff billing for data center operators."
+      }
+    })} />
+  </Fragment>
   <!-- Hero -->
   <section class="relative overflow-hidden bg-mesh-strong py-20">
     <div class="glow-orb glow-orb-primary w-80 h-80 -top-40 -right-40"></div>

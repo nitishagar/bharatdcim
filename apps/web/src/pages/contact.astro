@@ -3,9 +3,24 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout
-  title="Contact Us"
+  title="Get a Demo - Contact BharatDCIM"
   description="Get in touch with BharatDCIM. Schedule a demo, request early access, or ask questions about our DCIM solution for Indian data centers."
 >
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "ContactPage",
+      "name": "Contact BharatDCIM",
+      "description": "Schedule a demo, request early access, or ask questions about BharatDCIM.",
+      "url": "https://bharatdcim.com/contact",
+      "mainEntity": {
+        "@type": "Organization",
+        "name": "BharatDCIM",
+        "url": "https://bharatdcim.com",
+        "email": "hello@bharatdcim.com"
+      }
+    })} />
+  </Fragment>
   <!-- Hero -->
   <section class="relative overflow-hidden bg-mesh-strong py-20">
     <div class="glow-orb glow-orb-accent w-80 h-80 -top-40 -left-40"></div>
@@ -36,9 +51,10 @@ import Layout from '../layouts/Layout.astro';
           <p class="text-sm text-gray-600 mb-6">Share your current setup and we will tailor the demo around your tariff and metering profile.</p>
           <form class="space-y-6" action="https://formspree.io/f/maqdnopv" method="POST">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
+              <label for="contact-name" class="block text-sm font-medium text-gray-700 mb-2">Name</label>
               <input
                 type="text"
+                id="contact-name"
                 name="name"
                 required
                 class="calculator-input"
@@ -47,9 +63,10 @@ import Layout from '../layouts/Layout.astro';
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+              <label for="contact-email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
               <input
                 type="email"
+                id="contact-email"
                 name="email"
                 required
                 class="calculator-input"
@@ -58,9 +75,10 @@ import Layout from '../layouts/Layout.astro';
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Company</label>
+              <label for="contact-company" class="block text-sm font-medium text-gray-700 mb-2">Company</label>
               <input
                 type="text"
+                id="contact-company"
                 name="company"
                 class="calculator-input"
                 placeholder="Your company name"
@@ -68,8 +86,8 @@ import Layout from '../layouts/Layout.astro';
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Number of Racks</label>
-              <select name="racks" class="calculator-select">
+              <label for="contact-racks" class="block text-sm font-medium text-gray-700 mb-2">Number of Racks</label>
+              <select id="contact-racks" name="racks" class="calculator-select">
                 <option value="">Select range</option>
                 <option value="10-50">10-50 racks</option>
                 <option value="50-100">50-100 racks</option>
@@ -80,8 +98,8 @@ import Layout from '../layouts/Layout.astro';
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Interest</label>
-              <select name="interest" class="calculator-select">
+              <label for="contact-interest" class="block text-sm font-medium text-gray-700 mb-2">Interest</label>
+              <select id="contact-interest" name="interest" class="calculator-select">
                 <option value="">What are you interested in?</option>
                 <option value="demo">Request a Demo</option>
                 <option value="early-access">Join Early Access</option>
@@ -91,8 +109,9 @@ import Layout from '../layouts/Layout.astro';
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
+              <label for="contact-message" class="block text-sm font-medium text-gray-700 mb-2">Message</label>
               <textarea
+                id="contact-message"
                 name="message"
                 rows="4"
                 class="calculator-input"

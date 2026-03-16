@@ -7,6 +7,27 @@ import TodCalculator from '../components/TodCalculator';
   title="Indian ToD Power Tariff Calculator"
   description="Free calculator to estimate data center electricity costs with Time-of-Day tariffs. Compare power costs across Maharashtra, Tamil Nadu, Karnataka, and Telangana."
 >
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Indian ToD Power Tariff Calculator",
+      "description": "Free calculator to estimate data center electricity costs with Time-of-Day tariffs across Indian states.",
+      "url": "https://bharatdcim.com/calculator",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "INR"
+      },
+      "provider": {
+        "@type": "Organization",
+        "name": "BharatDCIM",
+        "url": "https://bharatdcim.com"
+      }
+    })} />
+  </Fragment>
   <!-- Hero -->
   <section class="py-20 bg-gradient-to-b from-gray-50 to-white">
     <div class="container">
