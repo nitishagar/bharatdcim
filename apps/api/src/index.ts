@@ -14,6 +14,8 @@ import { uploadsRouter } from './routes/uploads.js';
 import { agentsRouter } from './routes/agents.js';
 import { dashboardRouter } from './routes/dashboard.js';
 import { platformRouter } from './routes/platform.js';
+import { envReadingsRouter } from './routes/env-readings.js';
+import { alertsRouter } from './routes/alerts.js';
 import { openApiSpec } from './openapi.js';
 import {
   checkLimit,
@@ -178,6 +180,8 @@ app.route('/uploads', uploadsRouter);
 app.route('/agents', agentsRouter);
 app.route('/dashboard', dashboardRouter);
 app.route('/platform', platformRouter);
+app.route('/env-readings', envReadingsRouter);
+app.route('/alerts', alertsRouter);
 
 // 404 handler
 app.notFound((c) => {
