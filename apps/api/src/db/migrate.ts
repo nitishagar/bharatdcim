@@ -201,13 +201,86 @@ const migration = `
     processing_time_ms INTEGER NOT NULL,
     created_at TEXT NOT NULL
   );
+
+  CREATE TABLE IF NOT EXISTS sites (
+    id TEXT PRIMARY KEY,
+    tenant_id TEXT NOT NULL REFERENCES tenants(id),
+    name TEXT NOT NULL,
+    address TEXT,
+    city TEXT,
+    state_code TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'active',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS racks (
+    id TEXT PRIMARY KEY,
+    tenant_id TEXT NOT NULL REFERENCES tenants(id),
+    site_id TEXT REFERENCES sites(id),
+    name TEXT NOT NULL,
+    location TEXT,
+    capacity_u INTEGER NOT NULL DEFAULT 42,
+    status TEXT NOT NULL DEFAULT 'active',
+    metadata TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS assets (
+    id TEXT PRIMARY KEY,
+    tenant_id TEXT NOT NULL REFERENCES tenants(id),
+    rack_id TEXT REFERENCES racks(id),
+    name TEXT NOT NULL,
+    asset_type TEXT NOT NULL,
+    manufacturer TEXT,
+    model TEXT,
+    serial_number TEXT,
+    rack_unit_start INTEGER,
+    rack_unit_size INTEGER NOT NULL DEFAULT 1,
+    status TEXT NOT NULL DEFAULT 'active',
+    metadata TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS bill_disputes (
+    id TEXT PRIMARY KEY,
+    bill_id TEXT NOT NULL REFERENCES bills(id),
+    tenant_id TEXT NOT NULL REFERENCES tenants(id),
+    disputed_by TEXT NOT NULL,
+    reason TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'open',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
 `;
+
+// Additive column migrations — safe to re-run (SQLite ignores duplicate columns after first run)
+const addColumnMigrations = [
+  `ALTER TABLE meters ADD COLUMN rack_id TEXT REFERENCES racks(id)`,
+];
 
 async function main() {
   console.log('Running migration against Turso...');
   console.log(`Database: ${url}`);
 
   await client.executeMultiple(migration);
+
+  // Apply additive column migrations (ignore errors for already-existing columns)
+  for (const stmt of addColumnMigrations) {
+    try {
+      await client.execute(stmt);
+      console.log(`  Applied: ${stmt.slice(0, 60)}...`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (msg.includes('duplicate column') || msg.includes('already exists')) {
+        // Column already exists — skip silently
+      } else {
+        throw err;
+      }
+    }
+  }
 
   // Verify tables were created
   const result = await client.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name");

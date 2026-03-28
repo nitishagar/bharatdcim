@@ -51,11 +51,54 @@ export async function createTestDb() {
       updated_at TEXT NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS sites (
+      id TEXT PRIMARY KEY,
+      tenant_id TEXT NOT NULL REFERENCES tenants(id),
+      name TEXT NOT NULL,
+      address TEXT,
+      city TEXT,
+      state_code TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'active',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS racks (
+      id TEXT PRIMARY KEY,
+      tenant_id TEXT NOT NULL REFERENCES tenants(id),
+      site_id TEXT REFERENCES sites(id),
+      name TEXT NOT NULL,
+      location TEXT,
+      capacity_u INTEGER NOT NULL DEFAULT 42,
+      status TEXT NOT NULL DEFAULT 'active',
+      metadata TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS assets (
+      id TEXT PRIMARY KEY,
+      tenant_id TEXT NOT NULL REFERENCES tenants(id),
+      rack_id TEXT REFERENCES racks(id),
+      name TEXT NOT NULL,
+      asset_type TEXT NOT NULL,
+      manufacturer TEXT,
+      model TEXT,
+      serial_number TEXT,
+      rack_unit_start INTEGER,
+      rack_unit_size INTEGER NOT NULL DEFAULT 1,
+      status TEXT NOT NULL DEFAULT 'active',
+      metadata TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
     CREATE TABLE IF NOT EXISTS meters (
       id TEXT PRIMARY KEY,
       tenant_id TEXT NOT NULL REFERENCES tenants(id),
       name TEXT NOT NULL,
       site_id TEXT,
+      rack_id TEXT REFERENCES racks(id),
       state_code TEXT NOT NULL,
       tariff_id TEXT REFERENCES tariff_configs(id),
       meter_type TEXT,
@@ -199,6 +242,17 @@ export async function createTestDb() {
       meters_affected TEXT,
       processing_time_ms INTEGER NOT NULL,
       created_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS bill_disputes (
+      id TEXT PRIMARY KEY,
+      bill_id TEXT NOT NULL REFERENCES bills(id),
+      tenant_id TEXT NOT NULL REFERENCES tenants(id),
+      disputed_by TEXT NOT NULL,
+      reason TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'open',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
     );
   `);
 

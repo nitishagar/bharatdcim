@@ -39,6 +39,54 @@ export const tariffConfigs = sqliteTable('tariff_configs', {
   updatedAt: text('updated_at').notNull(),
 });
 
+// ─── Sites ─────────────────────────────────────────────────────
+
+export const sites = sqliteTable('sites', {
+  id: text('id').primaryKey(),
+  tenantId: text('tenant_id').notNull().references(() => tenants.id),
+  name: text('name').notNull(),
+  address: text('address'),
+  city: text('city'),
+  stateCode: text('state_code').notNull(),
+  status: text('status').notNull().default('active'), // 'active' | 'deleted'
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+});
+
+// ─── Racks ─────────────────────────────────────────────────────
+
+export const racks = sqliteTable('racks', {
+  id: text('id').primaryKey(),
+  tenantId: text('tenant_id').notNull().references(() => tenants.id),
+  siteId: text('site_id').references(() => sites.id),
+  name: text('name').notNull(),
+  location: text('location'),
+  capacityU: integer('capacity_u').notNull().default(42),
+  status: text('status').notNull().default('active'), // 'active' | 'decommissioned' | 'deleted'
+  metadata: text('metadata'), // JSON
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+});
+
+// ─── Assets ────────────────────────────────────────────────────
+
+export const assets = sqliteTable('assets', {
+  id: text('id').primaryKey(),
+  tenantId: text('tenant_id').notNull().references(() => tenants.id),
+  rackId: text('rack_id').references(() => racks.id),
+  name: text('name').notNull(),
+  assetType: text('asset_type').notNull(), // 'server'|'storage'|'network'|'pdu'|'ups'|'cooling'|'other'
+  manufacturer: text('manufacturer'),
+  model: text('model'),
+  serialNumber: text('serial_number'),
+  rackUnitStart: integer('rack_unit_start'),
+  rackUnitSize: integer('rack_unit_size').notNull().default(1),
+  status: text('status').notNull().default('active'), // 'active' | 'decommissioned' | 'deleted'
+  metadata: text('metadata'), // JSON
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+});
+
 // ─── Meters ────────────────────────────────────────────────────
 
 export const meters = sqliteTable('meters', {
@@ -46,6 +94,7 @@ export const meters = sqliteTable('meters', {
   tenantId: text('tenant_id').notNull().references(() => tenants.id),
   name: text('name').notNull(),
   siteId: text('site_id'),
+  rackId: text('rack_id').references(() => racks.id),
   stateCode: text('state_code').notNull(),
   tariffId: text('tariff_id').references(() => tariffConfigs.id),
   meterType: text('meter_type'), // 'grid' | 'dg' | 'solar'
@@ -186,6 +235,19 @@ export const agentHeartbeats = sqliteTable('agent_heartbeats', {
   tenantId: text('tenant_id').references(() => tenants.id),
   status: text('status').notNull().default('online'), // 'online' | 'offline'
   lastHeartbeatAt: text('last_heartbeat_at').notNull(),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+});
+
+// ─── Bill Disputes ─────────────────────────────────────────────
+
+export const billDisputes = sqliteTable('bill_disputes', {
+  id: text('id').primaryKey(),
+  billId: text('bill_id').notNull().references(() => bills.id),
+  tenantId: text('tenant_id').notNull().references(() => tenants.id),
+  disputedBy: text('disputed_by').notNull(), // Clerk userId of the disputer
+  reason: text('reason').notNull(),
+  status: text('status').notNull().default('open'), // 'open' | 'resolved'
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
 });
