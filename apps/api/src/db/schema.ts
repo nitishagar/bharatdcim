@@ -252,6 +252,47 @@ export const billDisputes = sqliteTable('bill_disputes', {
   updatedAt: text('updated_at').notNull(),
 });
 
+// ─── Environmental Readings ────────────────────────────────────
+
+export const envReadings = sqliteTable('env_readings', {
+  id: text('id').primaryKey(),
+  meterId: text('meter_id').notNull().references(() => meters.id),
+  timestamp: text('timestamp').notNull(),
+  tempCTenths: integer('temp_c_tenths'),       // tenths of °C: 235 = 23.5°C
+  humidityPctTenths: integer('humidity_pct_tenths'), // tenths of %RH: 450 = 45.0%
+  source: text('source'),                       // 'snmp'
+  createdAt: text('created_at').notNull(),
+});
+
+// ─── Alert Rules ───────────────────────────────────────────────
+
+export const alertRules = sqliteTable('alert_rules', {
+  id: text('id').primaryKey(),
+  tenantId: text('tenant_id').notNull().references(() => tenants.id),
+  meterId: text('meter_id').references(() => meters.id),
+  metric: text('metric').notNull(),      // 'temperature' | 'humidity'
+  operator: text('operator').notNull(),  // 'gt' | 'lt' | 'gte' | 'lte'
+  threshold: integer('threshold').notNull(), // tenths (same scale as env_readings)
+  severity: text('severity').notNull().default('warning'), // 'warning' | 'critical'
+  enabled: integer('enabled').notNull().default(1),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+});
+
+// ─── Alert Events ──────────────────────────────────────────────
+
+export const alertEvents = sqliteTable('alert_events', {
+  id: text('id').primaryKey(),
+  tenantId: text('tenant_id').notNull().references(() => tenants.id),
+  ruleId: text('rule_id').notNull().references(() => alertRules.id),
+  meterId: text('meter_id').notNull().references(() => meters.id),
+  value: integer('value').notNull(),         // observed value in tenths
+  threshold: integer('threshold').notNull(), // rule threshold at time of event
+  severity: text('severity').notNull(),
+  triggeredAt: text('triggered_at').notNull(),
+  resolvedAt: text('resolved_at'),
+  createdAt: text('created_at').notNull(),
+});
 // ─── Upload Audit ──────────────────────────────────────────────
 
 export const uploadAudit = sqliteTable('upload_audit', {

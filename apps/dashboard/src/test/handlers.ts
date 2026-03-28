@@ -42,6 +42,25 @@ export const handlers = [
   http.get('*/platform/overview', () => HttpResponse.json(mockPlatformOverview)),
   http.get('*/platform/tenants',  () => HttpResponse.json(mockPlatformTenants)),
 
+  // Environmental monitoring endpoints
+  http.get('*/env-readings/latest', () => HttpResponse.json([
+    { id: 'er1', meterId: 'meter-001', timestamp: '2026-03-01T10:00:00Z', tempCTenths: 235, humidityPctTenths: 450 },
+  ])),
+  http.get('*/env-readings', ({ request }) => {
+    const url = new URL(request.url);
+    const meterId = url.searchParams.get('meter_id');
+    if (!meterId) return HttpResponse.json({ error: { code: 'VALIDATION_ERROR' } }, { status: 400 });
+    return HttpResponse.json([
+      { id: 'er1', meterId, timestamp: '2026-03-01T10:00:00Z', tempCTenths: 235, humidityPctTenths: 450 },
+    ]);
+  }),
+  http.get('*/alerts', () => HttpResponse.json([])),
+  http.get('*/alerts/rules', () => HttpResponse.json([])),
+  http.post('*/alerts/rules', () => HttpResponse.json({ id: 'rule-new' }, { status: 201 })),
+  http.patch('*/alerts/rules/:id', () => HttpResponse.json({ id: 'rule-1' })),
+  http.delete('*/alerts/rules/:id', () => new HttpResponse(null, { status: 204 })),
+  http.post('*/alerts/:id/resolve', () => HttpResponse.json({ id: 'ae1', resolvedAt: new Date().toISOString() })),
+
   // Delete endpoints
   http.delete('*/meters/:id',          () => new HttpResponse(null, { status: 204 })),
   http.delete('*/tariffs/:id',         () => new HttpResponse(null, { status: 204 })),
