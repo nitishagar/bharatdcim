@@ -7,5 +7,8 @@ routes = [
   { pattern = "api.bharatdcim.com", custom_domain = true }
 ]
 
+[triggers]
+crons = ["5 0 * * *"]
+
 [vars]
 CLERK_ISSUER_URL = "https://clerk.dashboard.bharatdcim.com"
