@@ -187,6 +187,44 @@ const migration = `
     updated_at TEXT NOT NULL
   );
 
+  CREATE TABLE IF NOT EXISTS env_readings (
+    id TEXT PRIMARY KEY,
+    meter_id TEXT NOT NULL REFERENCES meters(id),
+    timestamp TEXT NOT NULL,
+    temp_c_tenths INTEGER,
+    humidity_pct_tenths INTEGER,
+    source TEXT,
+    created_at TEXT NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS idx_env_readings_meter_time ON env_readings(meter_id, timestamp);
+
+  CREATE TABLE IF NOT EXISTS alert_rules (
+    id TEXT PRIMARY KEY,
+    tenant_id TEXT NOT NULL REFERENCES tenants(id),
+    meter_id TEXT REFERENCES meters(id),
+    metric TEXT NOT NULL,
+    operator TEXT NOT NULL,
+    threshold INTEGER NOT NULL,
+    severity TEXT NOT NULL DEFAULT 'warning',
+    enabled INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS alert_events (
+    id TEXT PRIMARY KEY,
+    tenant_id TEXT NOT NULL REFERENCES tenants(id),
+    rule_id TEXT NOT NULL REFERENCES alert_rules(id),
+    meter_id TEXT NOT NULL REFERENCES meters(id),
+    value INTEGER NOT NULL,
+    threshold INTEGER NOT NULL,
+    severity TEXT NOT NULL,
+    triggered_at TEXT NOT NULL,
+    resolved_at TEXT,
+    created_at TEXT NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS idx_alert_events_tenant_active ON alert_events(tenant_id, resolved_at);
+
   CREATE TABLE IF NOT EXISTS upload_audit (
     id TEXT PRIMARY KEY,
     tenant_id TEXT NOT NULL REFERENCES tenants(id),

@@ -3,6 +3,7 @@ import { createTestDb } from '../helpers.js';
 import {
   tenants, tariffConfigs, meters, powerReadings, bills,
   invoices, invoiceSequences, creditNotes, invoiceAuditLog, uploadAudit,
+  envReadings, alertRules, alertEvents,
 } from '../../src/db/schema.js';
 
 describe('Drizzle Schema', () => {
@@ -93,5 +94,106 @@ describe('Drizzle Schema', () => {
 
     const allReadings = await db.select().from(powerReadings).all();
     expect(allReadings).toHaveLength(1);
+  });
+
+  // ENV-DB-01: env_readings table exists after migration
+  it('ENV-DB-01: env_readings table exists', async () => {
+    const { client } = await createTestDb();
+    const result = await client.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name");
+    const tableNames = result.rows.map((r) => r.name as string);
+    expect(tableNames).toContain('env_readings');
+  });
+
+  // ENV-DB-02: env_readings has expected columns
+  it('ENV-DB-02: env_readings has correct columns', async () => {
+    const { client } = await createTestDb();
+    const result = await client.execute("PRAGMA table_info(env_readings)");
+    const cols = result.rows.map((r) => r.name as string);
+    expect(cols).toContain('id');
+    expect(cols).toContain('meter_id');
+    expect(cols).toContain('timestamp');
+    expect(cols).toContain('temp_c_tenths');
+    expect(cols).toContain('humidity_pct_tenths');
+    expect(cols).toContain('source');
+    expect(cols).toContain('created_at');
+  });
+
+  // ENV-DB-03: alert_rules table exists with required columns
+  it('ENV-DB-03: alert_rules table exists with correct columns', async () => {
+    const { client } = await createTestDb();
+    const tableResult = await client.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name");
+    const tableNames = tableResult.rows.map((r) => r.name as string);
+    expect(tableNames).toContain('alert_rules');
+
+    const colResult = await client.execute("PRAGMA table_info(alert_rules)");
+    const cols = colResult.rows.map((r) => r.name as string);
+    expect(cols).toContain('id');
+    expect(cols).toContain('tenant_id');
+    expect(cols).toContain('meter_id');
+    expect(cols).toContain('metric');
+    expect(cols).toContain('operator');
+    expect(cols).toContain('threshold');
+    expect(cols).toContain('severity');
+    expect(cols).toContain('enabled');
+  });
+
+  // ENV-DB-04: alert_events table exists with required columns
+  it('ENV-DB-04: alert_events table exists with correct columns', async () => {
+    const { client } = await createTestDb();
+    const tableResult = await client.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name");
+    const tableNames = tableResult.rows.map((r) => r.name as string);
+    expect(tableNames).toContain('alert_events');
+
+    const colResult = await client.execute("PRAGMA table_info(alert_events)");
+    const cols = colResult.rows.map((r) => r.name as string);
+    expect(cols).toContain('id');
+    expect(cols).toContain('tenant_id');
+    expect(cols).toContain('rule_id');
+    expect(cols).toContain('meter_id');
+    expect(cols).toContain('value');
+    expect(cols).toContain('threshold');
+    expect(cols).toContain('severity');
+    expect(cols).toContain('triggered_at');
+    expect(cols).toContain('resolved_at');
+  });
+
+  // ENV-DB-05: env_readings.meter_id FK — bad meter_id throws
+  it('ENV-DB-05: env_readings meter_id FK enforced', async () => {
+    const { db } = await createTestDb();
+    const now = new Date().toISOString();
+    await expect(
+      db.insert(envReadings).values({
+        id: 'er1', meterId: 'nonexistent-meter', timestamp: now, createdAt: now,
+      })
+    ).rejects.toThrow();
+  });
+
+  // ENV-DB-06: alert_events.rule_id FK — bad rule_id throws
+  it('ENV-DB-06: alert_events rule_id FK enforced', async () => {
+    const { db } = await createTestDb();
+    const now = new Date().toISOString();
+    await expect(
+      db.insert(alertEvents).values({
+        id: 'ae1', tenantId: 'nonexistent-tenant', ruleId: 'nonexistent-rule',
+        meterId: 'nonexistent-meter', value: 300, threshold: 280,
+        severity: 'warning', triggeredAt: now, createdAt: now,
+      })
+    ).rejects.toThrow();
+  });
+
+  // Drizzle column definitions for new tables
+  it('ENV-DB-07: Drizzle envReadings column definitions', () => {
+    expect(envReadings.id).toBeDefined();
+    expect(envReadings.meterId).toBeDefined();
+    expect(envReadings.tempCTenths).toBeDefined();
+    expect(envReadings.humidityPctTenths).toBeDefined();
+  });
+
+  it('ENV-DB-08: Drizzle alertRules column definitions', () => {
+    expect(alertRules.id).toBeDefined();
+    expect(alertRules.tenantId).toBeDefined();
+    expect(alertRules.metric).toBeDefined();
+    expect(alertRules.threshold).toBeDefined();
+    expect(alertRules.enabled).toBeDefined();
   });
 });
