@@ -13,6 +13,7 @@ const NAV_ITEMS = [
   { to: '/agents', label: 'Agents', icon: '🔌' },
   { to: '/tariffs', label: 'Tariffs', icon: '📊' },
   { to: '/capacity', label: 'Capacity', icon: '📈' },
+  { to: '/sla', label: 'SLA', icon: '📉' },
   { to: '/settings', label: 'Settings', icon: '⚙' },
 ];
 
@@ -30,7 +31,9 @@ const TITLE_MAP: Record<string, string> = {
   '/agents': 'SNMP Agents',
   '/tariffs': 'Tariffs',
   '/capacity': 'Capacity Planning',
+  '/sla': 'SLA Management',
   '/settings': 'Settings',
+  '/settings/notifications': 'Notification Settings',
   '/platform': 'Platform Overview',
   '/platform/tenants': 'Tenants',
 };

@@ -24,6 +24,9 @@ const Settings = lazy(() => import('./pages/Settings').then(m => ({ default: m.S
 const PlatformOverview = lazy(() => import('./pages/PlatformOverview').then(m => ({ default: m.PlatformOverview })));
 const PlatformTenants = lazy(() => import('./pages/PlatformTenants').then(m => ({ default: m.PlatformTenants })));
 const CapacityPlanning = lazy(() => import('./pages/CapacityPlanning').then(m => ({ default: m.CapacityPlanning })));
+const SLADashboard = lazy(() => import('./pages/SLADashboard').then(m => ({ default: m.SLADashboard })));
+const SLADetail = lazy(() => import('./pages/SLADetail').then(m => ({ default: m.SLADetail })));
+const NotificationSettings = lazy(() => import('./pages/NotificationSettings').then(m => ({ default: m.NotificationSettings })));
 
 /** Wires Clerk's session token into the API client */
 function AuthBridge() {
@@ -74,6 +77,9 @@ export function App() {
                 <Route path="tariffs" element={<Tariffs />} />
                 <Route path="settings" element={<Settings />} />
                 <Route path="capacity" element={<CapacityPlanning />} />
+                <Route path="sla" element={<SLADashboard />} />
+                <Route path="sla/:id" element={<SLADetail />} />
+                <Route path="settings/notifications" element={<NotificationSettings />} />
                 <Route path="platform" element={<RequirePlatformAdmin><PlatformOverview /></RequirePlatformAdmin>} />
                 <Route path="platform/tenants" element={<RequirePlatformAdmin><PlatformTenants /></RequirePlatformAdmin>} />
               </Route>
