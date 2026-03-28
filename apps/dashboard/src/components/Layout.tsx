@@ -7,6 +7,8 @@ import { DarkModeToggle } from './DarkModeToggle';
 const NAV_ITEMS = [
   { to: '/', label: 'Overview', icon: '◎' },
   { to: '/meters', label: 'Meters', icon: '⚡' },
+  { to: '/racks', label: 'Racks', icon: '🗄' },
+  { to: '/assets', label: 'Assets', icon: '🖥' },
   { to: '/billing', label: 'Billing', icon: '₹' },
   { to: '/invoices', label: 'Invoices', icon: '📄' },
   { to: '/uploads', label: 'Uploads', icon: '📁' },
@@ -23,6 +25,8 @@ const PLATFORM_NAV_ITEMS = [
 const TITLE_MAP: Record<string, string> = {
   '/': 'Overview',
   '/meters': 'Meters',
+  '/racks': 'Racks',
+  '/assets': 'Assets',
   '/billing': 'Billing',
   '/invoices': 'Invoices',
   '/uploads': 'Uploads',
@@ -36,6 +40,8 @@ const TITLE_MAP: Record<string, string> = {
 function getPageTitle(pathname: string): string {
   if (TITLE_MAP[pathname]) return TITLE_MAP[pathname];
   if (pathname.startsWith('/meters/')) return 'Meter Detail';
+  if (pathname.startsWith('/racks/')) return 'Rack Detail';
+  if (pathname.startsWith('/assets/')) return 'Asset Detail';
   if (pathname.startsWith('/billing/')) return 'Bill Detail';
   if (pathname.startsWith('/invoices/')) return 'Invoice Detail';
   return 'Dashboard';

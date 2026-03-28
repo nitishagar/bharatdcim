@@ -23,6 +23,10 @@ const Tariffs = lazy(() => import('./pages/Tariffs').then(m => ({ default: m.Tar
 const Settings = lazy(() => import('./pages/Settings').then(m => ({ default: m.Settings })));
 const PlatformOverview = lazy(() => import('./pages/PlatformOverview').then(m => ({ default: m.PlatformOverview })));
 const PlatformTenants = lazy(() => import('./pages/PlatformTenants').then(m => ({ default: m.PlatformTenants })));
+const Racks = lazy(() => import('./pages/Racks').then(m => ({ default: m.Racks })));
+const RackDetail = lazy(() => import('./pages/RackDetail').then(m => ({ default: m.RackDetail })));
+const Assets = lazy(() => import('./pages/Assets').then(m => ({ default: m.Assets })));
+const AssetDetail = lazy(() => import('./pages/AssetDetail').then(m => ({ default: m.AssetDetail })));
 
 /** Wires Clerk's session token into the API client */
 function AuthBridge() {
@@ -72,6 +76,10 @@ export function App() {
                 <Route path="agents" element={<Agents />} />
                 <Route path="tariffs" element={<Tariffs />} />
                 <Route path="settings" element={<Settings />} />
+                <Route path="racks" element={<Racks />} />
+                <Route path="racks/:id" element={<RackDetail />} />
+                <Route path="assets" element={<Assets />} />
+                <Route path="assets/:id" element={<AssetDetail />} />
                 <Route path="platform" element={<RequirePlatformAdmin><PlatformOverview /></RequirePlatformAdmin>} />
                 <Route path="platform/tenants" element={<RequirePlatformAdmin><PlatformTenants /></RequirePlatformAdmin>} />
               </Route>

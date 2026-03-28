@@ -83,3 +83,29 @@ export type EditMeterForm = z.infer<typeof editMeterSchema>;
 
 export const editTariffSchema = createTariffSchema.partial();
 export type EditTariffForm = z.infer<typeof editTariffSchema>;
+
+export const createRackSchema = z.object({
+  name: z.string().min(1, 'Rack name is required'),
+  location: z.string().optional(),
+  capacityU: z.string().optional()
+    .refine((v) => !v || (!isNaN(parseInt(v)) && parseInt(v) > 0), 'Must be a positive integer'),
+});
+
+export type CreateRackForm = z.infer<typeof createRackSchema>;
+
+const ASSET_TYPES = ['server', 'storage', 'network', 'pdu', 'ups', 'cooling', 'other'] as const;
+
+export const createAssetSchema = z.object({
+  name: z.string().min(1, 'Asset name is required'),
+  assetType: z.enum(ASSET_TYPES, { errorMap: () => ({ message: 'Invalid asset type' }) }),
+  rackId: z.string().optional(),
+  manufacturer: z.string().optional(),
+  model: z.string().optional(),
+  serialNumber: z.string().optional(),
+  rackUnitStart: z.string().optional()
+    .refine((v) => !v || (!isNaN(parseInt(v)) && parseInt(v) > 0), 'Must be a positive integer'),
+  rackUnitSize: z.string().optional()
+    .refine((v) => !v || (!isNaN(parseInt(v)) && parseInt(v) > 0), 'Must be a positive integer'),
+});
+
+export type CreateAssetForm = z.infer<typeof createAssetSchema>;
