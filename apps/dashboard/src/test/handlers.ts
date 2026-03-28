@@ -16,6 +16,16 @@ import {
   mockPlatformOverview,
   mockPlatformTenants,
   mockCreatedTenant,
+  mockCapacityThreshold,
+  mockCapacityThresholds,
+  mockCapacityForecast,
+  mockCapacityAlert,
+  mockCapacityAlerts,
+  mockSLAConfig,
+  mockSLAConfigs,
+  mockSLAViolations,
+  mockNotificationConfig,
+  mockNotificationConfigs,
 } from './mocks/data';
 
 function paginatedResponse<T>(items: T[], request: Request) {
@@ -79,4 +89,29 @@ export const handlers = [
   http.post('*/invoices/:id/cancel',   () => HttpResponse.json({ ok: true })),
   http.post('*/invoices/credit-notes', () => HttpResponse.json({ ok: true })),
   http.post('*/uploads/csv',           () => HttpResponse.json(mockUpload, { status: 201 })),
+
+  // Capacity endpoints
+  http.get('*/capacity/thresholds',    () => HttpResponse.json(mockCapacityThresholds)),
+  http.get('*/capacity/forecast',      () => HttpResponse.json(mockCapacityForecast)),
+  http.get('*/capacity/alerts',        () => HttpResponse.json(mockCapacityAlerts)),
+  http.post('*/capacity/thresholds',   () => HttpResponse.json(mockCapacityThreshold, { status: 201 })),
+  http.patch('*/capacity/thresholds/:id', () => HttpResponse.json(mockCapacityThreshold)),
+  http.delete('*/capacity/thresholds/:id', () => new HttpResponse(null, { status: 204 })),
+  http.patch('*/capacity/alerts/:id',  () => HttpResponse.json({ ...mockCapacityAlert, status: 'acknowledged', acknowledgedAt: new Date().toISOString() })),
+
+  // SLA endpoints
+  http.get('*/sla',                    () => HttpResponse.json(mockSLAConfigs)),
+  http.get('*/sla/:id/violations',     () => HttpResponse.json({ data: mockSLAViolations, total: 1, limit: 25, offset: 0 })),
+  http.get('*/sla/:id',                () => HttpResponse.json(mockSLAConfig)),
+  http.post('*/sla',                   () => HttpResponse.json(mockSLAConfig, { status: 201 })),
+  http.patch('*/sla/:id',              () => HttpResponse.json(mockSLAConfig)),
+  http.delete('*/sla/:id',             () => new HttpResponse(null, { status: 204 })),
+  http.patch('*/sla/violations/:id',   () => HttpResponse.json({ ...mockSLAViolations[0], status: 'acknowledged' })),
+
+  // Notification endpoints
+  http.get('*/notifications',          () => HttpResponse.json(mockNotificationConfigs)),
+  http.post('*/notifications',         () => HttpResponse.json(mockNotificationConfig, { status: 201 })),
+  http.patch('*/notifications/:id',    () => HttpResponse.json(mockNotificationConfig)),
+  http.delete('*/notifications/:id',   () => new HttpResponse(null, { status: 204 })),
+  http.post('*/notifications/:id/test', () => HttpResponse.json({ sent: true, type: 'email', destination: 'ops@example.com' })),
 ];

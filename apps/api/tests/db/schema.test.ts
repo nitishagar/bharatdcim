@@ -4,6 +4,7 @@ import {
   tenants, tariffConfigs, meters, powerReadings, bills,
   invoices, invoiceSequences, creditNotes, invoiceAuditLog, uploadAudit,
   envReadings, alertRules, alertEvents,
+  capacityThresholds, slaConfigs, alerts, slaViolations, notificationConfigs,
 } from '../../src/db/schema.js';
 
 describe('Drizzle Schema', () => {
@@ -25,6 +26,12 @@ describe('Drizzle Schema', () => {
     expect(tableNames).toContain('credit_notes');
     expect(tableNames).toContain('invoice_audit_log');
     expect(tableNames).toContain('upload_audit');
+    // New tables from capacity planning + SLA management
+    expect(tableNames).toContain('capacity_thresholds');
+    expect(tableNames).toContain('sla_configs');
+    expect(tableNames).toContain('alerts');
+    expect(tableNames).toContain('sla_violations');
+    expect(tableNames).toContain('notification_configs');
   });
 
   it('Drizzle table objects have correct column definitions', () => {
@@ -47,6 +54,23 @@ describe('Drizzle Schema', () => {
 
     expect(uploadAudit.processingTimeMs).toBeDefined();
     expect(uploadAudit.errorsJson).toBeDefined();
+
+    expect(capacityThresholds.metric).toBeDefined();
+    expect(capacityThresholds.warningValue).toBeDefined();
+    expect(capacityThresholds.criticalValue).toBeDefined();
+
+    expect(slaConfigs.targetBps).toBeDefined();
+    expect(slaConfigs.measurementWindow).toBeDefined();
+
+    expect(alerts.type).toBeDefined();
+    expect(alerts.severity).toBeDefined();
+    expect(alerts.predictedBreachAt).toBeDefined();
+
+    expect(slaViolations.actualBps).toBeDefined();
+    expect(slaViolations.gapBps).toBeDefined();
+
+    expect(notificationConfigs.eventsJson).toBeDefined();
+    expect(notificationConfigs.destination).toBeDefined();
   });
 
   it('CRUD operations work on all major tables', async () => {

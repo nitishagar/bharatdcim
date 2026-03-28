@@ -18,6 +18,11 @@ import { dashboardRouter } from './routes/dashboard.js';
 import { platformRouter } from './routes/platform.js';
 import { envReadingsRouter } from './routes/env-readings.js';
 import { alertsRouter } from './routes/alerts.js';
+import { capacityRouter } from './routes/capacity.js';
+import { slaRouter } from './routes/sla.js';
+import { notificationsRouter } from './routes/notifications.js';
+import { runDailyChecks } from './services/sla.js';
+import type { Bindings } from './types.js';
 import { openApiSpec } from './openapi.js';
 import {
   checkLimit,
@@ -186,10 +191,21 @@ app.route('/racks', racksRouter);
 app.route('/assets', assetsRouter);
 app.route('/env-readings', envReadingsRouter);
 app.route('/alerts', alertsRouter);
+app.route('/capacity', capacityRouter);
+app.route('/sla', slaRouter);
+app.route('/notifications', notificationsRouter);
 
 // 404 handler
 app.notFound((c) => {
   return c.json({ error: { code: 'NOT_FOUND', message: `Route ${c.req.method} ${c.req.path} not found` } }, 404);
 });
 
-export default app;
+export { app };
+
+export default {
+  fetch: app.fetch.bind(app),
+  async scheduled(_event: { scheduledTime: number }, env: Bindings, ctx: { waitUntil(p: Promise<unknown>): void }) {
+    const db = createDb(env.TURSO_DATABASE_URL, env.TURSO_AUTH_TOKEN);
+    ctx.waitUntil(runDailyChecks(db, env));
+  },
+};

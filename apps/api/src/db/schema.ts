@@ -252,6 +252,21 @@ export const billDisputes = sqliteTable('bill_disputes', {
   updatedAt: text('updated_at').notNull(),
 });
 
+// ─── Capacity Thresholds ───────────────────────────────────────
+
+export const capacityThresholds = sqliteTable('capacity_thresholds', {
+  id: text('id').primaryKey(),
+  tenantId: text('tenant_id').notNull(),
+  meterId: text('meter_id').notNull(),
+  metric: text('metric').notNull(), // 'kwh_daily' | 'kw_peak' | 'pue'
+  warningValue: integer('warning_value').notNull(),
+  criticalValue: integer('critical_value').notNull(),
+  windowDays: integer('window_days').notNull().default(30),
+  status: text('status').notNull().default('active'),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+});
+
 // ─── Environmental Readings ────────────────────────────────────
 
 export const envReadings = sqliteTable('env_readings', {
@@ -279,6 +294,21 @@ export const alertRules = sqliteTable('alert_rules', {
   updatedAt: text('updated_at').notNull(),
 });
 
+// ─── SLA Configs ───────────────────────────────────────────────
+
+export const slaConfigs = sqliteTable('sla_configs', {
+  id: text('id').primaryKey(),
+  tenantId: text('tenant_id').notNull(),
+  name: text('name').notNull(),
+  type: text('type').notNull(), // 'uptime' | 'pue' | 'power_availability' | 'response_time'
+  targetBps: integer('target_bps').notNull(),
+  measurementWindow: text('measurement_window').notNull().default('monthly'),
+  meterId: text('meter_id'),
+  status: text('status').notNull().default('active'),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+});
+
 // ─── Alert Events ──────────────────────────────────────────────
 
 export const alertEvents = sqliteTable('alert_events', {
@@ -293,6 +323,60 @@ export const alertEvents = sqliteTable('alert_events', {
   resolvedAt: text('resolved_at'),
   createdAt: text('created_at').notNull(),
 });
+
+// ─── Alerts ────────────────────────────────────────────────────
+
+export const alerts = sqliteTable('alerts', {
+  id: text('id').primaryKey(),
+  tenantId: text('tenant_id').notNull(),
+  meterId: text('meter_id'),
+  slaConfigId: text('sla_config_id'),
+  type: text('type').notNull(), // 'capacity_warning' | 'capacity_critical' | 'sla_warning' | 'sla_breach'
+  metric: text('metric').notNull(),
+  thresholdValue: integer('threshold_value').notNull(),
+  currentValue: integer('current_value').notNull(),
+  predictedBreachAt: text('predicted_breach_at'),
+  severity: text('severity').notNull().default('warning'),
+  status: text('status').notNull().default('active'),
+  acknowledgedAt: text('acknowledged_at'),
+  resolvedAt: text('resolved_at'),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+});
+
+// ─── SLA Violations ────────────────────────────────────────────
+
+export const slaViolations = sqliteTable('sla_violations', {
+  id: text('id').primaryKey(),
+  slaConfigId: text('sla_config_id').notNull(),
+  tenantId: text('tenant_id').notNull(),
+  meterId: text('meter_id'),
+  periodStart: text('period_start').notNull(),
+  periodEnd: text('period_end').notNull(),
+  targetBps: integer('target_bps').notNull(),
+  actualBps: integer('actual_bps').notNull(),
+  gapBps: integer('gap_bps').notNull(),
+  severity: text('severity').notNull(),
+  status: text('status').notNull().default('open'),
+  acknowledgedAt: text('acknowledged_at'),
+  resolvedAt: text('resolved_at'),
+  createdAt: text('created_at').notNull(),
+});
+
+// ─── Notification Configs ──────────────────────────────────────
+
+export const notificationConfigs = sqliteTable('notification_configs', {
+  id: text('id').primaryKey(),
+  tenantId: text('tenant_id').notNull(),
+  name: text('name').notNull(),
+  type: text('type').notNull(), // 'email' | 'webhook'
+  destination: text('destination').notNull(),
+  eventsJson: text('events_json').notNull().default('[]'),
+  status: text('status').notNull().default('active'),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+});
+
 // ─── Upload Audit ──────────────────────────────────────────────
 
 export const uploadAudit = sqliteTable('upload_audit', {

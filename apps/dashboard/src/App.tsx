@@ -32,6 +32,10 @@ const AssetDetail = lazy(() => import('./pages/AssetDetail').then(m => ({ defaul
 const PortalMeters = lazy(() => import('./pages/PortalMeters').then(m => ({ default: m.PortalMeters })));
 const PortalBilling = lazy(() => import('./pages/PortalBilling').then(m => ({ default: m.PortalBilling })));
 const PortalInvoices = lazy(() => import('./pages/PortalInvoices').then(m => ({ default: m.PortalInvoices })));
+const CapacityPlanning = lazy(() => import('./pages/CapacityPlanning').then(m => ({ default: m.CapacityPlanning })));
+const SLADashboard = lazy(() => import('./pages/SLADashboard').then(m => ({ default: m.SLADashboard })));
+const SLADetail = lazy(() => import('./pages/SLADetail').then(m => ({ default: m.SLADetail })));
+const NotificationSettings = lazy(() => import('./pages/NotificationSettings').then(m => ({ default: m.NotificationSettings })));
 
 /** Redirects org:member to /portal, lets org:admin see the admin dashboard */
 function RoleBasedIndex() {
@@ -92,6 +96,10 @@ export function App() {
                 <Route path="racks/:id" element={<RackDetail />} />
                 <Route path="assets" element={<Assets />} />
                 <Route path="assets/:id" element={<AssetDetail />} />
+                <Route path="capacity" element={<CapacityPlanning />} />
+                <Route path="sla" element={<SLADashboard />} />
+                <Route path="sla/:id" element={<SLADetail />} />
+                <Route path="settings/notifications" element={<NotificationSettings />} />
                 <Route path="platform" element={<RequirePlatformAdmin><PlatformOverview /></RequirePlatformAdmin>} />
                 <Route path="platform/tenants" element={<RequirePlatformAdmin><PlatformTenants /></RequirePlatformAdmin>} />
               </Route>

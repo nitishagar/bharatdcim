@@ -14,6 +14,8 @@ const NAV_ITEMS = [
   { to: '/uploads', label: 'Uploads', icon: '📁' },
   { to: '/agents', label: 'Agents', icon: '🔌' },
   { to: '/tariffs', label: 'Tariffs', icon: '📊' },
+  { to: '/capacity', label: 'Capacity', icon: '📈' },
+  { to: '/sla', label: 'SLA', icon: '📉' },
   { to: '/settings', label: 'Settings', icon: '⚙' },
 ];
 
@@ -32,7 +34,10 @@ const TITLE_MAP: Record<string, string> = {
   '/uploads': 'Uploads',
   '/agents': 'SNMP Agents',
   '/tariffs': 'Tariffs',
+  '/capacity': 'Capacity Planning',
+  '/sla': 'SLA Management',
   '/settings': 'Settings',
+  '/settings/notifications': 'Notification Settings',
   '/platform': 'Platform Overview',
   '/platform/tenants': 'Tenants',
 };
@@ -44,6 +49,7 @@ function getPageTitle(pathname: string): string {
   if (pathname.startsWith('/assets/')) return 'Asset Detail';
   if (pathname.startsWith('/billing/')) return 'Bill Detail';
   if (pathname.startsWith('/invoices/')) return 'Invoice Detail';
+  if (pathname.startsWith('/sla/')) return 'SLA Detail';
   return 'Dashboard';
 }
 

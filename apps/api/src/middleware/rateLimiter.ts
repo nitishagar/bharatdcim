@@ -56,4 +56,7 @@ export const RATE_LIMITED_PREFIXES = [
   '/racks',
   '/assets',
   '/sites',
+  '/capacity',
+  '/sla',
+  '/notifications',
 ];

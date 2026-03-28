@@ -252,6 +252,32 @@ const migration = `
     updated_at TEXT NOT NULL
   );
 
+  CREATE TABLE IF NOT EXISTS capacity_thresholds (
+    id TEXT PRIMARY KEY,
+    tenant_id TEXT NOT NULL REFERENCES tenants(id),
+    meter_id TEXT NOT NULL REFERENCES meters(id),
+    metric TEXT NOT NULL CHECK(metric IN ('kwh_daily', 'kw_peak', 'pue')),
+    warning_value INTEGER NOT NULL,
+    critical_value INTEGER NOT NULL,
+    window_days INTEGER NOT NULL DEFAULT 30,
+    status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active', 'paused')),
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS sla_configs (
+    id TEXT PRIMARY KEY,
+    tenant_id TEXT NOT NULL REFERENCES tenants(id),
+    name TEXT NOT NULL,
+    type TEXT NOT NULL CHECK(type IN ('uptime','pue','power_availability','response_time')),
+    target_bps INTEGER NOT NULL,
+    measurement_window TEXT NOT NULL DEFAULT 'monthly' CHECK(measurement_window IN ('daily','weekly','monthly')),
+    meter_id TEXT REFERENCES meters(id),
+    status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active','paused')),
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+
   CREATE TABLE IF NOT EXISTS racks (
     id TEXT PRIMARY KEY,
     tenant_id TEXT NOT NULL REFERENCES tenants(id),
@@ -261,6 +287,53 @@ const migration = `
     capacity_u INTEGER NOT NULL DEFAULT 42,
     status TEXT NOT NULL DEFAULT 'active',
     metadata TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS alerts (
+    id TEXT PRIMARY KEY,
+    tenant_id TEXT NOT NULL REFERENCES tenants(id),
+    meter_id TEXT REFERENCES meters(id),
+    sla_config_id TEXT REFERENCES sla_configs(id),
+    type TEXT NOT NULL CHECK(type IN ('capacity_warning','capacity_critical','sla_warning','sla_breach')),
+    metric TEXT NOT NULL,
+    threshold_value INTEGER NOT NULL,
+    current_value INTEGER NOT NULL,
+    predicted_breach_at TEXT,
+    severity TEXT NOT NULL DEFAULT 'warning' CHECK(severity IN ('warning','critical')),
+    status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active','acknowledged','resolved')),
+    acknowledged_at TEXT,
+    resolved_at TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS sla_violations (
+    id TEXT PRIMARY KEY,
+    sla_config_id TEXT NOT NULL REFERENCES sla_configs(id),
+    tenant_id TEXT NOT NULL REFERENCES tenants(id),
+    meter_id TEXT REFERENCES meters(id),
+    period_start TEXT NOT NULL,
+    period_end TEXT NOT NULL,
+    target_bps INTEGER NOT NULL,
+    actual_bps INTEGER NOT NULL,
+    gap_bps INTEGER NOT NULL,
+    severity TEXT NOT NULL CHECK(severity IN ('warning','critical')),
+    status TEXT NOT NULL DEFAULT 'open' CHECK(status IN ('open','acknowledged','resolved')),
+    acknowledged_at TEXT,
+    resolved_at TEXT,
+    created_at TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS notification_configs (
+    id TEXT PRIMARY KEY,
+    tenant_id TEXT NOT NULL REFERENCES tenants(id),
+    name TEXT NOT NULL,
+    type TEXT NOT NULL CHECK(type IN ('email','webhook')),
+    destination TEXT NOT NULL,
+    events_json TEXT NOT NULL DEFAULT '[]',
+    status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active','paused')),
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
   );
@@ -292,6 +365,18 @@ const migration = `
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
   );
+
+  CREATE INDEX IF NOT EXISTS idx_power_readings_meter_timestamp
+    ON power_readings(meter_id, timestamp);
+
+  CREATE INDEX IF NOT EXISTS idx_alerts_tenant_status
+    ON alerts(tenant_id, status);
+
+  CREATE INDEX IF NOT EXISTS idx_sla_violations_config_period
+    ON sla_violations(sla_config_id, period_start);
+
+  CREATE INDEX IF NOT EXISTS idx_notification_configs_tenant
+    ON notification_configs(tenant_id, status);
 `;
 
 // Additive column migrations — safe to re-run (SQLite ignores duplicate columns after first run)

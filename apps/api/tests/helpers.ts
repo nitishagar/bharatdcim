@@ -255,6 +255,19 @@ export async function createTestDb() {
       updated_at TEXT NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS capacity_thresholds (
+      id TEXT PRIMARY KEY,
+      tenant_id TEXT NOT NULL REFERENCES tenants(id),
+      meter_id TEXT NOT NULL REFERENCES meters(id),
+      metric TEXT NOT NULL,
+      warning_value INTEGER NOT NULL,
+      critical_value INTEGER NOT NULL,
+      window_days INTEGER NOT NULL DEFAULT 30,
+      status TEXT NOT NULL DEFAULT 'active',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
     CREATE TABLE IF NOT EXISTS env_readings (
       id TEXT PRIMARY KEY,
       meter_id TEXT NOT NULL REFERENCES meters(id),
@@ -278,6 +291,37 @@ export async function createTestDb() {
       updated_at TEXT NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS sla_configs (
+      id TEXT PRIMARY KEY,
+      tenant_id TEXT NOT NULL REFERENCES tenants(id),
+      name TEXT NOT NULL,
+      type TEXT NOT NULL,
+      target_bps INTEGER NOT NULL,
+      measurement_window TEXT NOT NULL DEFAULT 'monthly',
+      meter_id TEXT REFERENCES meters(id),
+      status TEXT NOT NULL DEFAULT 'active',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS alerts (
+      id TEXT PRIMARY KEY,
+      tenant_id TEXT NOT NULL REFERENCES tenants(id),
+      meter_id TEXT REFERENCES meters(id),
+      sla_config_id TEXT REFERENCES sla_configs(id),
+      type TEXT NOT NULL,
+      metric TEXT NOT NULL,
+      threshold_value INTEGER NOT NULL,
+      current_value INTEGER NOT NULL,
+      predicted_breach_at TEXT,
+      severity TEXT NOT NULL DEFAULT 'warning',
+      status TEXT NOT NULL DEFAULT 'active',
+      acknowledged_at TEXT,
+      resolved_at TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
     CREATE TABLE IF NOT EXISTS alert_events (
       id TEXT PRIMARY KEY,
       tenant_id TEXT NOT NULL REFERENCES tenants(id),
@@ -290,6 +334,47 @@ export async function createTestDb() {
       resolved_at TEXT,
       created_at TEXT NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS sla_violations (
+      id TEXT PRIMARY KEY,
+      sla_config_id TEXT NOT NULL REFERENCES sla_configs(id),
+      tenant_id TEXT NOT NULL REFERENCES tenants(id),
+      meter_id TEXT REFERENCES meters(id),
+      period_start TEXT NOT NULL,
+      period_end TEXT NOT NULL,
+      target_bps INTEGER NOT NULL,
+      actual_bps INTEGER NOT NULL,
+      gap_bps INTEGER NOT NULL,
+      severity TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'open',
+      acknowledged_at TEXT,
+      resolved_at TEXT,
+      created_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS notification_configs (
+      id TEXT PRIMARY KEY,
+      tenant_id TEXT NOT NULL REFERENCES tenants(id),
+      name TEXT NOT NULL,
+      type TEXT NOT NULL,
+      destination TEXT NOT NULL,
+      events_json TEXT NOT NULL DEFAULT '[]',
+      status TEXT NOT NULL DEFAULT 'active',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_power_readings_meter_timestamp
+      ON power_readings(meter_id, timestamp);
+
+    CREATE INDEX IF NOT EXISTS idx_alerts_tenant_status
+      ON alerts(tenant_id, status);
+
+    CREATE INDEX IF NOT EXISTS idx_sla_violations_config_period
+      ON sla_violations(sla_config_id, period_start);
+
+    CREATE INDEX IF NOT EXISTS idx_notification_configs_tenant
+      ON notification_configs(tenant_id, status);
   `);
 
   return { db, client };
