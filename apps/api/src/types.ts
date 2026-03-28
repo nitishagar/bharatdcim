@@ -13,6 +13,7 @@ export type Bindings = {
   TURSO_AUTH_TOKEN: string;
   API_TOKEN: string;
   CLERK_ISSUER_URL?: string;
+  RESEND_API_KEY: string;
 };
 
 export type Variables = {
