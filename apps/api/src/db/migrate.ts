@@ -29,6 +29,7 @@ const migration = `
 
   CREATE TABLE IF NOT EXISTS tariff_configs (
     id TEXT PRIMARY KEY,
+    tenant_id TEXT REFERENCES tenants(id),
     state_code TEXT NOT NULL,
     discom TEXT NOT NULL,
     category TEXT NOT NULL,
@@ -60,6 +61,7 @@ const migration = `
     tariff_id TEXT REFERENCES tariff_configs(id),
     meter_type TEXT,
     metadata TEXT,
+    status TEXT NOT NULL DEFAULT 'active',
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
   );
@@ -178,6 +180,7 @@ const migration = `
     agent_version TEXT,
     device_count INTEGER NOT NULL,
     unsynced_count INTEGER,
+    tenant_id TEXT REFERENCES tenants(id),
     status TEXT NOT NULL DEFAULT 'online',
     last_heartbeat_at TEXT NOT NULL,
     created_at TEXT NOT NULL,
