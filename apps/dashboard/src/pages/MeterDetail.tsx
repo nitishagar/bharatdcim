@@ -11,7 +11,8 @@ import { Breadcrumb } from '../components/Breadcrumb';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { useIsAdmin } from '../hooks/useIsAdmin';
 import { editMeterSchema, type EditMeterForm } from '../lib/schemas';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Legend } from 'recharts';
+import { useCapacityThresholds } from '../api/hooks/useCapacity';
 import { DayPicker, type DateRange } from 'react-day-picker';
 import 'react-day-picker/style.css';
 
@@ -31,6 +32,7 @@ export function MeterDetail() {
   const to = dateRange?.to?.toISOString().split('T')[0];
   const { data: readingsData, isLoading: readingsLoading } = useReadings(id!, from, to, { limit: 500 });
   const readings = readingsData?.data;
+  const { data: thresholds } = useCapacityThresholds(id!);
 
   if (meterLoading) return <DetailSkeleton />;
   if (meterError) return <ErrorMessage error={meterError} />;
@@ -40,6 +42,15 @@ export function MeterDetail() {
     time: new Date(r.timestamp).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }),
     kWh: r.kWh != null ? r.kWh / 1000 : 0,
   }));
+
+  const SMA_WINDOW = 7;
+  const smaValues: (number | null)[] = chartData.map((_, i) => {
+    if (i < SMA_WINDOW - 1) return null;
+    const slice = chartData.slice(i - SMA_WINDOW + 1, i + 1);
+    return slice.reduce((sum, d) => sum + d.kWh, 0) / SMA_WINDOW;
+  });
+  const chartDataWithSma = chartData.map((d, i) => ({ ...d, sma: smaValues[i] }));
+  const hasSma = smaValues.some((v) => v !== null);
 
   const rangeLabel = dateRange?.from && dateRange?.to
     ? `${dateRange.from.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })} — ${dateRange.to.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`
@@ -148,12 +159,42 @@ export function MeterDetail() {
       ) : (
         <div className="bg-white rounded-lg border p-4 dark:bg-gray-800 dark:border-gray-700" style={{ height: 300 }}>
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData}>
+            <LineChart data={chartDataWithSma}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="time" tick={{ fontSize: 12 }} />
               <YAxis tick={{ fontSize: 12 }} />
               <Tooltip />
-              <Line type="monotone" dataKey="kWh" stroke="#1e3a5f" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="kWh" stroke="#1e3a5f" strokeWidth={2} dot={false} name="kWh" />
+              {hasSma && (
+                <Line
+                  type="monotone"
+                  dataKey="sma"
+                  stroke="#6b7280"
+                  strokeWidth={1.5}
+                  strokeDasharray="5 5"
+                  dot={false}
+                  name="7-day Avg"
+                />
+              )}
+              {(thresholds ?? []).map((t) => (
+                <ReferenceLine
+                  key={`${t.id}-warning`}
+                  y={t.warningValue / 1000}
+                  stroke="#f59e0b"
+                  strokeDasharray="4 4"
+                  label={{ value: 'Warning', position: 'insideTopRight', fontSize: 11 }}
+                />
+              ))}
+              {(thresholds ?? []).map((t) => (
+                <ReferenceLine
+                  key={`${t.id}-critical`}
+                  y={t.criticalValue / 1000}
+                  stroke="#ef4444"
+                  strokeDasharray="4 4"
+                  label={{ value: 'Critical', position: 'insideTopRight', fontSize: 11 }}
+                />
+              ))}
+              <Legend />
             </LineChart>
           </ResponsiveContainer>
         </div>

@@ -23,6 +23,7 @@ const Tariffs = lazy(() => import('./pages/Tariffs').then(m => ({ default: m.Tar
 const Settings = lazy(() => import('./pages/Settings').then(m => ({ default: m.Settings })));
 const PlatformOverview = lazy(() => import('./pages/PlatformOverview').then(m => ({ default: m.PlatformOverview })));
 const PlatformTenants = lazy(() => import('./pages/PlatformTenants').then(m => ({ default: m.PlatformTenants })));
+const CapacityPlanning = lazy(() => import('./pages/CapacityPlanning').then(m => ({ default: m.CapacityPlanning })));
 
 /** Wires Clerk's session token into the API client */
 function AuthBridge() {
@@ -72,6 +73,7 @@ export function App() {
                 <Route path="agents" element={<Agents />} />
                 <Route path="tariffs" element={<Tariffs />} />
                 <Route path="settings" element={<Settings />} />
+                <Route path="capacity" element={<CapacityPlanning />} />
                 <Route path="platform" element={<RequirePlatformAdmin><PlatformOverview /></RequirePlatformAdmin>} />
                 <Route path="platform/tenants" element={<RequirePlatformAdmin><PlatformTenants /></RequirePlatformAdmin>} />
               </Route>

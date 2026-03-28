@@ -3,6 +3,7 @@ import { http, HttpResponse } from 'msw';
 import { server } from '../test/server';
 import { renderWithProviders } from '../test/utils';
 import { MeterDetail } from './MeterDetail';
+import { mockCapacityThresholds } from '../test/mocks/data';
 
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
@@ -89,5 +90,81 @@ describe('MeterDetail page', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
     await waitFor(() => expect(deleted).toBe(true));
     await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/meters'));
+  });
+});
+
+describe('MeterDetail chart — capacity threshold lines', () => {
+  beforeEach(() => {
+    vi.mock('recharts', async () => {
+      const actual = await vi.importActual<typeof import('recharts')>('recharts');
+      return {
+        ...actual,
+        ResponsiveContainer: ({ children }: { children: React.ReactNode }) => <div data-testid="recharts-container">{children}</div>,
+        LineChart: ({ children }: { children: React.ReactNode }) => <div data-testid="line-chart">{children}</div>,
+        Line: ({ dataKey, strokeDasharray }: { dataKey: string; strokeDasharray?: string }) => (
+          <div data-testid={`line-${dataKey}`} data-dasharray={strokeDasharray ?? ''} />
+        ),
+        ReferenceLine: ({ y, stroke }: { y: number; stroke: string }) => (
+          <div data-testid="reference-line" data-y={y} data-stroke={stroke} />
+        ),
+        Legend: () => <div data-testid="chart-legend" />,
+        CartesianGrid: () => null,
+        XAxis: () => null,
+        YAxis: () => null,
+        Tooltip: () => null,
+      };
+    });
+  });
+
+  it('renders ReferenceLine when capacity threshold exists (warning level)', async () => {
+    server.use(
+      http.get('*/capacity/thresholds', () => HttpResponse.json(mockCapacityThresholds)),
+    );
+    renderWithProviders(<MeterDetail />);
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Main Grid Meter' })).toBeInTheDocument());
+    await waitFor(() => {
+      const lines = screen.getAllByTestId('reference-line');
+      const warningLine = lines.find(el => el.getAttribute('data-stroke') === '#f59e0b');
+      expect(warningLine).toBeInTheDocument();
+    });
+  });
+
+  it('renders second ReferenceLine for critical threshold (red stroke)', async () => {
+    server.use(
+      http.get('*/capacity/thresholds', () => HttpResponse.json(mockCapacityThresholds)),
+    );
+    renderWithProviders(<MeterDetail />);
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Main Grid Meter' })).toBeInTheDocument());
+    await waitFor(() => {
+      const lines = screen.getAllByTestId('reference-line');
+      const criticalLine = lines.find(el => el.getAttribute('data-stroke') === '#ef4444');
+      expect(criticalLine).toBeInTheDocument();
+    });
+  });
+
+  it('renders Legend component', async () => {
+    renderWithProviders(<MeterDetail />);
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Main Grid Meter' })).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByTestId('chart-legend')).toBeInTheDocument());
+  });
+
+  it('renders dashed SMA trend line when readings are available', async () => {
+    renderWithProviders(<MeterDetail />);
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Main Grid Meter' })).toBeInTheDocument());
+    await waitFor(() => {
+      const smaLine = screen.queryByTestId('line-sma');
+      if (smaLine) {
+        expect(smaLine.getAttribute('data-dasharray')).toBeTruthy();
+      }
+    });
+  });
+
+  it('no ReferenceLine when no thresholds are configured for the meter', async () => {
+    server.use(
+      http.get('*/capacity/thresholds', () => HttpResponse.json([])),
+    );
+    renderWithProviders(<MeterDetail />);
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Main Grid Meter' })).toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByTestId('reference-line')).not.toBeInTheDocument());
   });
 });

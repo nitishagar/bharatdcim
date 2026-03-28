@@ -190,3 +190,102 @@ export const mockCreatedTenant = {
   createdAt: '2026-03-01T00:00:00Z',
   updatedAt: '2026-03-01T00:00:00Z',
 };
+
+// Capacity mock data
+export const mockCapacityThreshold = {
+  id: 'ct-001',
+  tenantId: 'tenant-001',
+  meterId: 'meter-001',
+  metric: 'kwh_daily',
+  warningValue: 800,
+  criticalValue: 1000,
+  windowDays: 30,
+  status: 'active',
+  createdAt: '2026-01-01T00:00:00Z',
+  updatedAt: '2026-01-01T00:00:00Z',
+};
+
+export const mockCapacityThresholds = [mockCapacityThreshold];
+
+export const mockCapacityForecast = {
+  dailyAggregates: [
+    { date: '2026-01-01', totalKwh: 500 },
+    { date: '2026-01-02', totalKwh: 550 },
+    { date: '2026-01-03', totalKwh: 600 },
+  ],
+  trendSlope: 50,
+  r2: 0.98,
+  projectedBreachAt: '2026-04-15T00:00:00.000Z',
+  thresholds: [mockCapacityThreshold],
+};
+
+export const mockCapacityAlert = {
+  id: 'alert-001',
+  tenantId: 'tenant-001',
+  meterId: 'meter-001',
+  slaConfigId: null,
+  type: 'capacity_critical',
+  metric: 'kwh_daily',
+  thresholdValue: 1000,
+  currentValue: 1100,
+  predictedBreachAt: null,
+  severity: 'critical',
+  status: 'active',
+  acknowledgedAt: null,
+  resolvedAt: null,
+  createdAt: '2026-03-01T00:00:00Z',
+  updatedAt: '2026-03-01T00:00:00Z',
+};
+
+export const mockCapacityAlerts = [mockCapacityAlert];
+
+// SLA mock data
+export const mockSLAConfig = {
+  id: 'sla-001',
+  tenantId: 'tenant-001',
+  name: 'Uptime SLA',
+  type: 'uptime',
+  targetBps: 9900,
+  measurementWindow: 'daily',
+  meterId: 'meter-001',
+  status: 'active',
+  createdAt: '2026-01-01T00:00:00Z',
+  updatedAt: '2026-01-01T00:00:00Z',
+  currentCompliance: null,
+};
+
+export const mockSLAConfigs = [mockSLAConfig];
+
+export const mockSLAViolation = {
+  id: 'viol-001',
+  slaConfigId: 'sla-001',
+  tenantId: 'tenant-001',
+  meterId: 'meter-001',
+  periodStart: '2026-01-01T00:00:00Z',
+  periodEnd: '2026-01-02T00:00:00Z',
+  targetBps: 9900,
+  actualBps: 9500,
+  gapBps: 400,
+  severity: 'warning',
+  status: 'open',
+  acknowledgedAt: null,
+  resolvedAt: null,
+  createdAt: '2026-01-02T00:00:00Z',
+};
+
+export const mockSLAViolations = [mockSLAViolation];
+
+// Notification config mock data
+export const mockNotificationConfig = {
+  id: 'nc-001',
+  tenantId: 'tenant-001',
+  name: 'Ops Email',
+  type: 'email',
+  destination: 'ops@example.com',
+  eventsJson: '["capacity_warning","sla_breach"]',
+  status: 'active',
+  createdAt: '2026-01-01T00:00:00Z',
+  updatedAt: '2026-01-01T00:00:00Z',
+};
+
+export const mockNotificationConfigs = [mockNotificationConfig];
