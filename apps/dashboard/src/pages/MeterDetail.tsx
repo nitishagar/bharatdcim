@@ -4,11 +4,15 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMeter, useUpdateMeter, useDeleteMeter, type Meter } from '../api/hooks/useMeters';
 import { useReadings } from '../api/hooks/useReadings';
+import { useEnvReadings, useLatestEnvReading } from '../api/hooks/useEnvReadings';
+import { useActiveAlerts } from '../api/hooks/useAlerts';
 import { useTariffs } from '../api/hooks/useTariffs';
 import { DetailSkeleton, Skeleton } from '../components/Skeleton';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { Breadcrumb } from '../components/Breadcrumb';
 import { ConfirmDialog } from '../components/ConfirmDialog';
+import { EnvChart } from '../components/EnvChart';
+import { AlertBanner } from '../components/AlertBanner';
 import { useIsAdmin } from '../hooks/useIsAdmin';
 import { editMeterSchema, type EditMeterForm } from '../lib/schemas';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -31,6 +35,10 @@ export function MeterDetail() {
   const to = dateRange?.to?.toISOString().split('T')[0];
   const { data: readingsData, isLoading: readingsLoading } = useReadings(id!, from, to, { limit: 500 });
   const readings = readingsData?.data;
+
+  const { data: envData } = useEnvReadings(id!, from, to);
+  const { data: latestEnv } = useLatestEnvReading(id!);
+  const { data: activeAlerts } = useActiveAlerts(id!);
 
   if (meterLoading) return <DetailSkeleton />;
   if (meterError) return <ErrorMessage error={meterError} />;
@@ -158,6 +166,28 @@ export function MeterDetail() {
           </ResponsiveContainer>
         </div>
       )}
+
+      {/* Environmental Monitoring Section */}
+      <h3 className="text-lg font-semibold mt-8 mb-4 text-gray-800 dark:text-gray-200">Environmental</h3>
+      <AlertBanner alerts={activeAlerts ?? []} />
+      <div className="grid grid-cols-2 gap-4 mb-4">
+        <div
+          data-status={latestEnv?.tempCTenths != null && latestEnv.tempCTenths > 300 ? 'warning' : undefined}
+          className={`bg-white rounded-lg border p-4 dark:bg-gray-800 ${latestEnv?.tempCTenths != null && latestEnv.tempCTenths > 300 ? 'border-amber-400 dark:border-amber-500' : 'dark:border-gray-700'}`}
+        >
+          <span className="text-xs text-gray-500 dark:text-gray-400">Temperature</span>
+          <p className="font-medium text-lg dark:text-gray-200">
+            {latestEnv?.tempCTenths != null ? `${(latestEnv.tempCTenths / 10).toFixed(1)}°C` : '—'}
+          </p>
+        </div>
+        <div className="bg-white rounded-lg border p-4 dark:bg-gray-800 dark:border-gray-700">
+          <span className="text-xs text-gray-500 dark:text-gray-400">Humidity</span>
+          <p className="font-medium text-lg dark:text-gray-200">
+            {latestEnv?.humidityPctTenths != null ? `${(latestEnv.humidityPctTenths / 10).toFixed(1)}%` : '—'}
+          </p>
+        </div>
+      </div>
+      <EnvChart readings={envData ?? []} />
     </div>
   );
 }
