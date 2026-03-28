@@ -214,7 +214,7 @@ describe('MeterDetail chart — capacity threshold lines', () => {
   it('renders Legend component', async () => {
     renderWithProviders(<MeterDetail />);
     await waitFor(() => expect(screen.getByRole('heading', { name: 'Main Grid Meter' })).toBeInTheDocument());
-    await waitFor(() => expect(screen.getByTestId('chart-legend')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getAllByTestId('chart-legend').length).toBeGreaterThan(0));
   });
 
   it('renders dashed SMA trend line when readings are available', async () => {

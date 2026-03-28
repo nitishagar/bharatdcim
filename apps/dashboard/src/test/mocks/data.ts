@@ -191,6 +191,54 @@ export const mockCreatedTenant = {
   updatedAt: '2026-03-01T00:00:00Z',
 };
 
+// Asset mock data
+export const mockAsset = {
+  id: 'asset-001',
+  tenantId: 'tenant-001',
+  rackId: 'rack-001',
+  name: 'Dell PowerEdge R750',
+  assetType: 'server' as const,
+  manufacturer: 'Dell',
+  model: 'PowerEdge R750',
+  serialNumber: 'SN-001',
+  rackUnitStart: 10,
+  rackUnitSize: 2,
+  status: 'active',
+  metadata: null,
+  createdAt: '2026-01-01T00:00:00Z',
+  updatedAt: '2026-01-01T00:00:00Z',
+};
+
+export const mockAssets = [mockAsset];
+
+// Rack mock data
+export const mockRack = {
+  id: 'rack-001',
+  tenantId: 'tenant-001',
+  siteId: null,
+  name: 'Row A Rack 01',
+  location: 'Floor 1, Row A',
+  capacityU: 42,
+  status: 'active',
+  metadata: null,
+  createdAt: '2026-01-01T00:00:00Z',
+  updatedAt: '2026-01-01T00:00:00Z',
+};
+
+export const mockRacks = [mockRack];
+
+// Dispute mock data
+export const mockDispute = {
+  id: 'dispute-001',
+  billId: 'bill-001',
+  tenantId: 'tenant-001',
+  disputedBy: 'user-001',
+  reason: 'Incorrect reading',
+  status: 'open' as const,
+  createdAt: '2026-02-01T00:00:00Z',
+  updatedAt: '2026-02-01T00:00:00Z',
+};
+
 // Capacity mock data
 export const mockCapacityThreshold = {
   id: 'ct-001',

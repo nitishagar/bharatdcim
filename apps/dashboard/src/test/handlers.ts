@@ -16,6 +16,11 @@ import {
   mockPlatformOverview,
   mockPlatformTenants,
   mockCreatedTenant,
+  mockAsset,
+  mockAssets,
+  mockRack,
+  mockRacks,
+  mockDispute,
   mockCapacityThreshold,
   mockCapacityThresholds,
   mockCapacityForecast,
@@ -70,6 +75,24 @@ export const handlers = [
   http.patch('*/alerts/rules/:id', () => HttpResponse.json({ id: 'rule-1' })),
   http.delete('*/alerts/rules/:id', () => new HttpResponse(null, { status: 204 })),
   http.post('*/alerts/:id/resolve', () => HttpResponse.json({ id: 'ae1', resolvedAt: new Date().toISOString() })),
+
+  // Asset endpoints
+  http.get('*/assets',                 ({ request }) => paginatedResponse(mockAssets, request)),
+  http.get('*/assets/:id',            () => HttpResponse.json(mockAsset)),
+  http.post('*/assets',               () => HttpResponse.json(mockAsset, { status: 201 })),
+  http.patch('*/assets/:id',          () => HttpResponse.json(mockAsset)),
+  http.delete('*/assets/:id',         () => new HttpResponse(null, { status: 204 })),
+
+  // Rack endpoints
+  http.get('*/racks',                  ({ request }) => paginatedResponse(mockRacks, request)),
+  http.get('*/racks/:id',             () => HttpResponse.json(mockRack)),
+  http.post('*/racks',                () => HttpResponse.json(mockRack, { status: 201 })),
+  http.patch('*/racks/:id',           () => HttpResponse.json(mockRack)),
+  http.delete('*/racks/:id',          () => new HttpResponse(null, { status: 204 })),
+
+  // Dispute endpoints
+  http.post('*/bills/:billId/dispute', () => HttpResponse.json(mockDispute, { status: 201 })),
+  http.get('*/bills/:billId/disputes', () => HttpResponse.json([])),
 
   // Delete endpoints
   http.delete('*/meters/:id',          () => new HttpResponse(null, { status: 204 })),
