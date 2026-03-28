@@ -97,7 +97,7 @@ const ASSET_TYPES = ['server', 'storage', 'network', 'pdu', 'ups', 'cooling', 'o
 
 export const createAssetSchema = z.object({
   name: z.string().min(1, 'Asset name is required'),
-  assetType: z.enum(ASSET_TYPES, { errorMap: () => ({ message: 'Invalid asset type' }) }),
+  assetType: z.enum(ASSET_TYPES, { error: 'Invalid asset type' }),
   rackId: z.string().optional(),
   manufacturer: z.string().optional(),
   model: z.string().optional(),

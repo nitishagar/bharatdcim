@@ -1,11 +1,13 @@
 import { lazy, Suspense, useEffect } from 'react';
 import { SignedIn, SignedOut, RedirectToSignIn, useAuth, useOrganization } from '@clerk/clerk-react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
 import { setTokenGetter } from './api/client';
 import { Layout } from './components/Layout';
+import { PortalLayout } from './components/PortalLayout';
 import { RequirePlatformAdmin } from './components/RequirePlatformAdmin';
+import { RequirePortalAccess } from './components/RequirePortalAccess';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { DashboardSkeleton } from './components/Skeleton';
 
@@ -27,6 +29,16 @@ const Racks = lazy(() => import('./pages/Racks').then(m => ({ default: m.Racks }
 const RackDetail = lazy(() => import('./pages/RackDetail').then(m => ({ default: m.RackDetail })));
 const Assets = lazy(() => import('./pages/Assets').then(m => ({ default: m.Assets })));
 const AssetDetail = lazy(() => import('./pages/AssetDetail').then(m => ({ default: m.AssetDetail })));
+const PortalMeters = lazy(() => import('./pages/PortalMeters').then(m => ({ default: m.PortalMeters })));
+const PortalBilling = lazy(() => import('./pages/PortalBilling').then(m => ({ default: m.PortalBilling })));
+const PortalInvoices = lazy(() => import('./pages/PortalInvoices').then(m => ({ default: m.PortalInvoices })));
+
+/** Redirects org:member to /portal, lets org:admin see the admin dashboard */
+function RoleBasedIndex() {
+  const { orgRole } = useAuth();
+  if (orgRole === 'org:member') return <Navigate to="/portal/meters" replace />;
+  return <Dashboard />;
+}
 
 /** Wires Clerk's session token into the API client */
 function AuthBridge() {
@@ -65,7 +77,7 @@ export function App() {
           <Suspense fallback={<DashboardSkeleton />}>
             <Routes>
               <Route element={<Layout />}>
-                <Route index element={<Dashboard />} />
+                <Route index element={<RoleBasedIndex />} />
                 <Route path="meters" element={<Meters />} />
                 <Route path="meters/:id" element={<MeterDetail />} />
                 <Route path="billing" element={<Billing />} />
@@ -82,6 +94,13 @@ export function App() {
                 <Route path="assets/:id" element={<AssetDetail />} />
                 <Route path="platform" element={<RequirePlatformAdmin><PlatformOverview /></RequirePlatformAdmin>} />
                 <Route path="platform/tenants" element={<RequirePlatformAdmin><PlatformTenants /></RequirePlatformAdmin>} />
+              </Route>
+              <Route path="portal" element={<RequirePortalAccess><PortalLayout /></RequirePortalAccess>}>
+                <Route index element={<Navigate to="meters" replace />} />
+                <Route path="meters" element={<PortalMeters />} />
+                <Route path="billing" element={<PortalBilling />} />
+                <Route path="invoices" element={<PortalInvoices />} />
+                <Route path="settings" element={<Settings />} />
               </Route>
             </Routes>
           </Suspense>
