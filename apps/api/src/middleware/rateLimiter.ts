@@ -53,4 +53,7 @@ export const RATE_LIMITED_PREFIXES = [
   '/agents',
   '/dashboard',
   '/platform',
+  '/racks',
+  '/assets',
+  '/sites',
 ];

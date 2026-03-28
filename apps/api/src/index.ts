@@ -7,6 +7,8 @@ import { createDb } from './db/client.js';
 import type { AppEnv } from './types.js';
 import { tariffs } from './routes/tariffs.js';
 import { metersRouter } from './routes/meters.js';
+import { racksRouter } from './routes/racks.js';
+import { assetsRouter } from './routes/assets.js';
 import { billsRouter } from './routes/bills.js';
 import { readingsRouter } from './routes/readings.js';
 import { invoicesRouter } from './routes/invoices.js';
@@ -178,6 +180,8 @@ app.route('/uploads', uploadsRouter);
 app.route('/agents', agentsRouter);
 app.route('/dashboard', dashboardRouter);
 app.route('/platform', platformRouter);
+app.route('/racks', racksRouter);
+app.route('/assets', assetsRouter);
 
 // 404 handler
 app.notFound((c) => {
