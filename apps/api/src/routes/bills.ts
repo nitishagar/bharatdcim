@@ -1,14 +1,19 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { eq, and, sql } from 'drizzle-orm';
+import { z } from 'zod';
 import { calculateBill } from '@bharatdcim/billing-engine';
 import type { BillCalculationInput } from '@bharatdcim/billing-engine';
 import type { AppEnv } from '../types.js';
-import { bills, invoices } from '../db/schema.js';
+import { bills, invoices, billDisputes } from '../db/schema.js';
 import { requireAdmin } from '../middleware/rbac.js';
 import { parsePagination } from '../utils/pagination.js';
 import { CalculateBillSchema, CreateBillSchema } from '../schemas/bills.js';
 import { validationHook } from '../utils/validationHook.js';
+
+const CreateDisputeSchema = z.object({
+  reason: z.string().min(1),
+});
 
 const billsRouter = new Hono<AppEnv>();
 
@@ -111,6 +116,45 @@ billsRouter.post('/', zValidator('json', CreateBillSchema, validationHook), asyn
 
   await db.insert(bills).values(row);
   return c.json(row, 201);
+});
+
+// POST /bills/:id/dispute — create a dispute for a bill (any tenant member or admin)
+billsRouter.post('/:id/dispute', zValidator('json', CreateDisputeSchema, validationHook), async (c) => {
+  const db = c.get('db');
+  const tenantId = c.get('tenantId');
+  const id = c.req.param('id');
+  const conditions = [eq(bills.id, id)];
+  if (tenantId) conditions.push(eq(bills.tenantId, tenantId));
+  const rows = await db.select({ id: bills.id, tenantId: bills.tenantId }).from(bills).where(and(...conditions)).all();
+  if (rows.length === 0) {
+    return c.json({ error: { code: 'NOT_FOUND', message: `Bill ${id} not found` } }, 404);
+  }
+
+  const { reason } = c.req.valid('json');
+  const now = new Date().toISOString();
+  const dispute = {
+    id: crypto.randomUUID(),
+    billId: id,
+    tenantId: rows[0].tenantId,
+    disputedBy: tenantId ?? 'unknown',
+    reason,
+    status: 'open' as const,
+    createdAt: now,
+    updatedAt: now,
+  };
+  await db.insert(billDisputes).values(dispute);
+  return c.json(dispute, 201);
+});
+
+// GET /bills/:id/disputes — list disputes for a bill (tenant-scoped)
+billsRouter.get('/:id/disputes', async (c) => {
+  const db = c.get('db');
+  const tenantId = c.get('tenantId');
+  const id = c.req.param('id');
+  const conditions = [eq(billDisputes.billId, id)];
+  if (tenantId) conditions.push(eq(billDisputes.tenantId, tenantId));
+  const rows = await db.select().from(billDisputes).where(and(...conditions)).all();
+  return c.json(rows);
 });
 
 // DELETE /bills/:id — hard-delete draft bill (admin only), refuse 422 if not draft or has invoice
