@@ -16,6 +16,7 @@ import { dashboardRouter } from './routes/dashboard.js';
 import { platformRouter } from './routes/platform.js';
 import { capacityRouter } from './routes/capacity.js';
 import { slaRouter } from './routes/sla.js';
+import { notificationsRouter } from './routes/notifications.js';
 import { runDailyChecks } from './services/sla.js';
 import type { Bindings } from './types.js';
 import { openApiSpec } from './openapi.js';
@@ -184,6 +185,7 @@ app.route('/dashboard', dashboardRouter);
 app.route('/platform', platformRouter);
 app.route('/capacity', capacityRouter);
 app.route('/sla', slaRouter);
+app.route('/notifications', notificationsRouter);
 
 // 404 handler
 app.notFound((c) => {
