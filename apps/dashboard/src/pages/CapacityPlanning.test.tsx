@@ -108,6 +108,30 @@ describe('CapacityPlanning page', () => {
     renderWithProviders(<CapacityPlanning />);
     await waitFor(() => expect(screen.getByText(/projected breach/i)).toBeInTheDocument());
   });
+
+  it('shows error message when thresholds API fails', async () => {
+    server.use(
+      http.get('*/capacity/thresholds', () => HttpResponse.json({ error: 'Server error' }, { status: 500 })),
+    );
+    renderWithProviders(<CapacityPlanning />);
+    await waitFor(() => expect(screen.getByText(/retry/i)).toBeInTheDocument());
+  });
+
+  it('shows error message when alerts API fails', async () => {
+    server.use(
+      http.get('*/capacity/alerts', () => HttpResponse.json({ error: 'Server error' }, { status: 500 })),
+    );
+    renderWithProviders(<CapacityPlanning />);
+    await waitFor(() => expect(screen.getByText(/retry/i)).toBeInTheDocument());
+  });
+
+  it('shows error message in ForecastCard when forecast API fails', async () => {
+    server.use(
+      http.get('*/capacity/forecast', () => HttpResponse.json({ error: 'Server error' }, { status: 500 })),
+    );
+    renderWithProviders(<CapacityPlanning />);
+    await waitFor(() => expect(screen.getByText(/api error/i)).toBeInTheDocument());
+  });
 });
 
 describe('useCapacityForecast hook', () => {
