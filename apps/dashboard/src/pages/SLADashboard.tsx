@@ -4,6 +4,7 @@ import { useSLAConfigs, useCreateSLA, type SLAConfig } from '../api/hooks/useSLA
 import { KPICard } from '../components/KPICard';
 import { useIsAdmin } from '../hooks/useIsAdmin';
 import { Skeleton } from '../components/Skeleton';
+import { ErrorMessage } from '../components/ErrorMessage';
 
 function CreateSLAForm({ onClose }: { onClose: () => void }) {
   const createSLA = useCreateSLA();
@@ -116,7 +117,7 @@ function SLARow({ config }: { config: SLAConfig }) {
 export function SLADashboard() {
   const isAdmin = useIsAdmin();
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const { data: configs, isLoading } = useSLAConfigs();
+  const { data: configs, isLoading, error, refetch } = useSLAConfigs();
 
   const activeConfigs = (configs ?? []).filter((c) => c.status === 'active');
   const compliantCount = activeConfigs.filter(
@@ -151,6 +152,8 @@ export function SLADashboard() {
 
       {isLoading ? (
         <Skeleton className="h-40 w-full" />
+      ) : error ? (
+        <ErrorMessage error={error} onRetry={() => refetch()} />
       ) : !configs || configs.length === 0 ? (
         <p className="text-sm text-gray-400 dark:text-gray-500">No SLA configs configured.</p>
       ) : (
