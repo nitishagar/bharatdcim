@@ -44,7 +44,7 @@ invoicesRouter.post('/', zValidator('json', CreateInvoiceSchema, validationHook)
   const body = c.req.valid('json');
 
   try {
-    const result = await createInvoice(body.billId, body.supplierGSTIN, body.recipientGSTIN, db, tenantId);
+    const result = await createInvoice(body.billId, body.supplierGSTIN, body.recipientGSTIN, db, tenantId, c.env, c.get('irpCtx'));
     return c.json(result.invoice, 201);
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';
@@ -81,7 +81,7 @@ invoicesRouter.post('/:id/cancel', zValidator('json', CancelInvoiceSchema, valid
   const body = c.req.valid('json');
 
   try {
-    const result = await cancelInvoice(id, body.reason, db, tenantId);
+    const result = await cancelInvoice(id, body.reason, db, tenantId, c.env);
     return c.json(result);
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';
@@ -103,7 +103,7 @@ invoicesRouter.post('/credit-notes', zValidator('json', CreateCreditNoteSchema, 
   const body = c.req.valid('json');
 
   try {
-    const result = await createCreditNote(body.invoiceId, body.amountPaisa, body.reason, db, tenantId);
+    const result = await createCreditNote(body.invoiceId, body.amountPaisa, body.reason, db, tenantId, c.env, c.get('irpCtx'));
     return c.json(result, 201);
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';

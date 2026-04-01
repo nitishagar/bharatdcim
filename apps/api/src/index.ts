@@ -22,6 +22,7 @@ import { capacityRouter } from './routes/capacity.js';
 import { slaRouter } from './routes/sla.js';
 import { notificationsRouter } from './routes/notifications.js';
 import { runDailyChecks } from './services/sla.js';
+import { processIrpRetryQueue } from './services/irp-retry.js';
 import type { Bindings } from './types.js';
 import { openApiSpec } from './openapi.js';
 import {
@@ -173,6 +174,9 @@ app.use('*', async (c, next) => {
   if (API_PREFIXES.some((p) => c.req.path === p || c.req.path.startsWith(p + '/'))) {
     const db = createDb(c.env.TURSO_DATABASE_URL, c.env.TURSO_AUTH_TOKEN);
     c.set('db', db);
+    // Set IRP execution context for async IRP generation via ctx.waitUntil
+    const execCtx = (c as { executionCtx?: { waitUntil(p: Promise<unknown>): void } }).executionCtx;
+    c.set('irpCtx', execCtx ?? { waitUntil: (p) => void p });
   }
   await next();
 });
@@ -204,8 +208,12 @@ export { app };
 
 export default {
   fetch: app.fetch.bind(app),
-  async scheduled(_event: { scheduledTime: number }, env: Bindings, ctx: { waitUntil(p: Promise<unknown>): void }) {
+  async scheduled(event: { cron: string; scheduledTime: number }, env: Bindings, ctx: { waitUntil(p: Promise<unknown>): void }) {
     const db = createDb(env.TURSO_DATABASE_URL, env.TURSO_AUTH_TOKEN);
-    ctx.waitUntil(runDailyChecks(db, env));
+    if (event.cron === '*/15 * * * *') {
+      ctx.waitUntil(processIrpRetryQueue(db, env));
+    } else {
+      ctx.waitUntil(runDailyChecks(db, env));
+    }
   },
 };

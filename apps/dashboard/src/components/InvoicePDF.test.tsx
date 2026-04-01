@@ -6,6 +6,7 @@ vi.mock('@react-pdf/renderer', () => ({
   Page: ({ children }: { children: React.ReactNode }) => <div data-testid="pdf-page">{children}</div>,
   Text: ({ children }: { children: React.ReactNode }) => <span>{children}</span>,
   View: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Image: ({ src }: { src: string }) => <img data-testid="pdf-image" src={src} />,
   StyleSheet: { create: (s: unknown) => s },
   pdf: vi.fn(),
 }));
@@ -26,6 +27,14 @@ const baseProps = {
   totalAmountPaisa: 1276170,
   status: 'draft',
   financialYear: '2526',
+};
+
+const irnProps = {
+  eInvoiceStatus: 'irn_generated' as const,
+  irn: 'a'.repeat(64),
+  ackNo: '112010000011474',
+  ackDt: '2026-03-31 14:30:00',
+  qrCodeDataUrl: 'data:image/png;base64,mockQR',
 };
 
 describe('InvoicePDF component', () => {
@@ -51,5 +60,31 @@ describe('InvoicePDF component', () => {
     render(<InvoicePDF {...baseProps} taxType="IGST" igstPaisa={194670} cgstPaisa={null} sgstPaisa={null} />);
     expect(screen.getByText('IGST (18%)')).toBeInTheDocument();
     expect(screen.queryByText('CGST (9%)')).not.toBeInTheDocument();
+  });
+
+  it('PDF-01: renders IRN text and value when eInvoiceStatus=irn_generated', () => {
+    render(<InvoicePDF {...baseProps} {...irnProps} />);
+    expect(screen.getByText('IRN:')).toBeInTheDocument();
+    expect(screen.getByText('a'.repeat(64))).toBeInTheDocument();
+  });
+
+  it('PDF-02: renders Image element when signedQrCode/qrCodeDataUrl is present', () => {
+    render(<InvoicePDF {...baseProps} {...irnProps} />);
+    const img = screen.getByTestId('pdf-image');
+    expect(img).toBeInTheDocument();
+    expect(img).toHaveAttribute('src', 'data:image/png;base64,mockQR');
+  });
+
+  it('PDF-03: renders IRN Pending text and no Image when eInvoiceStatus=pending_irn', () => {
+    render(<InvoicePDF {...baseProps} eInvoiceStatus="pending_irn" irn={null} qrCodeDataUrl={null} />);
+    expect(screen.getByText(/IRN: Pending/)).toBeInTheDocument();
+    expect(screen.queryByTestId('pdf-image')).not.toBeInTheDocument();
+  });
+
+  it('PDF-04: renders neither IRN text nor Image when eInvoiceStatus=not_applicable', () => {
+    render(<InvoicePDF {...baseProps} eInvoiceStatus="not_applicable" irn={null} qrCodeDataUrl={null} />);
+    expect(screen.queryByText('IRN:')).not.toBeInTheDocument();
+    expect(screen.queryByText(/IRN: Pending/)).not.toBeInTheDocument();
+    expect(screen.queryByTestId('pdf-image')).not.toBeInTheDocument();
   });
 });

@@ -64,6 +64,10 @@ platformRouter.patch('/tenants/:id', zValidator('json', UpdateTenantSchema, vali
   if (body.stateCode !== undefined) updates.stateCode = body.stateCode;
   if (body.gstin !== undefined) updates.gstin = body.gstin ?? undefined;
   if (body.billingAddress !== undefined) updates.billingAddress = body.billingAddress ?? undefined;
+  if (body.legalName !== undefined) updates.legalName = body.legalName ?? undefined;
+  if (body.address1 !== undefined) updates.address1 = body.address1 ?? undefined;
+  if (body.city !== undefined) updates.city = body.city ?? undefined;
+  if (body.pincode !== undefined) updates.pincode = body.pincode ?? undefined;
 
   await db.update(tenants).set(updates).where(eq(tenants.id, id));
 

@@ -25,7 +25,9 @@ export const createInvoiceSchema = z.object({
 export type CreateInvoiceForm = z.infer<typeof createInvoiceSchema>;
 
 export const cancelInvoiceSchema = z.object({
-  reason: z.string().min(1, 'Cancellation reason is required'),
+  reason: z.enum(['Duplicate', 'Data Entry Mistake', 'Order Cancelled', 'Other'], {
+    error: 'Select a cancellation reason',
+  }),
 });
 
 export type CancelInvoiceForm = z.infer<typeof cancelInvoiceSchema>;

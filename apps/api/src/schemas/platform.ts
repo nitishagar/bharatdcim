@@ -14,4 +14,8 @@ export const UpdateTenantSchema = z.object({
   stateCode: z.string().min(1).max(5).optional(),
   gstin: z.string().regex(gstinRegex, 'Invalid GSTIN format').nullable().optional(),
   billingAddress: z.string().max(2000).nullable().optional(),
+  legalName: z.string().max(500).nullable().optional(),
+  address1: z.string().max(2000).nullable().optional(),
+  city: z.string().max(200).nullable().optional(),
+  pincode: z.string().max(10).nullable().optional(),
 });

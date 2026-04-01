@@ -8,6 +8,10 @@ export const tenants = sqliteTable('tenants', {
   gstin: text('gstin'),
   billingAddress: text('billing_address'),
   stateCode: text('state_code').notNull(),
+  legalName: text('legal_name'),
+  address1: text('address1'),
+  city: text('city'),
+  pincode: text('pincode'),
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
 });
@@ -178,6 +182,14 @@ export const invoices = sqliteTable('invoices', {
   totalTaxPaisa: integer('total_tax_paisa').notNull(),
   totalAmountPaisa: integer('total_amount_paisa').notNull(),
   status: text('status').notNull().default('draft'), // 'draft' | 'finalized' | 'cancelled'
+  eInvoiceStatus: text('e_invoice_status').notNull().default('not_applicable'),
+  // valid: 'not_applicable' | 'pending_irn' | 'irn_generated' | 'irn_cancelled'
+  irn: text('irn'),
+  ackNo: text('ack_no'),
+  ackDt: text('ack_dt'),
+  signedQrCode: text('signed_qr_code'),
+  irnGeneratedAt: text('irn_generated_at'),
+  irnCancelledAt: text('irn_cancelled_at'),
   invoiceDate: text('invoice_date').notNull(),
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
@@ -208,6 +220,14 @@ export const creditNotes = sqliteTable('credit_notes', {
   totalAmountPaisa: integer('total_amount_paisa').notNull(),
   reason: text('reason').notNull(),
   status: text('status').notNull().default('draft'),
+  eInvoiceStatus: text('e_invoice_status').notNull().default('not_applicable'),
+  // valid: 'not_applicable' | 'pending_irn' | 'irn_generated' | 'irn_cancelled'
+  irn: text('irn'),
+  ackNo: text('ack_no'),
+  ackDt: text('ack_dt'),
+  signedQrCode: text('signed_qr_code'),
+  irnGeneratedAt: text('irn_generated_at'),
+  irnCancelledAt: text('irn_cancelled_at'),
   creditNoteDate: text('credit_note_date').notNull(),
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
@@ -373,6 +393,23 @@ export const notificationConfigs = sqliteTable('notification_configs', {
   destination: text('destination').notNull(),
   eventsJson: text('events_json').notNull().default('[]'),
   status: text('status').notNull().default('active'),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+});
+
+// ─── IRP Retry Queue ───────────────────────────────────────────
+
+export const irpRetryQueue = sqliteTable('irp_retry_queue', {
+  id: text('id').primaryKey(),
+  invoiceId: text('invoice_id').notNull().references(() => invoices.id),
+  documentType: text('document_type').notNull(), // 'INV' | 'CRN'
+  attemptCount: integer('attempt_count').notNull().default(0),
+  lastAttemptedAt: text('last_attempted_at'),
+  nextRetryAt: text('next_retry_at').notNull(),
+  errorMessage: text('error_message'),
+  payloadJson: text('payload_json').notNull(),
+  status: text('status').notNull().default('pending'),
+  // valid: 'pending' | 'processing' | 'succeeded' | 'abandoned'
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
 });

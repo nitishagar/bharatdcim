@@ -8,7 +8,7 @@ routes = [
 ]
 
 [triggers]
-crons = ["5 0 * * *"]
+crons = ["5 0 * * *", "*/15 * * * *"]
 
 [vars]
 CLERK_ISSUER_URL = "https://clerk.dashboard.bharatdcim.com"

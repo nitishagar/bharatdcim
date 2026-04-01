@@ -9,7 +9,7 @@ export const CreateInvoiceSchema = z.object({
 });
 
 export const CancelInvoiceSchema = z.object({
-  reason: z.string().min(1).max(1000),
+  reason: z.enum(['Duplicate', 'Data Entry Mistake', 'Order Cancelled', 'Other']),
 });
 
 export const CreateCreditNoteSchema = z.object({

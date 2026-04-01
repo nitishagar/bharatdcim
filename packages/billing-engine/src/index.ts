@@ -11,6 +11,8 @@ export type { TaxType, GSTINValidation, TaxBreakdown } from './invoice/gst.js';
 export { getFinancialYear, formatInvoiceNumber, formatCreditNoteNumber } from './invoice/numbering.js';
 export { validateCreditNote } from './invoice/credit-note.js';
 export type { CreditNoteValidation } from './invoice/credit-note.js';
+export { buildIrpPayload, buildIrpItemList } from './invoice/irp-payload.js';
+export type { IRPAddress, IRPItem, IRPPayload } from './invoice/irp-payload.js';
 
 // CSV import pipeline
 export { parseCSV, detectDCIMFormat, normalizeRows, validateCSVFile, validateCSVRow } from './csv/index.js';

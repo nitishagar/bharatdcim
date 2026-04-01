@@ -13,6 +13,27 @@ import { InvoicePDF } from '../components/InvoicePDF';
 import { formatPaisa } from '../lib/formatCurrency';
 import { cancelInvoiceSchema, creditNoteSchema, type CancelInvoiceForm, type CreditNoteForm } from '../lib/schemas';
 
+const IRP_STATUS_CONFIG: Record<string, { label: string; color: 'green' | 'amber' | 'red' }> = {
+  irn_generated: { label: 'IRN Generated', color: 'green' },
+  pending_irn: { label: 'Pending IRN', color: 'amber' },
+  irn_cancelled: { label: 'IRN Cancelled', color: 'red' },
+};
+
+function IRPStatusBadge({ status }: { status: string }) {
+  const config = IRP_STATUS_CONFIG[status];
+  if (!config) return null;
+  const colorClass = {
+    green: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+    amber: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
+    red: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
+  }[config.color];
+  return (
+    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${colorClass}`}>
+      {config.label}
+    </span>
+  );
+}
+
 export function InvoiceDetail() {
   const { id } = useParams<{ id: string }>();
   const { data: invoice, isLoading, error } = useInvoice(id!);
@@ -52,6 +73,11 @@ export function InvoiceDetail() {
         totalAmountPaisa={invoice!.totalAmountPaisa}
         status={invoice!.status}
         financialYear={invoice!.financialYear}
+        eInvoiceStatus={invoice!.eInvoiceStatus}
+        irn={invoice!.irn}
+        ackNo={invoice!.ackNo}
+        ackDt={invoice!.ackDt}
+        qrCodeDataUrl={invoice!.signedQrCode}
       />
     ).toBlob();
     const url = URL.createObjectURL(blob);
@@ -85,12 +111,18 @@ export function InvoiceDetail() {
       ]
     : [['IGST (18%)', invoice.igstPaisa ?? 0]];
 
+  const showIrpCancelWarning =
+    invoice.status === 'cancelled' && invoice.eInvoiceStatus !== 'irn_cancelled';
+
   return (
     <div>
       <Breadcrumb items={[{ label: 'Invoices', to: '/invoices' }, { label: invoice.invoiceNumber }]} />
       <div className="flex items-center gap-3 mb-4">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{invoice.invoiceNumber}</h2>
         <StatusBadge status={invoice.status} />
+        {invoice.eInvoiceStatus !== 'not_applicable' && (
+          <IRPStatusBadge status={invoice.eInvoiceStatus} />
+        )}
         <button
           onClick={handleDownloadPDF}
           className="ml-auto rounded-lg border px-4 py-2 text-sm hover:bg-gray-50 print:hidden dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
@@ -98,6 +130,12 @@ export function InvoiceDetail() {
           Download PDF
         </button>
       </div>
+
+      {showIrpCancelWarning && (
+        <div className="mb-4 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-700 dark:bg-amber-900/20 dark:text-amber-300">
+          IRP cancellation was not performed (outside 24h window or no IRN). Amend via GSTR-1 filing if required.
+        </div>
+      )}
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="bg-white rounded-lg border p-4 dark:bg-gray-800 dark:border-gray-700">
@@ -117,6 +155,18 @@ export function InvoiceDetail() {
           <p className="font-medium text-sm dark:text-gray-200">{invoice.invoiceDate}</p>
         </div>
       </div>
+
+      {invoice.irn && (
+        <div className="mb-6 rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">IRN</p>
+          <p className="font-mono text-xs break-all dark:text-gray-200">{invoice.irn}</p>
+          {invoice.ackNo && (
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Ack No: {invoice.ackNo} &bull; Ack Date: {invoice.ackDt}
+            </p>
+          )}
+        </div>
+      )}
 
       <div className="bg-white rounded-lg border overflow-hidden mb-6 dark:bg-gray-800 dark:border-gray-700">
         <table className="w-full text-sm">
@@ -163,10 +213,16 @@ export function InvoiceDetail() {
       {showCancel && (
         <form onSubmit={cancelForm.handleSubmit(handleCancel)} className="mt-4 bg-white rounded-lg border p-4 dark:bg-gray-800 dark:border-gray-700">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cancellation Reason</label>
-          <input
+          <select
             {...cancelForm.register('reason')}
             className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm mb-1 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
-          />
+          >
+            <option value="">Select reason...</option>
+            <option value="Duplicate">Duplicate</option>
+            <option value="Data Entry Mistake">Data Entry Mistake</option>
+            <option value="Order Cancelled">Order Cancelled</option>
+            <option value="Other">Other</option>
+          </select>
           {cancelForm.formState.errors.reason && (
             <p className="text-sm text-red-500 mb-2">{cancelForm.formState.errors.reason.message}</p>
           )}

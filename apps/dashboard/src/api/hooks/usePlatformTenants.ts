@@ -8,6 +8,10 @@ export interface Tenant {
   stateCode: string;
   gstin: string | null;
   billingAddress: string | null;
+  legalName: string | null;
+  address1: string | null;
+  city: string | null;
+  pincode: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -35,7 +39,7 @@ export function useCreateTenant() {
 export function useUpdateTenant() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, ...data }: { id: string; name?: string; stateCode?: string; gstin?: string; billingAddress?: string }) =>
+    mutationFn: ({ id, ...data }: { id: string; name?: string; stateCode?: string; gstin?: string; billingAddress?: string; legalName?: string; address1?: string; city?: string; pincode?: string }) =>
       api<Tenant>(`/platform/tenants/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['platform', 'tenants'] });

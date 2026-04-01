@@ -22,6 +22,10 @@ export async function createTestDb() {
       gstin TEXT,
       billing_address TEXT,
       state_code TEXT NOT NULL,
+      legal_name TEXT,
+      address1 TEXT,
+      city TEXT,
+      pincode TEXT,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );
@@ -176,6 +180,13 @@ export async function createTestDb() {
       total_tax_paisa INTEGER NOT NULL,
       total_amount_paisa INTEGER NOT NULL,
       status TEXT NOT NULL DEFAULT 'draft',
+      e_invoice_status TEXT NOT NULL DEFAULT 'not_applicable',
+      irn TEXT,
+      ack_no TEXT,
+      ack_dt TEXT,
+      signed_qr_code TEXT,
+      irn_generated_at TEXT,
+      irn_cancelled_at TEXT,
       invoice_date TEXT NOT NULL,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
@@ -202,6 +213,13 @@ export async function createTestDb() {
       total_amount_paisa INTEGER NOT NULL,
       reason TEXT NOT NULL,
       status TEXT NOT NULL DEFAULT 'draft',
+      e_invoice_status TEXT NOT NULL DEFAULT 'not_applicable',
+      irn TEXT,
+      ack_no TEXT,
+      ack_dt TEXT,
+      signed_qr_code TEXT,
+      irn_generated_at TEXT,
+      irn_cancelled_at TEXT,
       credit_note_date TEXT NOT NULL,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
@@ -251,6 +269,20 @@ export async function createTestDb() {
       disputed_by TEXT NOT NULL,
       reason TEXT NOT NULL,
       status TEXT NOT NULL DEFAULT 'open',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS irp_retry_queue (
+      id TEXT PRIMARY KEY,
+      invoice_id TEXT NOT NULL REFERENCES invoices(id),
+      document_type TEXT NOT NULL,
+      attempt_count INTEGER NOT NULL DEFAULT 0,
+      last_attempted_at TEXT,
+      next_retry_at TEXT NOT NULL,
+      error_message TEXT,
+      payload_json TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'pending',
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );
@@ -382,7 +414,7 @@ export async function createTestDb() {
 
 /**
  * Create a Hono app with tenant context for testing.
- * Sets db, tenantId, authType, orgRole, and platformAdmin in context.
+ * Sets db, tenantId, authType, orgRole, platformAdmin, and irpCtx in context.
  */
 export function createAppWithTenant(
   db: Database,
@@ -391,12 +423,14 @@ export function createAppWithTenant(
     authType?: 'clerk' | 'api_token';
     orgRole?: string | null;
     platformAdmin?: boolean;
+    irpCtx?: { waitUntil(p: Promise<unknown>): void };
   } = {},
 ) {
   const {
     authType = 'clerk',
     orgRole = 'admin',
     platformAdmin = false,
+    irpCtx = { waitUntil: () => {} },
   } = options;
 
   const app = new Hono<AppEnv>();
@@ -415,6 +449,7 @@ export function createAppWithTenant(
     c.set('authType', authType);
     c.set('orgRole', orgRole);
     c.set('platformAdmin', platformAdmin);
+    c.set('irpCtx', irpCtx);
     await next();
   });
   return app;

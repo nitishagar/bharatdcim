@@ -418,7 +418,7 @@ describe('Tenant Isolation', () => {
       const res = await app.request('/invoices/inv-ka-1/cancel', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reason: 'Duplicate invoice' }),
+        body: JSON.stringify({ reason: 'Duplicate' }),
       });
       expect(res.status).toBe(400);
       const body = await res.json();

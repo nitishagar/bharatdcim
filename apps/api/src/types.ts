@@ -14,6 +14,13 @@ export type Bindings = {
   API_TOKEN: string;
   CLERK_ISSUER_URL?: string;
   RESEND_API_KEY: string;
+  GSP_API_KEY?: string;
+  GSP_BASE_URL?: string;
+  PLATFORM_LEGAL_NAME?: string;
+  PLATFORM_ADDRESS1?: string;
+  PLATFORM_CITY?: string;
+  PLATFORM_PINCODE?: string;
+  PLATFORM_GSTIN?: string;
 };
 
 export type Variables = {
@@ -22,6 +29,7 @@ export type Variables = {
   authType: 'clerk' | 'api_token';
   orgRole: string | null;
   platformAdmin: boolean;
+  irpCtx: { waitUntil(p: Promise<unknown>): void };
 };
 
 export type AppEnv = { Bindings: Bindings; Variables: Variables };

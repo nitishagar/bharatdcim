@@ -124,9 +124,42 @@ export const mockInvoice: Invoice = {
   totalTaxPaisa: 194670,
   totalAmountPaisa: 1276170,
   status: 'active',
+  eInvoiceStatus: 'irn_generated',
+  irn: 'a'.repeat(64),
+  ackNo: '112010000011474',
+  ackDt: '2026-03-31 14:30:00',
+  signedQrCode: 'eyJhbGciOiJSUzI1NiJ9.mock.signature',
+  irnGeneratedAt: '2026-03-31T14:30:00.000Z',
+  irnCancelledAt: null,
   invoiceDate: '2026-02-01',
   createdAt: '2026-02-01T09:00:00Z',
   updatedAt: '2026-02-01T09:00:00Z',
+};
+
+export const mockInvoicePending: Invoice = {
+  ...mockInvoice,
+  id: 'invoice-002',
+  invoiceNumber: 'INV-2026-002',
+  eInvoiceStatus: 'pending_irn',
+  irn: null,
+  ackNo: null,
+  ackDt: null,
+  signedQrCode: null,
+  irnGeneratedAt: null,
+  irnCancelledAt: null,
+};
+
+export const mockInvoiceNotApplicable: Invoice = {
+  ...mockInvoice,
+  id: 'invoice-003',
+  invoiceNumber: 'INV-2026-003',
+  eInvoiceStatus: 'not_applicable',
+  irn: null,
+  ackNo: null,
+  ackDt: null,
+  signedQrCode: null,
+  irnGeneratedAt: null,
+  irnCancelledAt: null,
 };
 
 export const mockInvoices: Invoice[] = [mockInvoice];

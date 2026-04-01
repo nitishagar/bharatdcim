@@ -1,11 +1,14 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
+import { eq, sql } from 'drizzle-orm';
 import { createTestDb } from '../helpers.js';
 import {
   tenants, tariffConfigs, meters, powerReadings, bills,
   invoices, invoiceSequences, creditNotes, invoiceAuditLog, uploadAudit,
   envReadings, alertRules, alertEvents,
   capacityThresholds, slaConfigs, alerts, slaViolations, notificationConfigs,
+  irpRetryQueue,
 } from '../../src/db/schema.js';
+import type { Database } from '../../src/db/client.js';
 
 describe('Drizzle Schema', () => {
   it('all tables can be created in-memory', async () => {
@@ -219,5 +222,139 @@ describe('Drizzle Schema', () => {
     expect(alertRules.metric).toBeDefined();
     expect(alertRules.threshold).toBeDefined();
     expect(alertRules.enabled).toBeDefined();
+  });
+});
+
+describe('IRP Schema tests', () => {
+  let db: Database;
+
+  const baseNow = '2026-04-01T00:00:00Z';
+
+  async function seedBase(localDb: Database) {
+    await (localDb as any).insert(tenants).values({
+      id: 'tenant-001', name: 'Test DC', stateCode: 'MH', createdAt: baseNow, updatedAt: baseNow,
+    });
+    await (localDb as any).insert(tariffConfigs).values({
+      id: 'tc1', stateCode: 'MH', discom: 'MSEDCL', category: 'HT', effectiveFrom: '2025-01-01',
+      billingUnit: 'kWh', baseEnergyRatePaisa: 800, wheelingChargePaisa: 50,
+      demandChargePerKvaPaisa: 50000, demandRatchetPercent: 75, minimumDemandKva: 50,
+      timeSlotsJson: '[]', fuelAdjustmentPaisa: 50, fuelAdjustmentType: 'absolute',
+      electricityDutyBps: 600, pfThresholdBps: 9000, pfPenaltyRatePaisa: 20,
+      version: 1, createdAt: baseNow, updatedAt: baseNow,
+    });
+    await (localDb as any).insert(meters).values({
+      id: 'meter-001', tenantId: 'tenant-001', name: 'Main Meter', stateCode: 'MH',
+      tariffId: 'tc1', createdAt: baseNow, updatedAt: baseNow,
+    });
+    await (localDb as any).insert(bills).values({
+      id: 'bill-001', tenantId: 'tenant-001', meterId: 'meter-001', tariffId: 'tc1',
+      billingPeriodStart: '2026-01-01', billingPeriodEnd: '2026-01-31',
+      peakKwh: 100, normalKwh: 500, offPeakKwh: 100, totalKwh: 700,
+      contractedDemandKva: 100, recordedDemandKva: 90, billedDemandKva: 100,
+      powerFactor: 9500, peakChargesPaisa: 80000, normalChargesPaisa: 350000,
+      offPeakChargesPaisa: 70000, totalEnergyChargesPaisa: 500000,
+      wheelingChargesPaisa: 35000, demandChargesPaisa: 500000,
+      fuelAdjustmentPaisa: 35000, electricityDutyPaisa: 64200, pfPenaltyPaisa: 0,
+      dgChargesPaisa: 0, subtotalPaisa: 1134200, gstPaisa: 204156, totalBillPaisa: 1338356,
+      effectiveRatePaisaPerKwh: 1912, createdAt: baseNow, updatedAt: baseNow,
+    });
+  }
+
+  async function seedInvoice(localDb: Database) {
+    await (localDb as any).insert(invoices).values({
+      id: 'invoice-001', billId: 'bill-001', tenantId: 'tenant-001',
+      invoiceNumber: 'INV/2627/000001', financialYear: '2627',
+      supplierGstin: '27AAPFU0939F1ZV', recipientGstin: '29ABCDE1234F1Z5',
+      taxType: 'CGST_SGST', taxableAmountPaisa: 1134200,
+      cgstPaisa: 102078, sgstPaisa: 102078, igstPaisa: null,
+      totalTaxPaisa: 204156, totalAmountPaisa: 1338356,
+      invoiceDate: baseNow, createdAt: baseNow, updatedAt: baseNow,
+    });
+  }
+
+  beforeEach(async () => {
+    const testDb = await createTestDb();
+    db = testDb.db as unknown as Database;
+    await seedBase(db);
+  });
+
+  it('SCHEMA-01: invoices row inserted with no e_invoice_status gets default not_applicable', async () => {
+    await seedInvoice(db);
+    const rows = await (db as any).select().from(invoices).where(eq(invoices.id, 'invoice-001')).all();
+    expect(rows[0].eInvoiceStatus).toBe('not_applicable');
+  });
+
+  it('SCHEMA-02: invoices row can be updated with IRN fields and irn_generated status', async () => {
+    await seedInvoice(db);
+    await (db as any).update(invoices).set({
+      irn: 'a'.repeat(64),
+      ackNo: '112010000011474',
+      ackDt: '2026-04-01 14:30:00',
+      signedQrCode: 'eyJhbGciOiJSUzI1NiJ9.mock.sig',
+      eInvoiceStatus: 'irn_generated',
+      irnGeneratedAt: baseNow,
+      updatedAt: baseNow,
+    }).where(eq(invoices.id, 'invoice-001'));
+
+    const rows = await (db as any).select().from(invoices).where(eq(invoices.id, 'invoice-001')).all();
+    expect(rows[0].eInvoiceStatus).toBe('irn_generated');
+    expect(rows[0].irn).toBe('a'.repeat(64));
+    expect(rows[0].ackNo).toBe('112010000011474');
+    expect(rows[0].signedQrCode).toBe('eyJhbGciOiJSUzI1NiJ9.mock.sig');
+  });
+
+  it('SCHEMA-03: tenants rows have legalName, address1, city, pincode (nullable); existing rows unaffected', async () => {
+    const rows = await (db as any).select().from(tenants).where(eq(tenants.id, 'tenant-001')).all();
+    expect(rows[0].legalName).toBeNull();
+    expect(rows[0].address1).toBeNull();
+    expect(rows[0].city).toBeNull();
+    expect(rows[0].pincode).toBeNull();
+    expect(rows[0].name).toBe('Test DC');
+    expect(rows[0].stateCode).toBe('MH');
+  });
+
+  it('SCHEMA-04: irp_retry_queue INSERT with required fields succeeds', async () => {
+    await seedInvoice(db);
+    await (db as any).insert(irpRetryQueue).values({
+      id: 'retry-001',
+      invoiceId: 'invoice-001',
+      documentType: 'INV',
+      attemptCount: 0,
+      nextRetryAt: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+      payloadJson: JSON.stringify({ version: '1.1' }),
+      status: 'pending',
+      createdAt: baseNow,
+      updatedAt: baseNow,
+    });
+
+    const rows = await (db as any).select().from(irpRetryQueue).where(eq(irpRetryQueue.id, 'retry-001')).all();
+    expect(rows[0].documentType).toBe('INV');
+    expect(rows[0].status).toBe('pending');
+    expect(rows[0].attemptCount).toBe(0);
+  });
+
+  it('SEQ-01: 10 concurrent nextSequence upserts for same FY produce 10 distinct values', async () => {
+    const fy = '2627';
+    const nowTs = new Date().toISOString();
+
+    const results = await Promise.all(
+      Array.from({ length: 10 }, async (_, i) => {
+        const res = await (db as any)
+          .insert(invoiceSequences)
+          .values({ id: `seq-${i}`, financialYear: fy, lastSequence: 1, updatedAt: nowTs })
+          .onConflictDoUpdate({
+            target: invoiceSequences.financialYear,
+            set: {
+              lastSequence: sql`${invoiceSequences.lastSequence} + 1`,
+              updatedAt: nowTs,
+            },
+          })
+          .returning({ lastSequence: invoiceSequences.lastSequence });
+        return res[0].lastSequence;
+      }),
+    );
+
+    const unique = new Set(results);
+    expect(unique.size).toBe(10);
   });
 });

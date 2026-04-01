@@ -83,11 +83,15 @@ describe('createInvoiceSchema', () => {
 // ─── cancelInvoiceSchema ──────────────────────────────────────────────────
 
 describe('cancelInvoiceSchema', () => {
-  it('accepts a non-empty reason', () => {
-    expect(cancelInvoiceSchema.safeParse({ reason: 'Duplicate invoice' }).success).toBe(true);
+  it('accepts valid enum reasons', () => {
+    expect(cancelInvoiceSchema.safeParse({ reason: 'Duplicate' }).success).toBe(true);
+    expect(cancelInvoiceSchema.safeParse({ reason: 'Data Entry Mistake' }).success).toBe(true);
+    expect(cancelInvoiceSchema.safeParse({ reason: 'Order Cancelled' }).success).toBe(true);
+    expect(cancelInvoiceSchema.safeParse({ reason: 'Other' }).success).toBe(true);
   });
 
-  it('rejects an empty reason', () => {
+  it('rejects invalid reason not in enum', () => {
+    expect(cancelInvoiceSchema.safeParse({ reason: 'Duplicate invoice' }).success).toBe(false);
     expect(cancelInvoiceSchema.safeParse({ reason: '' }).success).toBe(false);
   });
 });

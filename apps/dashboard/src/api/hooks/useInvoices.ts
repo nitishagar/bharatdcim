@@ -19,6 +19,13 @@ export interface Invoice {
   totalTaxPaisa: number;
   totalAmountPaisa: number;
   status: string;
+  eInvoiceStatus: 'not_applicable' | 'pending_irn' | 'irn_generated' | 'irn_cancelled';
+  irn: string | null;
+  ackNo: string | null;
+  ackDt: string | null;
+  signedQrCode: string | null;
+  irnGeneratedAt: string | null;
+  irnCancelledAt: string | null;
   invoiceDate: string;
   createdAt: string;
   updatedAt: string;
