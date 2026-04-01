@@ -71,7 +71,7 @@ describe('RBAC Enforcement', () => {
             baseEnergyRatePaisa: 800, wheelingChargePaisa: 50,
             demandChargePerKVAPaisa: 50000, demandRatchetPercent: 75, minimumDemandKVA: 50,
             timeSlots: [], fuelAdjustmentPaisa: 50, fuelAdjustmentType: 'absolute',
-            electricityDutyBps: 600, pfThresholdBps: 9000, pfPenaltyRatePaisa: 20, version: 1,
+            electricityDutyBps: 600, pfThresholdBps: 9000, pfPenaltyRatePaisa: 20, gstRateBps: 1800, version: 1,
           },
         }),
       });

@@ -79,6 +79,7 @@ export async function calculateAndStoreBill(
     electricityDutyBps: tariffRow.electricityDutyBps,
     pfThresholdBps: tariffRow.pfThresholdBps,
     pfPenaltyRatePaisa: tariffRow.pfPenaltyRatePaisa,
+    gstRateBps: tariffRow.gstRateBps,
     version: tariffRow.version,
   };
 

@@ -97,6 +97,7 @@ tariffs.post('/', zValidator('json', CreateTariffSchema, validationHook), async 
     electricityDutyBps: body.electricityDutyBps,
     pfThresholdBps: body.pfThresholdBps,
     pfPenaltyRatePaisa: body.pfPenaltyRatePaisa,
+    gstRateBps: body.gstRateBps,
     version: body.version,
     createdAt: now,
     updatedAt: now,

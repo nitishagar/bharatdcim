@@ -24,6 +24,7 @@ export interface TariffConfig {
   electricityDutyBps: number; // basis points: 1600 = 16%
   pfThresholdBps: number; // basis points: 9000 = 0.90
   pfPenaltyRatePaisa: number;
+  gstRateBps: number; // basis points: 1800 = 18%
   version: number;
 }
 

@@ -140,9 +140,9 @@ export function calculateBill(input: BillCalculationInput): BillOutput {
     pfPenaltyPaisa +
     dgChargesPaisa;
 
-  // GST: 18% of subtotal
+  // GST: gstRateBps of subtotal (basis points / 10000)
   const gstPaisa = Math.round(
-    new Decimal(subtotalPaisa).mul(18).div(100).toNumber(),
+    new Decimal(subtotalPaisa).mul(tariff.gstRateBps).div(10000).toNumber(),
   );
 
   // Total
