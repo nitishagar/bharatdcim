@@ -76,6 +76,7 @@ export const createTariffSchema = z.object({
   effectiveFrom: z.string().min(1, 'Effective from date is required'),
   effectiveTo: z.string().optional(),
   billingUnit: z.enum(['kWh', 'kVAh']).optional(),
+  gstRateBps: z.string().optional(),
 });
 
 export type CreateTariffForm = z.infer<typeof createTariffSchema>;

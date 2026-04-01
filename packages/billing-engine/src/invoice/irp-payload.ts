@@ -66,8 +66,9 @@ export function buildIrpItemList(params: {
   cgstPaisa: number | null;
   sgstPaisa: number | null;
   igstPaisa: number | null;
+  gstRateBps?: number;
 }): IRPItem {
-  const { subtotalPaisa, totalKwh, taxType, cgstPaisa, sgstPaisa, igstPaisa } = params;
+  const { subtotalPaisa, totalKwh, taxType, cgstPaisa, sgstPaisa, igstPaisa, gstRateBps = 1800 } = params;
 
   const assAmt = paisaToRupees(subtotalPaisa);
   const cgstAmt = taxType === 'CGST_SGST' ? paisaToRupees(cgstPaisa ?? 0) : 0;
@@ -87,7 +88,7 @@ export function buildIrpItemList(params: {
     unitPrice,
     totAmt: assAmt,
     assAmt,
-    gstRt: 18,
+    gstRt: gstRateBps / 100,
     igstAmt,
     cgstAmt,
     sgstAmt,
@@ -110,6 +111,7 @@ export function buildIrpPayload(params: {
   igstPaisa: number | null;
   totalAmountPaisa: number;
   totalKwh: number;
+  gstRateBps?: number;
   seller: { lglNm: string; addr1: string; loc: string; pin: number };
   buyer: { lglNm: string; addr1: string; loc: string; pin: number };
   originalInvoiceNumber?: string;
@@ -119,7 +121,7 @@ export function buildIrpPayload(params: {
     invoiceNumber, invoiceDate, docType,
     supplierGstin, recipientGstin, taxType,
     taxableAmountPaisa, cgstPaisa, sgstPaisa, igstPaisa, totalAmountPaisa,
-    totalKwh, seller, buyer,
+    totalKwh, gstRateBps = 1800, seller, buyer,
     originalInvoiceNumber, originalInvoiceDate,
   } = params;
 
@@ -152,6 +154,7 @@ export function buildIrpPayload(params: {
     cgstPaisa,
     sgstPaisa,
     igstPaisa,
+    gstRateBps,
   });
 
   const assVal = paisaToRupees(taxableAmountPaisa);

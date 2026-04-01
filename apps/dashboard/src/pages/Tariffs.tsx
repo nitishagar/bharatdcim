@@ -197,6 +197,7 @@ function CreateTariffFormComponent({ onClose, onCreated }: { onClose: () => void
         effectiveFrom: formData.effectiveFrom,
         effectiveTo: formData.effectiveTo || null,
         billingUnit: formData.billingUnit ?? 'kWh',
+        gstRateBps: formData.gstRateBps ? parseInt(formData.gstRateBps) : 1800,
       });
       reset();
       onCreated();
@@ -237,7 +238,7 @@ function CreateTariffFormComponent({ onClose, onCreated }: { onClose: () => void
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Base Energy Rate (paisa/kWh)</label>
           <input
@@ -264,6 +265,15 @@ function CreateTariffFormComponent({ onClose, onCreated }: { onClose: () => void
             {...register('demandChargePerKvaPaisa')}
             className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
             placeholder="0"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">GST Rate (bps, e.g. 1800=18%)</label>
+          <input
+            type="number"
+            {...register('gstRateBps')}
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+            placeholder="1800"
           />
         </div>
       </div>

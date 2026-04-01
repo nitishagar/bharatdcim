@@ -5,7 +5,7 @@ import {
   validateCreditNote, buildIrpPayload,
 } from '@bharatdcim/billing-engine';
 import type { TaxType } from '@bharatdcim/billing-engine';
-import { bills, invoices, invoiceSequences, creditNotes, invoiceAuditLog, irpRetryQueue, tenants } from '../db/schema.js';
+import { bills, invoices, invoiceSequences, creditNotes, invoiceAuditLog, irpRetryQueue, tenants, tariffConfigs } from '../db/schema.js';
 import type { Database } from '../db/client.js';
 import type { Bindings } from '../types.js';
 import { generateIrn, cancelIrn, buildGspConfig, buildPlatformSeller, mapReasonToCode } from './irp.js';
@@ -46,6 +46,7 @@ async function triggerIrpGeneration(
   db: Database,
   docType: 'INV' | 'CRN' = 'INV',
   originalInvoice?: typeof invoices.$inferSelect,
+  gstRateBps = 1800,
 ): Promise<void> {
   const now = new Date().toISOString();
 
@@ -78,6 +79,7 @@ async function triggerIrpGeneration(
     igstPaisa: invoice.igstPaisa,
     totalAmountPaisa: invoice.totalAmountPaisa,
     totalKwh: bill.totalKwh,
+    gstRateBps,
     seller,
     buyer,
     originalInvoiceNumber: originalInvoice?.invoiceNumber,
@@ -154,9 +156,13 @@ export async function createInvoice(
     throw new Error(`Bill ${billId} is already invoiced`);
   }
 
+  // Fetch tariff to get gstRateBps
+  const tariffRows = await db.select().from(tariffConfigs).where(eq(tariffConfigs.id, bill.tariffId)).all();
+  const gstRateBps = tariffRows[0]?.gstRateBps ?? 1800;
+
   // Determine tax type and calculate tax
   const taxType: TaxType = determineTaxType(supplierGSTIN, recipientGSTIN);
-  const taxBreakdown = calculateInvoiceTax(bill.subtotalPaisa, taxType);
+  const taxBreakdown = calculateInvoiceTax(bill.subtotalPaisa, taxType, gstRateBps);
 
   // Generate invoice number
   const now = new Date();
@@ -213,7 +219,7 @@ export async function createInvoice(
     const tenant = tenantRows[0];
     if (tenant) {
       ctx.waitUntil(
-        triggerIrpGeneration(invoice, bill, tenant, env, db)
+        triggerIrpGeneration(invoice, bill, tenant, env, db, 'INV', undefined, gstRateBps)
           .catch((err) => console.error('[IRP] async generation failed:', err)),
       );
     }
@@ -337,8 +343,15 @@ export async function createCreditNote(
     throw new Error(validation.error!);
   }
 
+  // Fetch bill and tariff for gstRateBps
+  const creditNoteBillRows = await db.select().from(bills).where(eq(bills.id, invoice.billId)).all();
+  const creditNoteTariffRows = creditNoteBillRows[0]
+    ? await db.select().from(tariffConfigs).where(eq(tariffConfigs.id, creditNoteBillRows[0].tariffId)).all()
+    : [];
+  const creditNoteGstRateBps = creditNoteTariffRows[0]?.gstRateBps ?? 1800;
+
   // Calculate tax on credit note amount (same tax type as original)
-  const taxBreakdown = calculateInvoiceTax(amountPaisa, invoice.taxType as TaxType);
+  const taxBreakdown = calculateInvoiceTax(amountPaisa, invoice.taxType as TaxType, creditNoteGstRateBps);
 
   // Generate credit note number
   const now = new Date();
@@ -386,15 +399,10 @@ export async function createCreditNote(
 
   // Trigger IRP for credit note asynchronously
   if (env) {
-    // Fetch bill from original invoice
-    const billRows = await db.select().from(bills).where(eq(bills.id, invoice.billId)).all();
     const tenantRows = await db.select().from(tenants).where(eq(tenants.id, invoice.tenantId)).all();
-    if (billRows[0] && tenantRows[0]) {
-      // Create a synthetic invoice-like object for the credit note IRP call
-      // We store the IRP result on the credit note's paired invoice tracking via a synthetic invoice row
-      // For now, trigger IRP generation using the invoice record (the credit note shares invoice's IRP tracking)
+    if (creditNoteBillRows[0] && tenantRows[0]) {
       ctx.waitUntil(
-        triggerIrpGeneration(invoice, billRows[0], tenantRows[0], env, db, 'CRN', invoice)
+        triggerIrpGeneration(invoice, creditNoteBillRows[0], tenantRows[0], env, db, 'CRN', invoice, creditNoteGstRateBps)
           .catch((err) => console.error('[IRP] credit note IRP failed:', err)),
       );
     }

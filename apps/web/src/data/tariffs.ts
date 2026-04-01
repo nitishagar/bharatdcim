@@ -26,6 +26,7 @@ export interface StateTariff {
   fuelAdjustmentCharge: number; // ₹/unit (FAC/FPPCA)
   fuelAdjustmentType: 'absolute' | 'percentage'; // How FAC is applied
   electricityDuty: number; // Percentage
+  gstRate: number; // Percentage (e.g., 18 for 18%)
   powerFactorPenaltyThreshold: number; // Below this PF, penalty applies
   powerFactorPenaltyRate: number; // ₹/kVAh penalty
   dgRate: number; // Typical DG power rate ₹/kWh
@@ -54,6 +55,7 @@ export const stateTariffs: StateTariff[] = [
     fuelAdjustmentCharge: 0.72, // ₹/kVAh mid-range estimate (range: 0.50-0.95)
     fuelAdjustmentType: 'absolute',
     electricityDuty: 0.093, // 9.30% (Maharashtra Electricity Duty Act 2016, Industrial Part F)
+    gstRate: 18,
     powerFactorPenaltyThreshold: 0.90,
     powerFactorPenaltyRate: 0.25,
     dgRate: 22.0,
@@ -80,6 +82,7 @@ export const stateTariffs: StateTariff[] = [
     fuelAdjustmentCharge: 1.58, // 1.58% of energy charges (FPPCA)
     fuelAdjustmentType: 'percentage',
     electricityDuty: 0.05, // 5%
+    gstRate: 18,
     powerFactorPenaltyThreshold: 0.90,
     powerFactorPenaltyRate: 0.20,
     dgRate: 24.0,
@@ -105,6 +108,7 @@ export const stateTariffs: StateTariff[] = [
     fuelAdjustmentCharge: 0.28, // ₹/unit mid-range estimate (range: 0.20-0.35)
     fuelAdjustmentType: 'absolute',
     electricityDuty: 0.06, // 6%
+    gstRate: 18,
     powerFactorPenaltyThreshold: 0.90, // 0.90 for HT; 0.85 applies only to LT (KERC Tariff Order 2025)
     powerFactorPenaltyRate: 0.15,
     dgRate: 20.0,
@@ -130,6 +134,7 @@ export const stateTariffs: StateTariff[] = [
     fuelAdjustmentCharge: 0, // Negligible for Feb 2026
     fuelAdjustmentType: 'absolute',
     electricityDuty: 0.05, // 5%
+    gstRate: 18,
     powerFactorPenaltyThreshold: 0.90,
     powerFactorPenaltyRate: 0.15,
     dgRate: 18.0,
@@ -331,8 +336,8 @@ export function calculateBill(
   // Subtotal after duty
   const subtotal = subtotalBeforeDuty + electricityDuty;
 
-  // GST at 18%
-  const gst = subtotal * 0.18;
+  // GST
+  const gst = subtotal * (tariff.gstRate / 100);
 
   // Total Bill
   const totalBill = subtotal + gst;
