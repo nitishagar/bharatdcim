@@ -25,6 +25,18 @@ describe('NotificationSettings page', () => {
     );
   });
 
+  it('renders error message on API failure', async () => {
+    server.use(
+      http.get('*/notifications', () =>
+        HttpResponse.json({ error: { message: 'Notifications unavailable' } }, { status: 503 }),
+      ),
+    );
+    renderWithProviders(<NotificationSettings />);
+    await waitFor(() =>
+      expect(screen.getByText('Notifications unavailable')).toBeInTheDocument(),
+    );
+  });
+
   it('renders list of notification configs with type badge', async () => {
     renderWithProviders(<NotificationSettings />);
     await waitFor(() => expect(screen.getByText('Ops Email')).toBeInTheDocument());
