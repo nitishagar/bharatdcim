@@ -197,15 +197,13 @@ export function CapacityPlanning() {
 
       {showAddForm && <AddThresholdForm onClose={() => setShowAddForm(false)} />}
 
-      {alertsError ? (
-        <ErrorMessage error={alertsError} onRetry={() => refetchAlerts()} />
-      ) : (
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-          <KPICard icon="⚠" label="Meters at Risk" value={alertsLoading ? '—' : metersAtRisk} />
-          <KPICard icon="🔔" label="Active Alerts" value={alertsLoading ? '—' : activeAlerts.length} />
-          <KPICard icon="📊" label="Thresholds" value={thresholdsLoading ? '—' : (thresholds?.length ?? 0)} />
-        </div>
-      )}
+      {alertsError && <ErrorMessage error={alertsError} onRetry={() => refetchAlerts()} />}
+
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+        <KPICard icon="⚠" label="Meters at Risk" value={alertsLoading ? '—' : metersAtRisk} />
+        <KPICard icon="🔔" label="Active Alerts" value={alertsLoading ? '—' : activeAlerts.length} />
+        <KPICard icon="📊" label="Thresholds" value={thresholdsLoading ? '—' : (thresholds?.length ?? 0)} />
+      </div>
 
       {meters.length > 0 && (
         <div className="mb-8">

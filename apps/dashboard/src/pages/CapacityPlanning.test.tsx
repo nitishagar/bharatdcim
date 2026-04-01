@@ -109,28 +109,28 @@ describe('CapacityPlanning page', () => {
     await waitFor(() => expect(screen.getByText(/projected breach/i)).toBeInTheDocument());
   });
 
-  it('shows error message when thresholds API fails', async () => {
+  it('shows ErrorMessage when thresholds API returns 500', async () => {
     server.use(
-      http.get('*/capacity/thresholds', () => HttpResponse.json({ error: 'Server error' }, { status: 500 })),
+      http.get('*/capacity/thresholds', () => HttpResponse.json({ message: 'Internal Server Error' }, { status: 500 })),
     );
     renderWithProviders(<CapacityPlanning />);
-    await waitFor(() => expect(screen.getByText(/retry/i)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByRole('button', { name: /retry/i })).toBeInTheDocument());
   });
 
-  it('shows error message when alerts API fails', async () => {
+  it('shows ErrorMessage when alerts API returns 500', async () => {
     server.use(
-      http.get('*/capacity/alerts', () => HttpResponse.json({ error: 'Server error' }, { status: 500 })),
+      http.get('*/capacity/alerts', () => HttpResponse.json({ message: 'Internal Server Error' }, { status: 500 })),
     );
     renderWithProviders(<CapacityPlanning />);
-    await waitFor(() => expect(screen.getByText(/retry/i)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByRole('button', { name: /retry/i })).toBeInTheDocument());
   });
 
-  it('shows error message in ForecastCard when forecast API fails', async () => {
+  it('ForecastCard shows ErrorMessage when forecast API returns 500', async () => {
     server.use(
-      http.get('*/capacity/forecast', () => HttpResponse.json({ error: 'Server error' }, { status: 500 })),
+      http.get('*/capacity/forecast', () => HttpResponse.json({ error: { message: 'Forecast unavailable' } }, { status: 500 })),
     );
     renderWithProviders(<CapacityPlanning />);
-    await waitFor(() => expect(screen.getByText(/api error/i)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getAllByText(/forecast unavailable/i).length).toBeGreaterThan(0));
   });
 });
 
