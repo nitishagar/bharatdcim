@@ -8,6 +8,7 @@ import {
 } from '../api/hooks/useNotifications';
 import { useIsAdmin } from '../hooks/useIsAdmin';
 import { Skeleton } from '../components/Skeleton';
+import { ErrorMessage } from '../components/ErrorMessage';
 
 const VALID_EVENTS = ['capacity_warning', 'capacity_critical', 'sla_warning', 'sla_breach'] as const;
 type ValidEvent = (typeof VALID_EVENTS)[number];
@@ -180,7 +181,7 @@ function AddChannelForm({ onClose }: { onClose: () => void }) {
 export function NotificationSettings() {
   const isAdmin = useIsAdmin();
   const [showAddForm, setShowAddForm] = useState(false);
-  const { data: configs, isLoading } = useNotificationConfigs();
+  const { data: configs, isLoading, error, refetch } = useNotificationConfigs();
 
   return (
     <div>
@@ -201,6 +202,8 @@ export function NotificationSettings() {
 
       {isLoading ? (
         <Skeleton className="h-40 w-full" />
+      ) : error ? (
+        <ErrorMessage error={error} onRetry={() => refetch()} />
       ) : !configs || configs.length === 0 ? (
         <p className="text-sm text-gray-400 dark:text-gray-500">No notification channels configured.</p>
       ) : (

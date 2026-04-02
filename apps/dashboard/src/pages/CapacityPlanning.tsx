@@ -10,11 +10,13 @@ import {
 import { KPICard } from '../components/KPICard';
 import { useIsAdmin } from '../hooks/useIsAdmin';
 import { Skeleton } from '../components/Skeleton';
+import { ErrorMessage } from '../components/ErrorMessage';
 
 function ForecastCard({ meterId, meterName }: { meterId: string; meterName: string }) {
-  const { data: forecast, isLoading } = useCapacityForecast(meterId, 30);
+  const { data: forecast, isLoading, error } = useCapacityForecast(meterId, 30);
 
   if (isLoading) return <Skeleton className="h-32" />;
+  if (error) return <ErrorMessage error={error} />;
   if (!forecast) return null;
 
   return (
@@ -169,8 +171,8 @@ export function CapacityPlanning() {
   const isAdmin = useIsAdmin();
   const [showAddForm, setShowAddForm] = useState(false);
 
-  const { data: thresholds, isLoading: thresholdsLoading } = useCapacityThresholds();
-  const { data: alerts, isLoading: alertsLoading } = useCapacityAlerts();
+  const { data: thresholds, isLoading: thresholdsLoading, error: thresholdsError, refetch: refetchThresholds } = useCapacityThresholds();
+  const { data: alerts, isLoading: alertsLoading, error: alertsError, refetch: refetchAlerts } = useCapacityAlerts();
   const { data: metersData } = useMeters({ limit: 100 });
   const meters = metersData?.data ?? [];
 
@@ -195,6 +197,8 @@ export function CapacityPlanning() {
 
       {showAddForm && <AddThresholdForm onClose={() => setShowAddForm(false)} />}
 
+      {alertsError && <ErrorMessage error={alertsError} onRetry={() => refetchAlerts()} />}
+
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         <KPICard icon="⚠" label="Meters at Risk" value={alertsLoading ? '—' : metersAtRisk} />
         <KPICard icon="🔔" label="Active Alerts" value={alertsLoading ? '—' : activeAlerts.length} />
@@ -216,6 +220,8 @@ export function CapacityPlanning() {
         <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">Thresholds</h3>
         {thresholdsLoading ? (
           <Skeleton className="h-32 w-full" />
+        ) : thresholdsError ? (
+          <ErrorMessage error={thresholdsError} onRetry={() => refetchThresholds()} />
         ) : !thresholds || thresholds.length === 0 ? (
           <p className="text-sm text-gray-400 dark:text-gray-500">No thresholds configured.</p>
         ) : (

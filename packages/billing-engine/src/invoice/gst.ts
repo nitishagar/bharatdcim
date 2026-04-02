@@ -118,9 +118,9 @@ export function determineTaxType(supplierGSTIN: string, recipientGSTIN: string):
 
 /**
  * Calculate GST tax breakdown.
- * GST rate for electricity services: 18% (9% CGST + 9% SGST or 18% IGST)
+ * @param gstRateBps - GST rate in basis points (default 1800 = 18%)
  */
-export function calculateInvoiceTax(taxableAmountPaisa: number, taxType: TaxType): TaxBreakdown {
+export function calculateInvoiceTax(taxableAmountPaisa: number, taxType: TaxType, gstRateBps = 1800): TaxBreakdown {
   if (taxableAmountPaisa === 0) {
     return { taxType, cgstPaisa: 0, sgstPaisa: 0, igstPaisa: 0, totalTaxPaisa: 0, totalAmountPaisa: 0 };
   }
@@ -128,8 +128,9 @@ export function calculateInvoiceTax(taxableAmountPaisa: number, taxType: TaxType
   const taxable = new Decimal(taxableAmountPaisa);
 
   if (taxType === 'CGST_SGST') {
-    const cgst = Math.round(taxable.mul(9).div(100).toNumber());
-    const sgst = Math.round(taxable.mul(9).div(100).toNumber());
+    // CGST = SGST = gstRateBps / 2 (each half of total GST)
+    const cgst = Math.round(taxable.mul(gstRateBps).div(20000).toNumber());
+    const sgst = Math.round(taxable.mul(gstRateBps).div(20000).toNumber());
     const totalTax = cgst + sgst;
     return {
       taxType,
@@ -141,8 +142,8 @@ export function calculateInvoiceTax(taxableAmountPaisa: number, taxType: TaxType
     };
   }
 
-  // IGST
-  const igst = Math.round(taxable.mul(18).div(100).toNumber());
+  // IGST = full gstRateBps
+  const igst = Math.round(taxable.mul(gstRateBps).div(10000).toNumber());
   return {
     taxType,
     cgstPaisa: 0,

@@ -82,4 +82,12 @@ describe('SLADashboard page', () => {
       expect(screen.getByText(/no sla configs/i)).toBeInTheDocument(),
     );
   });
+
+  it('shows error message with retry button on fetch failure', async () => {
+    server.use(http.get('*/sla', () => HttpResponse.json({ error: 'Internal Server Error' }, { status: 500 })));
+    renderWithProviders(<SLADashboard />);
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: /retry/i })).toBeInTheDocument(),
+    );
+  });
 });

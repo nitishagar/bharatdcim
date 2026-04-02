@@ -38,6 +38,7 @@ export const tariffConfigs = sqliteTable('tariff_configs', {
   electricityDutyBps: integer('electricity_duty_bps').notNull(),
   pfThresholdBps: integer('pf_threshold_bps').notNull(),
   pfPenaltyRatePaisa: integer('pf_penalty_rate_paisa').notNull(),
+  gstRateBps: integer('gst_rate_bps').notNull().default(1800),
   version: integer('version').notNull(),
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),

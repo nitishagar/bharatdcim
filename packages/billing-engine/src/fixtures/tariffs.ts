@@ -60,6 +60,7 @@ export const maharashtraTariff: TariffConfig = {
   electricityDutyBps: 930, // 9.30% (Maharashtra Electricity Duty Act 2016, Industrial Part F)
   pfThresholdBps: 9000, // 0.90
   pfPenaltyRatePaisa: 25, // ₹0.25
+  gstRateBps: 1800, // 18%
   version: 1,
 };
 
@@ -123,6 +124,7 @@ export const tamilNaduTariff: TariffConfig = {
   electricityDutyBps: 500, // 5%
   pfThresholdBps: 9000, // 0.90
   pfPenaltyRatePaisa: 20, // ₹0.20
+  gstRateBps: 1800, // 18%
   version: 1,
 };
 
@@ -178,6 +180,7 @@ export const karnatakaTariff: TariffConfig = {
   electricityDutyBps: 600, // 6%
   pfThresholdBps: 9000, // 0.90 — HT threshold; 0.85 applies only to LT (KERC Tariff Order 2025)
   pfPenaltyRatePaisa: 15, // ₹0.15
+  gstRateBps: 1800, // 18%
   version: 1,
 };
 
@@ -233,6 +236,7 @@ export const telanganaTariff: TariffConfig = {
   electricityDutyBps: 500, // 5%
   pfThresholdBps: 9000, // 0.90
   pfPenaltyRatePaisa: 15, // ₹0.15
+  gstRateBps: 1800, // 18%
   version: 1,
 };
 

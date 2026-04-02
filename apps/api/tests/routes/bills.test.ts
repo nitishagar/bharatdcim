@@ -40,6 +40,7 @@ describe('Bills Routes', () => {
         electricityDutyBps: 930,
         pfThresholdBps: 9000,
         pfPenaltyRatePaisa: 25,
+        gstRateBps: 1800,
         version: 1,
       },
       contractedDemandKVA: 400,
@@ -94,7 +95,7 @@ describe('Bills Routes', () => {
       baseEnergyRatePaisa: 868, wheelingChargePaisa: 74, demandChargePerKVAPaisa: 60000,
       demandRatchetPercent: 75, minimumDemandKVA: 50,
       timeSlots: [], fuelAdjustmentPaisa: 72, fuelAdjustmentType: 'absolute' as const,
-      electricityDutyBps: 930, pfThresholdBps: 9000, pfPenaltyRatePaisa: 25, version: 1,
+      electricityDutyBps: 930, pfThresholdBps: 9000, pfPenaltyRatePaisa: 25, gstRateBps: 1800, version: 1,
     };
 
     const directResult = calculateBill({

@@ -25,6 +25,7 @@ export const CreateTariffSchema = z.object({
   electricityDutyBps: z.number().int().min(0).optional().default(0),
   pfThresholdBps: z.number().int().min(0).max(10000).optional().default(9000),
   pfPenaltyRatePaisa: z.number().int().min(0).optional().default(0),
+  gstRateBps: z.number().int().min(0).max(10000).optional().default(1800),
   version: z.number().int().positive().optional().default(1),
 });
 
