@@ -3,13 +3,13 @@ import { createTestDb } from '../helpers.js';
 import { seedDatabase } from '../../src/db/seed.js';
 import { importCSV } from '../../src/services/csv-import.js';
 import { calculateAndStoreBill } from '../../src/services/billing.js';
-import { createInvoice } from '../../src/services/invoicing.js';
+import { createInvoice, createCreditNote } from '../../src/services/invoicing.js';
 import {
   calculateBill, classifyReading,
   maharashtraTariff, karnatakaTariff,
 } from '@bharatdcim/billing-engine';
 import type { ClassifiedReading, TariffConfig } from '@bharatdcim/billing-engine';
-import { bills, invoices, powerReadings, tariffConfigs, agentHeartbeats } from '../../src/db/schema.js';
+import { bills, invoices, creditNotes, powerReadings, tariffConfigs, agentHeartbeats } from '../../src/db/schema.js';
 import { eq } from 'drizzle-orm';
 import type { Database } from '../../src/db/client.js';
 
@@ -271,5 +271,110 @@ describe('E2E Integration Tests', () => {
     const updated = await db.select().from(agentHeartbeats).all();
     expect(updated).toHaveLength(1);
     expect(updated[0].deviceCount).toBe(6);
+  });
+
+  // E2E-008: GST split trust flow — verifies CGST/SGST consistency and IRP trigger status
+  it('E2E-008: GST split trust flow verifies CGST/SGST consistency and IRP trigger status', async () => {
+    const csv = `timestamp,meter_id,kwh
+2025-02-15T10:00:00Z,meter-mh-grid,100
+2025-02-15T14:00:00Z,meter-mh-grid,200`;
+
+    await importCSV(csv, 'trust-flow.csv', 256, 'tenant-mh', maharashtraTariff, db);
+
+    const billResult = await calculateAndStoreBill({
+      meterId: 'meter-mh-grid',
+      tenantId: 'tenant-mh',
+      periodStart: '2025-02-15T00:00:00Z',
+      periodEnd: '2025-02-15T23:59:59Z',
+      contractedDemandKVA: 100,
+      recordedDemandKVA: 80,
+      powerFactor: 0.92,
+    }, db);
+
+    // Same-state MH GSTINs → CGST_SGST tax type
+    const invoiceResult = await createInvoice(
+      billResult.billId,
+      '27AABCT1332E1ZT',
+      '27AABCT1332E1ZT',
+      db,
+    );
+    const inv = invoiceResult.invoice;
+
+    // Verify GST split: intra-state must use CGST+SGST (not IGST)
+    expect(inv.taxType).toBe('CGST_SGST');
+    expect(inv.cgstPaisa).toBeGreaterThan(0);
+    expect(inv.sgstPaisa).toBeGreaterThan(0);
+    expect(inv.igstPaisa).toBe(0);
+    expect(inv.cgstPaisa + inv.sgstPaisa).toBe(inv.totalTaxPaisa);
+
+    // IRP status: pending_irn immediately after creation (IRP runs async when env configured)
+    expect(inv.eInvoiceStatus).toBe('pending_irn');
+  });
+
+  // E2E-009: Credit note Section 34 deadline enforcement
+  it('E2E-009: Credit note respects GST Section 34 deadline', async () => {
+    // Set up a bill and invoice for both test cases
+    const csv = `timestamp,meter_id,kwh
+2025-02-15T10:00:00Z,meter-mh-grid,100`;
+    await importCSV(csv, 's34a.csv', 128, 'tenant-mh', null, db);
+
+    const billResult = await calculateAndStoreBill({
+      meterId: 'meter-mh-grid',
+      tenantId: 'tenant-mh',
+      periodStart: '2025-02-15T00:00:00Z',
+      periodEnd: '2025-02-15T23:59:59Z',
+      contractedDemandKVA: 100,
+      recordedDemandKVA: 80,
+      powerFactor: 0.92,
+    }, db);
+
+    const invoiceResult = await createInvoice(
+      billResult.billId,
+      '27AABCT1332E1ZT',
+      '27AABCT1332E1ZT',
+      db,
+    );
+
+    // Part 1: Credit note within current FY deadline should succeed
+    const creditNote = await createCreditNote(
+      invoiceResult.invoice.id,
+      100000, // ₹1,000 in paisa
+      'Billing correction',
+      db,
+    );
+    expect(creditNote.creditNoteNumber).toMatch(/^CRN\//);
+    expect(creditNote.status).toBe('draft');
+
+    // Part 2: Credit note after Section 34 deadline should fail
+    // Create a second bill+invoice, then backdate it to FY 2024-25 (deadline: Sept 30, 2025 — already past)
+    const csv2 = `timestamp,meter_id,kwh
+2025-03-01T10:00:00Z,meter-mh-grid,50`;
+    await importCSV(csv2, 's34b.csv', 64, 'tenant-mh', null, db);
+
+    const billResult2 = await calculateAndStoreBill({
+      meterId: 'meter-mh-grid',
+      tenantId: 'tenant-mh',
+      periodStart: '2025-03-01T00:00:00Z',
+      periodEnd: '2025-03-01T23:59:59Z',
+      contractedDemandKVA: 100,
+      recordedDemandKVA: 80,
+      powerFactor: 0.92,
+    }, db);
+
+    const invoiceResult2 = await createInvoice(
+      billResult2.billId,
+      '27AABCT1332E1ZT',
+      '27AABCT1332E1ZT',
+      db,
+    );
+
+    // Backdate invoice to Jan 2025 (FY 2024-25); deadline = Sept 30, 2025 (now passed)
+    await db.update(invoices)
+      .set({ invoiceDate: '2025-01-20T00:00:00.000Z' })
+      .where(eq(invoices.id, invoiceResult2.invoice.id));
+
+    await expect(
+      createCreditNote(invoiceResult2.invoice.id, 50000, 'Late correction', db),
+    ).rejects.toThrow('September 30');
   });
 });
