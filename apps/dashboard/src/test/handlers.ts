@@ -51,6 +51,13 @@ export const handlers = [
   http.get('*/bills/:id',         () => HttpResponse.json(mockBill)),
   http.get('*/invoices',          ({ request }) => paginatedResponse(mockInvoices, request)),
   http.get('*/invoices/:id',      () => HttpResponse.json(mockInvoice)),
+  http.get('*/invoices/:id/audit-log', () =>
+    HttpResponse.json([
+      { id: 'al-001', invoiceId: 'invoice-001', action: 'created', actorId: 'user-001', createdAt: '2026-02-01T09:00:00Z' },
+      { id: 'al-002', invoiceId: 'invoice-001', action: 'irn_generated', actorId: 'system', createdAt: '2026-03-31T14:30:00Z' },
+    ]),
+  ),
+  http.get('*/health', () => HttpResponse.json({ status: 'ok' })),
   http.get('*/uploads',           ({ request }) => paginatedResponse(mockUploads, request)),
   http.get('*/uploads/:id',       () => HttpResponse.json(mockUpload)),
   http.get('*/agents',            ({ request }) => paginatedResponse(mockAgents, request)),
