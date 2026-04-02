@@ -40,6 +40,6 @@ vi.mock('@clerk/clerk-react', () => ({
 }));
 
 // MSW lifecycle
-beforeAll(() => server.listen({ onUnhandledRequest: 'warn' }));
+beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
