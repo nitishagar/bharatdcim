@@ -21,7 +21,7 @@ afterEach(() => {
     isSignedIn: true,
     getToken: vi.fn(() => Promise.resolve('mock-test-token')),
     sessionClaims: { platformAdmin: false },
-  }));
+  } as unknown as ReturnType<typeof useAuth>));
 });
 
 describe('AssetDetail page', () => {
@@ -77,7 +77,7 @@ describe('AssetDetail page', () => {
       isSignedIn: true,
       getToken: vi.fn(() => Promise.resolve('mock-test-token')),
       sessionClaims: { platformAdmin: false },
-    } as any);
+    } as unknown as ReturnType<typeof useAuth>);
     renderWithProviders(<AssetDetail />);
     await waitFor(() => expect(screen.getByRole('heading', { name: 'Dell PowerEdge R750' })).toBeInTheDocument());
     await waitFor(() => expect(screen.queryByRole('button', { name: 'Delete Asset' })).not.toBeInTheDocument());

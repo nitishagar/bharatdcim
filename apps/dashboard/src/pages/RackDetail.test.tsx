@@ -20,7 +20,7 @@ afterEach(() => {
     isSignedIn: true,
     getToken: vi.fn(() => Promise.resolve('mock-test-token')),
     sessionClaims: { platformAdmin: false },
-  }));
+  } as unknown as ReturnType<typeof useAuth>));
 });
 
 const emptyPage = { data: [], total: 0, limit: 100, offset: 0 };
