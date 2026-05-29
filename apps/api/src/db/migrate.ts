@@ -401,6 +401,37 @@ const migration = `
     updated_at TEXT NOT NULL
   );
 
+  CREATE TABLE IF NOT EXISTS rec_certificates (
+    id TEXT PRIMARY KEY,
+    tenant_id TEXT NOT NULL REFERENCES tenants(id),
+    certificate_type TEXT NOT NULL,
+    serial_number TEXT NOT NULL,
+    source TEXT NOT NULL,
+    mwh_milliunits INTEGER NOT NULL,
+    vintage_period_start TEXT NOT NULL,
+    vintage_period_end TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'active',
+    retired_at TEXT,
+    retired_against_period TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS carbon_emissions (
+    id TEXT PRIMARY KEY,
+    tenant_id TEXT NOT NULL REFERENCES tenants(id),
+    period_start TEXT NOT NULL,
+    period_end TEXT NOT NULL,
+    grid_emission_factor_g_per_kwh INTEGER NOT NULL,
+    total_kwh_milliunits INTEGER NOT NULL,
+    renewable_kwh_milliunits INTEGER NOT NULL,
+    rec_offset_kwh_milliunits INTEGER NOT NULL,
+    scope2_gross_kg INTEGER NOT NULL,
+    scope2_net_kg INTEGER NOT NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+
   CREATE INDEX IF NOT EXISTS idx_power_readings_meter_timestamp
     ON power_readings(meter_id, timestamp);
 
@@ -412,6 +443,12 @@ const migration = `
 
   CREATE INDEX IF NOT EXISTS idx_notification_configs_tenant
     ON notification_configs(tenant_id, status);
+
+  CREATE INDEX IF NOT EXISTS idx_rec_tenant_status
+    ON rec_certificates(tenant_id, status);
+
+  CREATE INDEX IF NOT EXISTS idx_emissions_tenant_period
+    ON carbon_emissions(tenant_id, period_start);
 `;
 
 // Additive column migrations — safe to re-run (SQLite ignores duplicate columns after first run)

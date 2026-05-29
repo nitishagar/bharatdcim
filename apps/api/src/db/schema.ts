@@ -423,6 +423,41 @@ export const irpRetryQueue = sqliteTable('irp_retry_queue', {
   updatedAt: text('updated_at').notNull(),
 });
 
+// ─── REC Certificates ─────────────────────────────────────────
+
+export const recCertificates = sqliteTable('rec_certificates', {
+  id: text('id').primaryKey(),
+  tenantId: text('tenant_id').notNull().references(() => tenants.id),
+  certificateType: text('certificate_type').notNull(), // 'REC' | 'I-REC'
+  serialNumber: text('serial_number').notNull(),
+  source: text('source').notNull(), // 'solar' | 'wind' | 'hydro' | 'other'
+  mwh: integer('mwh_milliunits').notNull(), // stored ×1000 for sub-MWh precision
+  vintagePeriodStart: text('vintage_period_start').notNull(),
+  vintagePeriodEnd: text('vintage_period_end').notNull(),
+  status: text('status').notNull().default('active'), // 'active' | 'retired'
+  retiredAt: text('retired_at'),
+  retiredAgainstPeriod: text('retired_against_period'),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+});
+
+// ─── Carbon Emissions ──────────────────────────────────────────
+
+export const carbonEmissions = sqliteTable('carbon_emissions', {
+  id: text('id').primaryKey(),
+  tenantId: text('tenant_id').notNull().references(() => tenants.id),
+  periodStart: text('period_start').notNull(),
+  periodEnd: text('period_end').notNull(),
+  gridEmissionFactorGPerKwh: integer('grid_emission_factor_g_per_kwh').notNull(), // grams CO2e per kWh
+  totalKwh: integer('total_kwh_milliunits').notNull(), // kWh ×1000
+  renewableKwh: integer('renewable_kwh_milliunits').notNull(), // kWh ×1000
+  recOffsetKwh: integer('rec_offset_kwh_milliunits').notNull(), // kWh ×1000
+  scope2GrossKg: integer('scope2_gross_kg').notNull(), // kg CO2e
+  scope2NetKg: integer('scope2_net_kg').notNull(), // kg CO2e
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+});
+
 // ─── Upload Audit ──────────────────────────────────────────────
 
 export const uploadAudit = sqliteTable('upload_audit', {
