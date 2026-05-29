@@ -6,7 +6,10 @@ import { eq } from 'drizzle-orm';
 import type { Database } from '../../src/db/client.js';
 import type { Bindings } from '../../src/types.js';
 
-const baseNow = '2026-04-01T00:00:00Z';
+// Relative to test-run time so seeded rows are "recent" and not stale-abandoned
+// by the 72h abandon window. (A previously hardcoded date silently rotted past
+// 72h, flipping RETRY-04's attempt-5 case into the abandon branch.)
+const baseNow = new Date(Date.now() - 60 * 60 * 1000).toISOString();
 
 const mockEnv: Bindings = {
   TURSO_DATABASE_URL: 'file::memory:',

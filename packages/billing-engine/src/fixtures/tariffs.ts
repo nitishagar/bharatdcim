@@ -240,10 +240,133 @@ export const telanganaTariff: TariffConfig = {
   version: 1,
 };
 
+// FY2024-25 SERC-order-derived (medium confidence); verify against official schedule before customer use.
+export const madhyaPradeshTariff: TariffConfig = {
+  id: 'mp-htii-2025',
+  stateCode: 'MP',
+  discom: 'MPPKVVCL / MPERC',
+  category: 'HT-II Industrial',
+  effectiveFrom: '2024-04-01',
+  effectiveTo: null,
+  billingUnit: 'kVAh',
+  baseEnergyRatePaisa: 725,
+  wheelingChargePaisa: 60,
+  demandChargePerKVAPaisa: 35000,
+  demandRatchetPercent: 75,
+  minimumDemandKVA: 0,
+  timeSlots: [
+    { name: 'Night Off-Peak', startHour: 22, startMinute: 0, endHour: 6, endMinute: 0, type: 'off-peak', multiplierBps: 10000, adderPaisa: -120 },
+    { name: 'Morning Normal', startHour: 6, startMinute: 0, endHour: 9, endMinute: 0, type: 'normal', multiplierBps: 10000, adderPaisa: 0 },
+    { name: 'Morning Peak', startHour: 9, startMinute: 0, endHour: 12, endMinute: 0, type: 'peak', multiplierBps: 10000, adderPaisa: 70 },
+    { name: 'Solar Hours', startHour: 12, startMinute: 0, endHour: 18, endMinute: 0, type: 'normal', multiplierBps: 10000, adderPaisa: 0 },
+    { name: 'Evening Peak', startHour: 18, startMinute: 0, endHour: 22, endMinute: 0, type: 'peak', multiplierBps: 10000, adderPaisa: 100 },
+  ],
+  fuelAdjustmentPaisa: 15, // ₹0.15 FAC (absolute)
+  fuelAdjustmentType: 'absolute',
+  electricityDutyBps: 900, // 9%
+  pfThresholdBps: 9000,
+  pfPenaltyRatePaisa: 25,
+  gstRateBps: 1800,
+  version: 1,
+};
+
+// FY2024-25 SERC-order-derived (medium confidence); verify against official schedule before customer use.
+export const gujaratTariff: TariffConfig = {
+  id: 'gj-htii-2025',
+  stateCode: 'GJ',
+  discom: 'DGVCL / GERC',
+  category: 'HT-II Industrial',
+  effectiveFrom: '2024-04-01',
+  effectiveTo: null,
+  billingUnit: 'kVAh',
+  baseEnergyRatePaisa: 695,
+  wheelingChargePaisa: 50,
+  demandChargePerKVAPaisa: 32000,
+  demandRatchetPercent: 85,
+  minimumDemandKVA: 0,
+  timeSlots: [
+    { name: 'Night Off-Peak', startHour: 22, startMinute: 0, endHour: 6, endMinute: 0, type: 'off-peak', multiplierBps: 10000, adderPaisa: -100 },
+    { name: 'Morning Normal', startHour: 6, startMinute: 0, endHour: 9, endMinute: 0, type: 'normal', multiplierBps: 10000, adderPaisa: 0 },
+    { name: 'Morning Peak', startHour: 9, startMinute: 0, endHour: 12, endMinute: 0, type: 'peak', multiplierBps: 10000, adderPaisa: 60 },
+    { name: 'Solar Hours', startHour: 12, startMinute: 0, endHour: 18, endMinute: 0, type: 'normal', multiplierBps: 10000, adderPaisa: 0 },
+    { name: 'Evening Peak', startHour: 18, startMinute: 0, endHour: 22, endMinute: 0, type: 'peak', multiplierBps: 10000, adderPaisa: 90 },
+  ],
+  fuelAdjustmentPaisa: 1000, // 10% FPPPA expressed as bps (percentage type)
+  fuelAdjustmentType: 'percentage',
+  electricityDutyBps: 1500, // 15%
+  pfThresholdBps: 9000,
+  pfPenaltyRatePaisa: 20,
+  gstRateBps: 1800,
+  version: 1,
+};
+
+// FY2024-25 SERC-order-derived (medium confidence); verify against official schedule before customer use.
+export const uttarPradeshTariff: TariffConfig = {
+  id: 'up-htc-2025',
+  stateCode: 'UP',
+  discom: 'PVVNL / UPERC',
+  category: 'HT-C Industrial',
+  effectiveFrom: '2024-04-01',
+  effectiveTo: null,
+  billingUnit: 'kWh',
+  baseEnergyRatePaisa: 665,
+  wheelingChargePaisa: 70,
+  demandChargePerKVAPaisa: 41500,
+  demandRatchetPercent: 75,
+  minimumDemandKVA: 0,
+  timeSlots: [
+    { name: 'Night Off-Peak', startHour: 22, startMinute: 0, endHour: 6, endMinute: 0, type: 'off-peak', multiplierBps: 10000, adderPaisa: -80 },
+    { name: 'Morning Normal', startHour: 6, startMinute: 0, endHour: 9, endMinute: 0, type: 'normal', multiplierBps: 10000, adderPaisa: 0 },
+    { name: 'Morning Peak', startHour: 9, startMinute: 0, endHour: 12, endMinute: 0, type: 'peak', multiplierBps: 10000, adderPaisa: 65 },
+    { name: 'Solar Hours', startHour: 12, startMinute: 0, endHour: 18, endMinute: 0, type: 'normal', multiplierBps: 10000, adderPaisa: 0 },
+    { name: 'Evening Peak', startHour: 18, startMinute: 0, endHour: 22, endMinute: 0, type: 'peak', multiplierBps: 10000, adderPaisa: 95 },
+  ],
+  fuelAdjustmentPaisa: 20, // ₹0.20 VCA (absolute)
+  fuelAdjustmentType: 'absolute',
+  electricityDutyBps: 500, // 5%
+  pfThresholdBps: 9000,
+  pfPenaltyRatePaisa: 30,
+  gstRateBps: 1800,
+  version: 1,
+};
+
+// FY2024-25 SERC-order-derived (medium confidence); verify against official schedule before customer use.
+export const delhiTariff: TariffConfig = {
+  id: 'dl-htms-2025',
+  stateCode: 'DL',
+  discom: 'BRPL / DERC',
+  category: 'HT-MS',
+  effectiveFrom: '2024-04-01',
+  effectiveTo: null,
+  billingUnit: 'kWh',
+  baseEnergyRatePaisa: 875,
+  wheelingChargePaisa: 0,
+  demandChargePerKVAPaisa: 50000,
+  demandRatchetPercent: 90,
+  minimumDemandKVA: 0,
+  timeSlots: [
+    { name: 'Morning Normal', startHour: 6, startMinute: 0, endHour: 10, endMinute: 0, type: 'normal', multiplierBps: 10000, adderPaisa: 0 },
+    { name: 'Day Normal', startHour: 10, startMinute: 0, endHour: 18, endMinute: 0, type: 'normal', multiplierBps: 10000, adderPaisa: 0 },
+    { name: 'Evening Peak', startHour: 18, startMinute: 0, endHour: 22, endMinute: 0, type: 'peak', multiplierBps: 10000, adderPaisa: 120 },
+    { name: 'Night Off-Peak', startHour: 22, startMinute: 0, endHour: 6, endMinute: 0, type: 'off-peak', multiplierBps: 10000, adderPaisa: -80 },
+  ],
+  fuelAdjustmentPaisa: 800, // 8% PPAC expressed as bps (percentage type)
+  fuelAdjustmentType: 'percentage',
+  electricityDutyBps: 500, // 5%
+  pfThresholdBps: 9000,
+  pfPenaltyRatePaisa: 20,
+  gstRateBps: 1800,
+  version: 1,
+};
+
 /** All tariff fixtures indexed by state code */
 export const tariffFixtures: Record<string, TariffConfig> = {
   MH: maharashtraTariff,
   TN: tamilNaduTariff,
   KA: karnatakaTariff,
   TS: telanganaTariff,
+  MP: madhyaPradeshTariff,
+  GJ: gujaratTariff,
+  UP: uttarPradeshTariff,
+  DL: delhiTariff,
 };

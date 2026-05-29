@@ -26,6 +26,12 @@ const columns: ColumnDef<Tariff, unknown>[] = [
   { accessorKey: 'stateCode', header: 'State' },
   { accessorKey: 'discom', header: 'DISCOM' },
   { accessorKey: 'category', header: 'Category' },
+  { id: 'version', header: 'Ver', accessorFn: (t) => t.version, cell: ({ row }) => `v${row.original.version}` },
+  { id: 'effectiveDates', header: 'Effective', accessorFn: (t) => t.effectiveFrom, cell: ({ row }) => {
+    const from = row.original.effectiveFrom;
+    const to = row.original.effectiveTo;
+    return to ? `${from} – ${to}` : `${from} –`;
+  }},
   { id: 'rate', header: 'Rate', accessorFn: (t) => t.baseEnergyRatePaisa, cell: ({ row }) => formatPaisa(row.original.baseEnergyRatePaisa) + '/kWh' },
   { id: 'wheeling', header: 'Wheeling', accessorFn: (t) => t.wheelingChargePaisa, cell: ({ row }) => formatPaisa(row.original.wheelingChargePaisa) },
   { id: 'demand', header: 'Demand', accessorFn: (t) => t.demandChargePerKvaPaisa, cell: ({ row }) => formatPaisa(row.original.demandChargePerKvaPaisa) + '/KVA' },

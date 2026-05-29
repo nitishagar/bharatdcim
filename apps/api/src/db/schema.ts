@@ -39,6 +39,7 @@ export const tariffConfigs = sqliteTable('tariff_configs', {
   pfThresholdBps: integer('pf_threshold_bps').notNull(),
   pfPenaltyRatePaisa: integer('pf_penalty_rate_paisa').notNull(),
   gstRateBps: integer('gst_rate_bps').notNull().default(1800),
+  lineageKey: text('lineage_key'),
   version: integer('version').notNull(),
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),

@@ -3,7 +3,7 @@ import {
   classifyReading,
 } from '@bharatdcim/billing-engine';
 import type { TariffConfig, ClassifiedReading, BillOutput } from '@bharatdcim/billing-engine';
-import { eq, and, gte, lte } from 'drizzle-orm';
+import { eq, and, gte, lte, gt, or, isNull } from 'drizzle-orm';
 import { powerReadings, tariffConfigs, meters, bills } from '../db/schema.js';
 import type { Database } from '../db/client.js';
 
@@ -30,6 +30,27 @@ function generateId(): string {
   return crypto.randomUUID();
 }
 
+export async function selectTariffForPeriod(
+  db: Database,
+  meter: { tariffId: string; tenantId: string; stateCode: string },
+  periodStart: string,
+): Promise<typeof tariffConfigs.$inferSelect> {
+  const bound = (await db.select().from(tariffConfigs).where(eq(tariffConfigs.id, meter.tariffId)).all())[0];
+  if (!bound) throw new Error(`Tariff ${meter.tariffId} not found`);
+  const lineageKey = bound.lineageKey;
+  if (!lineageKey) return bound;
+  const versions = await db.select().from(tariffConfigs)
+    .where(and(
+      eq(tariffConfigs.lineageKey, lineageKey),
+      lte(tariffConfigs.effectiveFrom, periodStart),
+      or(isNull(tariffConfigs.effectiveTo), gt(tariffConfigs.effectiveTo, periodStart)),
+    )).all();
+  if (versions.length === 0) {
+    throw new Error(`No tariff version effective for period starting ${periodStart} (lineage ${lineageKey})`);
+  }
+  return versions.sort((a, b) => b.version - a.version)[0];
+}
+
 /**
  * Orchestrates the full billing flow:
  * 1. Look up meter → tariff config
@@ -53,11 +74,11 @@ export async function calculateAndStoreBill(
     throw new Error(`Meter ${params.meterId} has no tariff configured`);
   }
 
-  const tariffRows = await db.select().from(tariffConfigs).where(eq(tariffConfigs.id, meter.tariffId)).all();
-  if (tariffRows.length === 0) {
-    throw new Error(`Tariff ${meter.tariffId} not found`);
-  }
-  const tariffRow = tariffRows[0];
+  const tariffRow = await selectTariffForPeriod(
+    db,
+    { tariffId: meter.tariffId, tenantId: meter.tenantId, stateCode: meter.stateCode },
+    params.periodStart,
+  );
 
   // Reconstruct TariffConfig from DB row
   const tariff: TariffConfig = {

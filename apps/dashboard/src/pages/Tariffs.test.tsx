@@ -24,6 +24,15 @@ describe('Tariffs page', () => {
     expect(screen.getByRole('button', { name: 'Create Tariff' })).toBeInTheDocument();
   });
 
+  it('renders version and effective-date columns', async () => {
+    renderWithProviders(<Tariffs />);
+    await waitFor(() => expect(screen.getByText('BESCOM')).toBeInTheDocument());
+    expect(screen.getByText('Ver')).toBeInTheDocument();
+    expect(screen.getByText('Effective')).toBeInTheDocument();
+    expect(screen.getByText('v1')).toBeInTheDocument();
+    expect(screen.getByText('2026-01-01 –')).toBeInTheDocument();
+  });
+
   it('renders error message on API failure', async () => {
     server.use(
       http.get('*/tariffs', () =>
