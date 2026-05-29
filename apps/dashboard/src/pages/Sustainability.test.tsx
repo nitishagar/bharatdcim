@@ -67,7 +67,7 @@ describe('Sustainability page', () => {
       isSignedIn: true,
       getToken: vi.fn(() => Promise.resolve('mock-test-token')),
       sessionClaims: { platformAdmin: false },
-    } as ReturnType<typeof useAuth>);
+    } as unknown as ReturnType<typeof useAuth>);
 
     renderWithProviders(<Sustainability />);
     await waitFor(() => expect(screen.getByText('REC Certificates')).toBeInTheDocument());
