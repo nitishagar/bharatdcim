@@ -32,10 +32,14 @@ export function BillDetail() {
     { name: 'Duty', amount: bill.electricityDutyPaisa / 100 },
     { name: 'PF Penalty', amount: bill.pfPenaltyPaisa / 100 },
     { name: 'DG', amount: bill.dgChargesPaisa / 100 },
+    { name: 'PPA Energy', amount: (bill.ppaEnergyChargesPaisa ?? 0) / 100 },
+    { name: 'CSS', amount: (bill.crossSubsidySurchargePaisa ?? 0) / 100 },
+    { name: 'Addl. Surcharge', amount: (bill.additionalSurchargePaisa ?? 0) / 100 },
+    { name: 'Tx Loss', amount: (bill.transmissionLossChargesPaisa ?? 0) / 100 },
     { name: 'GST', amount: bill.gstPaisa / 100 },
   ].filter((d) => d.amount > 0);
 
-  const lineItems = [
+  const lineItems: [string, number][] = [
     ['Peak Energy Charges', bill.peakChargesPaisa],
     ['Normal Energy Charges', bill.normalChargesPaisa],
     ['Off-Peak Energy Charges', bill.offPeakChargesPaisa],
@@ -45,10 +49,14 @@ export function BillDetail() {
     ['Electricity Duty', bill.electricityDutyPaisa],
     ['PF Penalty', bill.pfPenaltyPaisa],
     ['DG Charges', bill.dgChargesPaisa],
+    ...((bill.ppaEnergyChargesPaisa ?? 0) > 0 ? [['PPA Energy Charges', bill.ppaEnergyChargesPaisa] as [string, number]] : []),
+    ...((bill.crossSubsidySurchargePaisa ?? 0) > 0 ? [['Cross-Subsidy Surcharge (CSS)', bill.crossSubsidySurchargePaisa] as [string, number]] : []),
+    ...((bill.additionalSurchargePaisa ?? 0) > 0 ? [['Additional Surcharge', bill.additionalSurchargePaisa] as [string, number]] : []),
+    ...((bill.transmissionLossChargesPaisa ?? 0) > 0 ? [['Transmission Loss', bill.transmissionLossChargesPaisa] as [string, number]] : []),
     ['Subtotal', bill.subtotalPaisa],
     ['GST (18%)', bill.gstPaisa],
     ['Total', bill.totalBillPaisa],
-  ] as const;
+  ];
 
   return (
     <div>
@@ -124,7 +132,7 @@ export function BillDetail() {
                   <tr
                     key={i}
                     className={`border-b border-gray-100 dark:border-gray-700 ${
-                      label === 'Subtotal' || label === 'Total' ? 'font-semibold bg-gray-50 dark:bg-gray-700' : ''
+                      label === 'Subtotal' || label === 'Total' ? 'font-semibold bg-gray-50 dark:bg-gray-700' : (label === 'Cross-Subsidy Surcharge (CSS)' || label === 'Additional Surcharge' || label === 'Transmission Loss' || label === 'PPA Energy Charges' ? 'text-blue-700 dark:text-blue-400' : '')
                     }`}
                   >
                     <td className="px-4 py-2 dark:text-gray-300">{label}</td>

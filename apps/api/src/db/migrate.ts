@@ -423,6 +423,13 @@ const addColumnMigrations = [
   `ALTER TABLE tenants ADD COLUMN pincode TEXT`,
   `ALTER TABLE tariff_configs ADD COLUMN gst_rate_bps INTEGER NOT NULL DEFAULT 1800`,
   `ALTER TABLE tariff_configs ADD COLUMN lineage_key TEXT`,
+  `ALTER TABLE tariff_configs ADD COLUMN oa_css_rate_paisa INTEGER`,
+  `ALTER TABLE tariff_configs ADD COLUMN oa_additional_surcharge_paisa INTEGER`,
+  `ALTER TABLE tariff_configs ADD COLUMN oa_transmission_loss_bps INTEGER`,
+  `ALTER TABLE bills ADD COLUMN ppa_energy_charges_paisa INTEGER NOT NULL DEFAULT 0`,
+  `ALTER TABLE bills ADD COLUMN cross_subsidy_surcharge_paisa INTEGER NOT NULL DEFAULT 0`,
+  `ALTER TABLE bills ADD COLUMN additional_surcharge_paisa INTEGER NOT NULL DEFAULT 0`,
+  `ALTER TABLE bills ADD COLUMN transmission_loss_charges_paisa INTEGER NOT NULL DEFAULT 0`,
 ];
 
 async function main() {

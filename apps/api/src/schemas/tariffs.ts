@@ -27,6 +27,9 @@ export const CreateTariffSchema = z.object({
   pfPenaltyRatePaisa: z.number().int().min(0).optional().default(0),
   gstRateBps: z.number().int().min(0).max(10000).optional().default(1800),
   version: z.number().int().positive().optional().default(1),
+  oaCssRatePaisa: z.number().int().min(0).nullable().optional(),
+  oaAdditionalSurchargePaisa: z.number().int().min(0).nullable().optional(),
+  oaTransmissionLossBps: z.number().int().min(0).nullable().optional(),
 });
 
 export const UpdateTariffSchema = z.object({
@@ -39,4 +42,7 @@ export const UpdateTariffSchema = z.object({
   effectiveFrom: z.string().optional(),
   effectiveTo: z.string().nullable().optional(),
   billingUnit: z.enum(['kWh', 'kVAh']).optional(),
+  oaCssRatePaisa: z.number().int().min(0).nullable().optional(),
+  oaAdditionalSurchargePaisa: z.number().int().min(0).nullable().optional(),
+  oaTransmissionLossBps: z.number().int().min(0).nullable().optional(),
 });
