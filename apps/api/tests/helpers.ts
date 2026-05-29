@@ -53,6 +53,9 @@ export async function createTestDb() {
       gst_rate_bps INTEGER NOT NULL DEFAULT 1800,
       lineage_key TEXT,
       version INTEGER NOT NULL,
+      oa_css_rate_paisa INTEGER,
+      oa_additional_surcharge_paisa INTEGER,
+      oa_transmission_loss_bps INTEGER,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );
@@ -157,6 +160,10 @@ export async function createTestDb() {
       electricity_duty_paisa INTEGER NOT NULL,
       pf_penalty_paisa INTEGER NOT NULL,
       dg_charges_paisa INTEGER NOT NULL,
+      ppa_energy_charges_paisa INTEGER NOT NULL DEFAULT 0,
+      cross_subsidy_surcharge_paisa INTEGER NOT NULL DEFAULT 0,
+      additional_surcharge_paisa INTEGER NOT NULL DEFAULT 0,
+      transmission_loss_charges_paisa INTEGER NOT NULL DEFAULT 0,
       subtotal_paisa INTEGER NOT NULL,
       gst_paisa INTEGER NOT NULL,
       total_bill_paisa INTEGER NOT NULL,

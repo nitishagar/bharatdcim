@@ -130,6 +130,40 @@ export function calculateBill(input: BillCalculationInput): BillOutput {
     new Decimal(dgKWh).mul(dgRatePaisa).toNumber(),
   );
 
+  // Open Access charges (zero when powerSources absent — backward-compat guaranteed)
+  let ppaEnergyChargesPaisa = 0;
+  let crossSubsidySurchargePaisa = 0;
+  let additionalSurchargePaisa = 0;
+  let transmissionLossChargesPaisa = 0;
+  const sourceBreakdown: BillOutput['sourceBreakdown'] = [];
+
+  if (input.powerSources?.length) {
+    const oa = tariff.openAccess;
+    let oaKWh = 0;
+
+    for (const ps of input.powerSources) {
+      if (ps.source === 'grid') {
+        // Grid kWh handled by slot path above — informational only in breakdown
+        sourceBreakdown.push({ source: 'grid', kWh: ps.kWh, energyChargesPaisa: 0 });
+        continue;
+      }
+      const rate = ps.ppaRatePaisa ?? 0;
+      const charge = Math.round(new Decimal(ps.kWh).mul(rate).toNumber());
+      ppaEnergyChargesPaisa += charge;
+      oaKWh += ps.kWh;
+      sourceBreakdown.push({ source: ps.source, kWh: ps.kWh, energyChargesPaisa: charge });
+    }
+
+    if (oa && oaKWh > 0) {
+      crossSubsidySurchargePaisa = Math.round(new Decimal(oaKWh).mul(oa.cssRatePaisa).toNumber());
+      additionalSurchargePaisa = Math.round(new Decimal(oaKWh).mul(oa.additionalSurchargePaisa).toNumber());
+      // Transmission loss modeled as % of OA energy charge (unit gross-up simplification)
+      transmissionLossChargesPaisa = Math.round(
+        new Decimal(ppaEnergyChargesPaisa).mul(oa.transmissionLossBps).div(10000).toNumber(),
+      );
+    }
+  }
+
   // Subtotal: sum all components
   const subtotalPaisa =
     totalEnergyChargesPaisa +
@@ -138,7 +172,11 @@ export function calculateBill(input: BillCalculationInput): BillOutput {
     fuelAdjustmentPaisa +
     electricityDutyPaisa +
     pfPenaltyPaisa +
-    dgChargesPaisa;
+    dgChargesPaisa +
+    ppaEnergyChargesPaisa +
+    crossSubsidySurchargePaisa +
+    additionalSurchargePaisa +
+    transmissionLossChargesPaisa;
 
   // GST: gstRateBps of subtotal (basis points / 10000)
   const gstPaisa = Math.round(
@@ -171,6 +209,11 @@ export function calculateBill(input: BillCalculationInput): BillOutput {
     electricityDutyPaisa,
     pfPenaltyPaisa,
     dgChargesPaisa,
+    ppaEnergyChargesPaisa,
+    crossSubsidySurchargePaisa,
+    additionalSurchargePaisa,
+    transmissionLossChargesPaisa,
+    sourceBreakdown,
     subtotalPaisa,
     gstPaisa,
     totalBillPaisa,

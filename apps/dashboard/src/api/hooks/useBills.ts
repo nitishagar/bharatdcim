@@ -28,6 +28,10 @@ export interface Bill {
   electricityDutyPaisa: number;
   pfPenaltyPaisa: number;
   dgChargesPaisa: number;
+  ppaEnergyChargesPaisa: number;
+  crossSubsidySurchargePaisa: number;
+  additionalSurchargePaisa: number;
+  transmissionLossChargesPaisa: number;
   subtotalPaisa: number;
   gstPaisa: number;
   totalBillPaisa: number;

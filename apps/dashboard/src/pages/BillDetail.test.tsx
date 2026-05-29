@@ -3,6 +3,7 @@ import { http, HttpResponse } from 'msw';
 import { server } from '../test/server';
 import { renderWithProviders } from '../test/utils';
 import { mockBill } from '../test/mocks/data';
+import type { Bill } from '../api/hooks/useBills';
 import { BillDetail } from './BillDetail';
 
 const mockNavigate = vi.fn();
@@ -69,5 +70,31 @@ describe('BillDetail page', () => {
     renderWithProviders(<BillDetail />);
     await waitFor(() => expect(screen.getByRole('heading', { name: 'Bill Detail' })).toBeInTheDocument());
     expect(screen.queryByRole('button', { name: 'Delete Bill' })).not.toBeInTheDocument();
+  });
+
+  it('shows OA line items when non-zero OA charges are present', async () => {
+    const oaBill: Bill = {
+      ...mockBill,
+      ppaEnergyChargesPaisa: 160000,
+      crossSubsidySurchargePaisa: 60000,
+      additionalSurchargePaisa: 20000,
+      transmissionLossChargesPaisa: 16000,
+    };
+    server.use(http.get('*/bills/:id', () => HttpResponse.json(oaBill)));
+    renderWithProviders(<BillDetail />);
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Bill Detail' })).toBeInTheDocument());
+    expect(screen.getByText('PPA Energy Charges')).toBeInTheDocument();
+    expect(screen.getByText('Cross-Subsidy Surcharge (CSS)')).toBeInTheDocument();
+    expect(screen.getByText('Additional Surcharge')).toBeInTheDocument();
+    expect(screen.getByText('Transmission Loss')).toBeInTheDocument();
+  });
+
+  it('hides OA line items when OA charges are zero', async () => {
+    renderWithProviders(<BillDetail />);
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Bill Detail' })).toBeInTheDocument());
+    expect(screen.queryByText('PPA Energy Charges')).not.toBeInTheDocument();
+    expect(screen.queryByText('Cross-Subsidy Surcharge (CSS)')).not.toBeInTheDocument();
+    expect(screen.queryByText('Additional Surcharge')).not.toBeInTheDocument();
+    expect(screen.queryByText('Transmission Loss')).not.toBeInTheDocument();
   });
 });

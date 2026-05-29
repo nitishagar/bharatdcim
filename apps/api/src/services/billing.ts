@@ -2,7 +2,7 @@ import {
   calculateBill,
   classifyReading,
 } from '@bharatdcim/billing-engine';
-import type { TariffConfig, ClassifiedReading, BillOutput } from '@bharatdcim/billing-engine';
+import type { TariffConfig, ClassifiedReading, BillOutput, PowerSourceInput } from '@bharatdcim/billing-engine';
 import { eq, and, gte, lte, gt, or, isNull } from 'drizzle-orm';
 import { powerReadings, tariffConfigs, meters, bills } from '../db/schema.js';
 import type { Database } from '../db/client.js';
@@ -102,6 +102,13 @@ export async function calculateAndStoreBill(
     pfPenaltyRatePaisa: tariffRow.pfPenaltyRatePaisa,
     gstRateBps: tariffRow.gstRateBps,
     version: tariffRow.version,
+    ...(tariffRow.oaCssRatePaisa != null && {
+      openAccess: {
+        cssRatePaisa: tariffRow.oaCssRatePaisa,
+        additionalSurchargePaisa: tariffRow.oaAdditionalSurchargePaisa ?? 0,
+        transmissionLossBps: tariffRow.oaTransmissionLossBps ?? 0,
+      },
+    }),
   };
 
   // 2. Fetch readings for the billing period
@@ -117,17 +124,45 @@ export async function calculateAndStoreBill(
     )
     .all();
 
-  // 3. Classify each reading by ToD
-  const classifiedReadings: ClassifiedReading[] = readingRows.map((r) => {
-    const classification = classifyReading(new Date(r.timestamp), tariff);
-    return {
-      timestamp: r.timestamp,
-      kWh: (r.kWh ?? 0) / 1000, // Convert from paisa-equivalent back to kWh
-      slotName: classification.slotName,
-      slotType: classification.slotType,
-      ratePaisa: classification.ratePaisa,
-    };
-  });
+  // 3. Classify readings by ToD; for OA tariffs, separate solar/captive from grid.
+  // Solar/captive are billed at PPA rates via powerSources — exclude from slot path to avoid double-counting.
+  const OA_SOURCES = new Set(['solar', 'captive']);
+  const oaKWhBySrc: Map<string, { kWh: number; ratePaisa: number }> = new Map();
+
+  const classifiedReadings: ClassifiedReading[] = [];
+  for (const r of readingRows) {
+    const kWh = (r.kWh ?? 0) / 1000; // Convert from paisa-equivalent back to kWh
+    const src = r.source ?? 'grid';
+
+    if (tariff.openAccess && OA_SOURCES.has(src)) {
+      // Accumulate OA kWh + use reading's stored rate as PPA rate
+      const prev = oaKWhBySrc.get(src) ?? { kWh: 0, ratePaisa: r.ratePaisa ?? 0 };
+      oaKWhBySrc.set(src, { kWh: prev.kWh + kWh, ratePaisa: r.ratePaisa ?? prev.ratePaisa });
+    } else {
+      const classification = classifyReading(new Date(r.timestamp), tariff);
+      classifiedReadings.push({
+        timestamp: r.timestamp,
+        kWh,
+        slotName: classification.slotName,
+        slotType: classification.slotType,
+        ratePaisa: classification.ratePaisa,
+      });
+    }
+  }
+
+  // Build powerSources when OA tariff is present
+  let powerSources: PowerSourceInput[] | undefined;
+  if (tariff.openAccess) {
+    powerSources = [];
+    for (const [src, { kWh, ratePaisa }] of oaKWhBySrc) {
+      powerSources.push({ source: src as 'solar' | 'captive', kWh, ppaRatePaisa: ratePaisa });
+    }
+    // Grid kWh — informational entry in sourceBreakdown
+    const gridKWh = classifiedReadings.reduce((sum, r) => sum + r.kWh, 0);
+    if (gridKWh > 0) {
+      powerSources.push({ source: 'grid', kWh: gridKWh });
+    }
+  }
 
   // 4. Calculate bill
   const billResult = calculateBill({
@@ -138,6 +173,7 @@ export async function calculateAndStoreBill(
     powerFactor: params.powerFactor,
     dgKWh: params.dgKWh ?? 0,
     dgRatePaisa: params.dgRatePaisa ?? 0,
+    powerSources,
   });
 
   // 5. Store bill in DB
@@ -170,6 +206,10 @@ export async function calculateAndStoreBill(
     electricityDutyPaisa: billResult.electricityDutyPaisa,
     pfPenaltyPaisa: billResult.pfPenaltyPaisa,
     dgChargesPaisa: billResult.dgChargesPaisa,
+    ppaEnergyChargesPaisa: billResult.ppaEnergyChargesPaisa,
+    crossSubsidySurchargePaisa: billResult.crossSubsidySurchargePaisa,
+    additionalSurchargePaisa: billResult.additionalSurchargePaisa,
+    transmissionLossChargesPaisa: billResult.transmissionLossChargesPaisa,
     subtotalPaisa: billResult.subtotalPaisa,
     gstPaisa: billResult.gstPaisa,
     totalBillPaisa: billResult.totalBillPaisa,

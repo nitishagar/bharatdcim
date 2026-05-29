@@ -99,6 +99,9 @@ tariffs.post('/', zValidator('json', CreateTariffSchema, validationHook), async 
     pfPenaltyRatePaisa: body.pfPenaltyRatePaisa,
     gstRateBps: body.gstRateBps,
     version: body.version,
+    oaCssRatePaisa: body.oaCssRatePaisa ?? null,
+    oaAdditionalSurchargePaisa: body.oaAdditionalSurchargePaisa ?? null,
+    oaTransmissionLossBps: body.oaTransmissionLossBps ?? null,
     createdAt: now,
     updatedAt: now,
   };
@@ -136,6 +139,9 @@ tariffs.patch('/:id', zValidator('json', UpdateTariffSchema, validationHook), as
   if (body.effectiveFrom !== undefined) updates.effectiveFrom = body.effectiveFrom;
   if ('effectiveTo' in body) updates.effectiveTo = body.effectiveTo ?? null;
   if (body.billingUnit !== undefined) updates.billingUnit = body.billingUnit;
+  if ('oaCssRatePaisa' in body) updates.oaCssRatePaisa = body.oaCssRatePaisa ?? null;
+  if ('oaAdditionalSurchargePaisa' in body) updates.oaAdditionalSurchargePaisa = body.oaAdditionalSurchargePaisa ?? null;
+  if ('oaTransmissionLossBps' in body) updates.oaTransmissionLossBps = body.oaTransmissionLossBps ?? null;
 
   await db.update(tariffConfigs).set(updates).where(eq(tariffConfigs.id, id));
   const updated = await db.select().from(tariffConfigs).where(eq(tariffConfigs.id, id)).all();

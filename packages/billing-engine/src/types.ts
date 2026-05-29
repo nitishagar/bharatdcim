@@ -26,6 +26,11 @@ export interface TariffConfig {
   pfPenaltyRatePaisa: number;
   gstRateBps: number; // basis points: 1800 = 18%
   version: number;
+  openAccess?: {
+    cssRatePaisa: number;              // cross-subsidy surcharge, paisa per OA kWh
+    additionalSurchargePaisa: number;  // paisa per OA kWh
+    transmissionLossBps: number;       // basis points loss gross-up on OA energy charge
+  };
 }
 
 export interface TimeSlotConfig {
@@ -55,6 +60,14 @@ export interface SlotClassification {
   ratePaisa: number;
 }
 
+export type PowerSourceType = 'grid' | 'solar' | 'captive';
+
+export interface PowerSourceInput {
+  source: PowerSourceType;
+  kWh: number;
+  ppaRatePaisa?: number; // required for solar/captive; grid uses slot rates
+}
+
 /** Input to calculateBill */
 export interface BillCalculationInput {
   readings: ClassifiedReading[];
@@ -64,6 +77,7 @@ export interface BillCalculationInput {
   powerFactor: number; // 0.0 - 1.0
   dgKWh: number;
   dgRatePaisa: number;
+  powerSources?: PowerSourceInput[];
 }
 
 /** Output: all values in integer paisa */
@@ -84,6 +98,11 @@ export interface BillOutput {
   electricityDutyPaisa: number;
   pfPenaltyPaisa: number;
   dgChargesPaisa: number;
+  ppaEnergyChargesPaisa: number;
+  crossSubsidySurchargePaisa: number;
+  additionalSurchargePaisa: number;
+  transmissionLossChargesPaisa: number;
+  sourceBreakdown: { source: PowerSourceType; kWh: number; energyChargesPaisa: number }[];
   subtotalPaisa: number;
   gstPaisa: number;
   totalBillPaisa: number;
