@@ -21,6 +21,7 @@ import { alertsRouter } from './routes/alerts.js';
 import { capacityRouter } from './routes/capacity.js';
 import { slaRouter } from './routes/sla.js';
 import { notificationsRouter } from './routes/notifications.js';
+import { sustainability as sustainabilityRouter } from './routes/sustainability.js';
 import { runDailyChecks } from './services/sla.js';
 import { processIrpRetryQueue } from './services/irp-retry.js';
 import type { Bindings } from './types.js';
@@ -198,6 +199,7 @@ app.route('/alerts', alertsRouter);
 app.route('/capacity', capacityRouter);
 app.route('/sla', slaRouter);
 app.route('/notifications', notificationsRouter);
+app.route('/sustainability', sustainabilityRouter);
 
 // 404 handler
 app.notFound((c) => {

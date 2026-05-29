@@ -61,4 +61,5 @@ export const RATE_LIMITED_PREFIXES = [
   '/notifications',
   '/env-readings',
   '/alerts',
+  '/sustainability',
 ];

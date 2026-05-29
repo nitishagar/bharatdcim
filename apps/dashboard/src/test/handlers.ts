@@ -31,6 +31,10 @@ import {
   mockSLAViolations,
   mockNotificationConfig,
   mockNotificationConfigs,
+  mockRec,
+  mockRecs,
+  mockCarbonEmission,
+  mockCarbonEmissions,
 } from './mocks/data';
 
 function paginatedResponse<T>(items: T[], request: Request) {
@@ -144,4 +148,12 @@ export const handlers = [
   http.patch('*/notifications/:id',    () => HttpResponse.json(mockNotificationConfig)),
   http.delete('*/notifications/:id',   () => new HttpResponse(null, { status: 204 })),
   http.post('*/notifications/:id/test', () => HttpResponse.json({ sent: true, type: 'email', destination: 'ops@example.com' })),
+
+  // Sustainability endpoints
+  http.get('*/sustainability/recs',         ({ request }) => paginatedResponse(mockRecs, request)),
+  http.post('*/sustainability/recs',        () => HttpResponse.json(mockRec, { status: 201 })),
+  http.patch('*/sustainability/recs/:id',   () => HttpResponse.json(mockRec)),
+  http.post('*/sustainability/recs/:id/retire', () => HttpResponse.json({ ...mockRec, status: 'retired', retiredAt: new Date().toISOString() })),
+  http.get('*/sustainability/emissions',    ({ request }) => paginatedResponse(mockCarbonEmissions, request)),
+  http.post('*/sustainability/emissions/compute', () => HttpResponse.json(mockCarbonEmission, { status: 201 })),
 ];

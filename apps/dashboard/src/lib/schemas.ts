@@ -112,3 +112,24 @@ export const createAssetSchema = z.object({
 });
 
 export type CreateAssetForm = z.infer<typeof createAssetSchema>;
+
+export const createRecSchema = z.object({
+  certificateType: z.enum(['REC', 'I-REC'], { error: 'Select certificate type' }),
+  serialNumber: z.string().min(1, 'Serial number is required'),
+  source: z.enum(['solar', 'wind', 'hydro', 'other'], { error: 'Select energy source' }),
+  mwh: z.string().min(1, 'MWh is required')
+    .refine((v) => !isNaN(parseInt(v)) && parseInt(v) > 0, 'Must be a positive integer (MWh ×1000)'),
+  vintagePeriodStart: z.string().min(1, 'Vintage period start is required'),
+  vintagePeriodEnd: z.string().min(1, 'Vintage period end is required'),
+});
+
+export type CreateRecForm = z.infer<typeof createRecSchema>;
+
+export const computeEmissionsSchema = z.object({
+  periodStart: z.string().min(1, 'Period start is required'),
+  periodEnd: z.string().min(1, 'Period end is required'),
+  gridEmissionFactorGPerKwh: z.string().optional()
+    .refine((v) => !v || (!isNaN(parseInt(v)) && parseInt(v) > 0), 'Must be a positive integer'),
+});
+
+export type ComputeEmissionsForm = z.infer<typeof computeEmissionsSchema>;

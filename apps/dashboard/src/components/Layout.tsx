@@ -16,6 +16,7 @@ const NAV_ITEMS = [
   { to: '/tariffs', label: 'Tariffs', icon: '📊' },
   { to: '/capacity', label: 'Capacity', icon: '📈' },
   { to: '/sla', label: 'SLA', icon: '📉' },
+  { to: '/sustainability', label: 'Sustainability', icon: '🌱' },
   { to: '/settings', label: 'Settings', icon: '⚙' },
 ];
 
@@ -36,6 +37,7 @@ const TITLE_MAP: Record<string, string> = {
   '/tariffs': 'Tariffs',
   '/capacity': 'Capacity Planning',
   '/sla': 'SLA Management',
+  '/sustainability': 'Sustainability',
   '/settings': 'Settings',
   '/settings/notifications': 'Notification Settings',
   '/platform': 'Platform Overview',

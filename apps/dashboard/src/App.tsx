@@ -38,6 +38,7 @@ const CapacityPlanning = lazy(() => import('./pages/CapacityPlanning').then(m =>
 const SLADashboard = lazy(() => import('./pages/SLADashboard').then(m => ({ default: m.SLADashboard })));
 const SLADetail = lazy(() => import('./pages/SLADetail').then(m => ({ default: m.SLADetail })));
 const NotificationSettings = lazy(() => import('./pages/NotificationSettings').then(m => ({ default: m.NotificationSettings })));
+const Sustainability = lazy(() => import('./pages/Sustainability').then(m => ({ default: m.Sustainability })));
 
 /** Redirects org:member to /portal, lets org:admin see the admin dashboard */
 export function RoleBasedIndex() {
@@ -102,6 +103,7 @@ export function App() {
                 <Route path="sla" element={<SLADashboard />} />
                 <Route path="sla/:id" element={<SLADetail />} />
                 <Route path="settings/notifications" element={<NotificationSettings />} />
+                <Route path="sustainability" element={<Sustainability />} />
                 <Route path="platform" element={<RequirePlatformAdmin><PlatformOverview /></RequirePlatformAdmin>} />
                 <Route path="platform/tenants" element={<RequirePlatformAdmin><PlatformTenants /></RequirePlatformAdmin>} />
               </Route>

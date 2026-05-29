@@ -376,3 +376,36 @@ export const mockNotificationConfig = {
 };
 
 export const mockNotificationConfigs = [mockNotificationConfig];
+
+export const mockRec = {
+  id: 'rec-001',
+  tenantId: 'tenant-001',
+  certificateType: 'REC' as const,
+  serialNumber: 'IN-REC-2026-001',
+  source: 'solar' as const,
+  mwh: 1000,
+  vintagePeriodStart: '2026-03-01',
+  vintagePeriodEnd: '2026-03-31',
+  status: 'active' as const,
+  retiredAt: null,
+  retiredAgainstPeriod: null,
+  createdAt: '2026-03-01T00:00:00Z',
+  updatedAt: '2026-03-01T00:00:00Z',
+};
+export const mockRecs = [mockRec];
+
+export const mockCarbonEmission = {
+  id: 'em-001',
+  tenantId: 'tenant-001',
+  periodStart: '2026-03-01',
+  periodEnd: '2026-03-31',
+  gridEmissionFactorGPerKwh: 710,
+  totalKwh: 100000,
+  renewableKwh: 20000,
+  recOffsetKwh: 10000,
+  scope2GrossKg: 56800,
+  scope2NetKg: 49680,
+  createdAt: '2026-04-01T00:00:00Z',
+  updatedAt: '2026-04-01T00:00:00Z',
+};
+export const mockCarbonEmissions = [mockCarbonEmission];
