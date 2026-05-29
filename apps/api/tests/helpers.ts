@@ -51,6 +51,7 @@ export async function createTestDb() {
       pf_threshold_bps INTEGER NOT NULL,
       pf_penalty_rate_paisa INTEGER NOT NULL,
       gst_rate_bps INTEGER NOT NULL DEFAULT 1800,
+      lineage_key TEXT,
       version INTEGER NOT NULL,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL

@@ -21,6 +21,7 @@ export type { ParsedCSV, DCIMFormat, NormalizedRow, CSVError, CSVValidationResul
 // Tariff fixtures
 export {
   maharashtraTariff, tamilNaduTariff, karnatakaTariff, telanganaTariff,
+  madhyaPradeshTariff, gujaratTariff, uttarPradeshTariff, delhiTariff,
   tariffFixtures,
 } from './fixtures/tariffs.js';
 

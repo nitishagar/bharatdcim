@@ -1,5 +1,6 @@
 import {
   maharashtraTariff, tamilNaduTariff, karnatakaTariff, telanganaTariff,
+  madhyaPradeshTariff, gujaratTariff, uttarPradeshTariff, delhiTariff,
 } from '@bharatdcim/billing-engine';
 import type { TariffConfig } from '@bharatdcim/billing-engine';
 import { tenants, tariffConfigs, meters } from './schema.js';
@@ -58,12 +59,16 @@ export async function seedDatabase(db: Database): Promise<void> {
     },
   ]);
 
-  // Seed all 4 state tariffs
+  // Seed all 8 state tariffs
   await db.insert(tariffConfigs).values([
     tariffToRow(maharashtraTariff),
     tariffToRow(tamilNaduTariff),
     tariffToRow(karnatakaTariff),
     tariffToRow(telanganaTariff),
+    tariffToRow(madhyaPradeshTariff),
+    tariffToRow(gujaratTariff),
+    tariffToRow(uttarPradeshTariff),
+    tariffToRow(delhiTariff),
   ]);
 
   // Seed meters

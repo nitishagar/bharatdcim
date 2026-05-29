@@ -10,6 +10,7 @@ export interface Tariff {
   category: string;
   effectiveFrom: string;
   effectiveTo: string | null;
+  lineageKey: string | null;
   billingUnit: string;
   baseEnergyRatePaisa: number;
   wheelingChargePaisa: number;
@@ -22,6 +23,7 @@ export interface Tariff {
   electricityDutyBps: number;
   pfThresholdBps: number;
   pfPenaltyRatePaisa: number;
+  gstRateBps: number;
   version: number;
   createdAt: string;
   updatedAt: string;

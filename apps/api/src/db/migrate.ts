@@ -422,6 +422,7 @@ const addColumnMigrations = [
   `ALTER TABLE tenants ADD COLUMN city TEXT`,
   `ALTER TABLE tenants ADD COLUMN pincode TEXT`,
   `ALTER TABLE tariff_configs ADD COLUMN gst_rate_bps INTEGER NOT NULL DEFAULT 1800`,
+  `ALTER TABLE tariff_configs ADD COLUMN lineage_key TEXT`,
 ];
 
 async function main() {

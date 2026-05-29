@@ -175,13 +175,13 @@ describe('E2E Integration Tests', () => {
     expect(seq2).toBe(seq1 + 1);
   });
 
-  // E2E-004: Tariff seeding — API can load all 4 state fixture tariffs
+  // E2E-004: Tariff seeding — API can load all 8 state fixture tariffs
   it('E2E-004: tariff seeding loads 4 state configs', async () => {
     const tariffs = await db.select().from(tariffConfigs).all();
-    expect(tariffs).toHaveLength(4);
+    expect(tariffs).toHaveLength(8);
 
     const states = tariffs.map(t => t.stateCode).sort();
-    expect(states).toEqual(['KA', 'MH', 'TN', 'TS']);
+    expect(states).toEqual(['DL', 'GJ', 'KA', 'MH', 'MP', 'TN', 'TS', 'UP']);
   });
 
   // E2E-005: Bill→Invoice pipeline amounts consistent
