@@ -189,6 +189,29 @@ export const openApiSpec = {
         responses: { '200': { description: 'Cancelled' } },
       },
     },
+    '/invoices/{id}/send': {
+      post: {
+        tags: ['Invoices'],
+        summary: 'Send invoice PDF to recipient email',
+        description: 'Renders invoice as PDF (pdf-lib) and delivers via Resend. Resolves recipient from body.to → invoice.recipient_email → tenant.billing_email. Returns 400 if no recipient is resolvable.',
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+        requestBody: {
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: { to: { type: 'string', format: 'email', description: 'Override recipient email' } },
+              },
+            },
+          },
+        },
+        responses: {
+          '200': { description: '{ sent: true, to: string }' },
+          '400': { description: 'No recipient resolvable' },
+          '503': { description: 'Email service not configured' },
+        },
+      },
+    },
     '/invoices/credit-notes': {
       post: {
         tags: ['Invoices'],
