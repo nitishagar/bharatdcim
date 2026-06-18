@@ -350,6 +350,7 @@ export const alertEvents = sqliteTable('alert_events', {
   severity: text('severity').notNull(),
   triggeredAt: text('triggered_at').notNull(),
   resolvedAt: text('resolved_at'),
+  notifiedAt: text('notified_at'),
   createdAt: text('created_at').notNull(),
 });
 
@@ -390,6 +391,7 @@ export const slaViolations = sqliteTable('sla_violations', {
   status: text('status').notNull().default('open'),
   acknowledgedAt: text('acknowledged_at'),
   resolvedAt: text('resolved_at'),
+  notifiedAt: text('notified_at'),
   createdAt: text('created_at').notNull(),
 });
 

@@ -8,6 +8,8 @@ export const VALID_EVENTS = [
   'capacity_critical',
   'sla_warning',
   'sla_breach',
+  'env_temperature_breach',
+  'env_humidity_breach',
 ] as const;
 
 export type AlertEvent = (typeof VALID_EVENTS)[number];
@@ -16,9 +18,9 @@ export interface NotificationPayload {
   event: AlertEvent;
   tenantId: string;
   meterId?: string | null;
-  metric: string;
-  currentValue: number;
-  thresholdValue: number;
+  metric?: string;
+  currentValue?: number;
+  thresholdValue?: number;
   message: string;
   timestamp: string;
 }
@@ -88,11 +90,14 @@ export async function dispatchNotifications(
 }
 
 function buildEmailHtml(payload: NotificationPayload): string {
+  const metricBlock = payload.metric != null
+    ? `<p><strong>Metric:</strong> ${payload.metric}</p>
+    <p><strong>Current Value:</strong> ${payload.currentValue}</p>
+    <p><strong>Threshold:</strong> ${payload.thresholdValue}</p>`
+    : '';
   return `
     <h2>BharatDCIM Alert: ${payload.event}</h2>
-    <p><strong>Metric:</strong> ${payload.metric}</p>
-    <p><strong>Current Value:</strong> ${payload.currentValue}</p>
-    <p><strong>Threshold:</strong> ${payload.thresholdValue}</p>
+    ${metricBlock}
     <p><strong>Time:</strong> ${payload.timestamp}</p>
     <p>${payload.message}</p>
     <hr><p style="color:#888;font-size:12px">BharatDCIM — Data Center Intelligence Platform</p>

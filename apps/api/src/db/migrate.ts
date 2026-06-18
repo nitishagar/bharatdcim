@@ -469,6 +469,9 @@ const addColumnMigrations = [
   `ALTER TABLE bills ADD COLUMN transmission_loss_charges_paisa INTEGER NOT NULL DEFAULT 0`,
   `ALTER TABLE alerts ADD COLUMN notified_at TEXT`,
   `UPDATE alerts SET notified_at = created_at WHERE status = 'active' AND notified_at IS NULL`,
+  `ALTER TABLE sla_violations ADD COLUMN notified_at TEXT`,
+  `UPDATE sla_violations SET notified_at = created_at WHERE status = 'open' AND notified_at IS NULL`,
+  `ALTER TABLE alert_events ADD COLUMN notified_at TEXT`,
 ];
 
 async function main() {

@@ -99,4 +99,16 @@ describe('NotificationSettings page', () => {
       expect(screen.getByLabelText(/sla_breach/i)).toBeInTheDocument();
     });
   });
+
+  it('events checkboxes render for env breach events', async () => {
+    renderWithProviders(<NotificationSettings />);
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: /add channel/i })).toBeInTheDocument(),
+    );
+    fireEvent.click(screen.getByRole('button', { name: /add channel/i }));
+    await waitFor(() => {
+      expect(screen.getByLabelText(/env_temperature_breach/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/env_humidity_breach/i)).toBeInTheDocument();
+    });
+  });
 });

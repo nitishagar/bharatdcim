@@ -10,7 +10,14 @@ import { useIsAdmin } from '../hooks/useIsAdmin';
 import { Skeleton } from '../components/Skeleton';
 import { ErrorMessage } from '../components/ErrorMessage';
 
-const VALID_EVENTS = ['capacity_warning', 'capacity_critical', 'sla_warning', 'sla_breach'] as const;
+const VALID_EVENTS = [
+  'capacity_warning',
+  'capacity_critical',
+  'sla_warning',
+  'sla_breach',
+  'env_temperature_breach',
+  'env_humidity_breach',
+] as const;
 type ValidEvent = (typeof VALID_EVENTS)[number];
 
 function TestButton({ id }: { id: string }) {

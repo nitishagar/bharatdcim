@@ -1,6 +1,13 @@
 import { z } from 'zod';
 
-const VALID_EVENTS = ['capacity_warning', 'capacity_critical', 'sla_warning', 'sla_breach'] as const;
+const VALID_EVENTS = [
+  'capacity_warning',
+  'capacity_critical',
+  'sla_warning',
+  'sla_breach',
+  'env_temperature_breach',
+  'env_humidity_breach',
+] as const;
 
 export const CreateNotificationSchema = z.object({
   name: z.string().min(1).max(100),

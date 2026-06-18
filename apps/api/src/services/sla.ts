@@ -2,6 +2,7 @@ import { eq, and, gte, lt, inArray, isNull } from 'drizzle-orm';
 import type { Database } from '../db/client.js';
 import type { Bindings } from '../types.js';
 import { meters, powerReadings, slaConfigs, slaViolations, capacityThresholds, alerts } from '../db/schema.js';
+import type { AlertEvent } from './notifications.js';
 import { aggregateByDay, fitLinearRegression, projectBreachDate } from './capacity-math.js';
 import { dispatchNotifications } from './notifications.js';
 
@@ -276,7 +277,7 @@ export async function runDailyChecks(
   for (const alert of newAlerts) {
     try {
       await dispatchNotifications(db, env, alert.tenantId, {
-        event: alert.type as any,
+        event: alert.type as AlertEvent,
         tenantId: alert.tenantId,
         meterId: alert.meterId,
         metric: alert.metric,
@@ -288,6 +289,33 @@ export async function runDailyChecks(
       await db.update(alerts).set({ notifiedAt: new Date().toISOString() }).where(eq(alerts.id, alert.id));
     } catch (err) {
       console.error('[NOTIFY] alert dispatch failed, will retry next run:', alert.id, err);
+    }
+  }
+
+  // Dispatch SLA violations (dispatch-once, same idempotency pattern)
+  const newViolations = await db
+    .select()
+    .from(slaViolations)
+    .where(and(eq(slaViolations.status, 'open'), isNull(slaViolations.notifiedAt)))
+    .all();
+
+  for (const v of newViolations) {
+    const cfg = configs.find((c) => c.id === v.slaConfigId);
+    const event: AlertEvent = v.severity === 'critical' ? 'sla_breach' : 'sla_warning';
+    try {
+      await dispatchNotifications(db, env, v.tenantId, {
+        event,
+        tenantId: v.tenantId,
+        meterId: v.meterId,
+        metric: cfg?.type ?? 'sla',
+        currentValue: v.actualBps,
+        thresholdValue: v.targetBps,
+        message: `SLA ${event}: ${cfg?.name ?? v.slaConfigId} actual ${v.actualBps}bps vs target ${v.targetBps}bps`,
+        timestamp: v.createdAt,
+      });
+      await db.update(slaViolations).set({ notifiedAt: new Date().toISOString() }).where(eq(slaViolations.id, v.id));
+    } catch (err) {
+      console.error('[NOTIFY] SLA violation dispatch failed:', v.id, err);
     }
   }
 }

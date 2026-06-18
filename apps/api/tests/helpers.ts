@@ -374,6 +374,7 @@ export async function createTestDb() {
       severity TEXT NOT NULL,
       triggered_at TEXT NOT NULL,
       resolved_at TEXT,
+      notified_at TEXT,
       created_at TEXT NOT NULL
     );
 
@@ -391,6 +392,7 @@ export async function createTestDb() {
       status TEXT NOT NULL DEFAULT 'open',
       acknowledged_at TEXT,
       resolved_at TEXT,
+      notified_at TEXT,
       created_at TEXT NOT NULL
     );
 
@@ -500,4 +502,15 @@ export function createAppWithTenant(
     await next();
   });
   return app;
+}
+
+/**
+ * Creates an irpCtx that collects all waitUntil promises.
+ * Call flushAll() after the request to await all dispatched side-effects.
+ */
+export function createCollectingCtx() {
+  const promises: Promise<unknown>[] = [];
+  const ctx = { waitUntil: (p: Promise<unknown>) => { promises.push(p); } };
+  const flushAll = () => Promise.all(promises.splice(0));
+  return { ctx, flushAll };
 }

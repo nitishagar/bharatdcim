@@ -1,10 +1,11 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
-import { eq, and, gte, lte, inArray, sql } from 'drizzle-orm';
+import { eq, and, gte, lte, inArray, sql, isNull } from 'drizzle-orm';
 import type { AppEnv } from '../types.js';
 import { envReadings, alertRules, alertEvents, meters } from '../db/schema.js';
 import { BatchEnvReadingsSchema } from '../schemas/env-readings.js';
 import { validationHook } from '../utils/validationHook.js';
+import { dispatchNotifications } from '../services/notifications.js';
 
 const envReadingsRouter = new Hono<AppEnv>();
 
@@ -140,27 +141,62 @@ envReadingsRouter.post('/batch', zValidator('json', BatchEnvReadingsSchema, vali
           const value = rule.metric === 'temperature' ? row.tempCTenths : row.humidityPctTenths;
           if (value == null) continue;
 
-          const breached = checkOperator(rule.operator, value, rule.threshold);
-          if (breached) {
-            breachEvents.push({
-              id: crypto.randomUUID(),
-              tenantId: effectiveTenantId,
-              ruleId: rule.id,
-              meterId: row.meterId,
-              value,
-              threshold: rule.threshold,
-              severity: rule.severity,
-              triggeredAt: row.timestamp,
-              resolvedAt: null,
-              createdAt: now,
-            });
-          }
+          if (!checkOperator(rule.operator, value, rule.threshold)) continue;
+
+          // Dedup: skip if an unresolved event already exists for this rule+meter
+          const open = await db.select({ id: alertEvents.id })
+            .from(alertEvents)
+            .where(and(
+              eq(alertEvents.ruleId, rule.id),
+              eq(alertEvents.meterId, row.meterId),
+              isNull(alertEvents.resolvedAt),
+            ))
+            .all();
+          if (open.length > 0) continue;
+
+          breachEvents.push({
+            id: crypto.randomUUID(),
+            tenantId: effectiveTenantId,
+            ruleId: rule.id,
+            meterId: row.meterId,
+            value,
+            threshold: rule.threshold,
+            severity: rule.severity,
+            triggeredAt: row.timestamp,
+            resolvedAt: null,
+            createdAt: now,
+          });
         }
       }
 
       if (breachEvents.length > 0) {
         for (let i = 0; i < breachEvents.length; i += batchSize) {
           await db.insert(alertEvents).values(breachEvents.slice(i, i + batchSize));
+        }
+
+        // Dispatch notifications fire-and-forget via waitUntil
+        const ctx = c.get('irpCtx');
+        for (const ev of breachEvents) {
+          const rule = rules.find((r) => r.id === ev.ruleId);
+          const event = rule?.metric === 'humidity' ? 'env_humidity_breach' as const : 'env_temperature_breach' as const;
+          ctx.waitUntil(
+            dispatchNotifications(db, c.env, ev.tenantId!, {
+              event,
+              tenantId: ev.tenantId!,
+              meterId: ev.meterId,
+              metric: rule?.metric ?? 'temperature',
+              currentValue: ev.value,
+              thresholdValue: ev.threshold,
+              message: `${event}: value ${ev.value / 10} crossed threshold ${ev.threshold / 10}`,
+              timestamp: ev.triggeredAt,
+            })
+              .then(() =>
+                db.update(alertEvents)
+                  .set({ notifiedAt: new Date().toISOString() })
+                  .where(eq(alertEvents.id, ev.id!)),
+              )
+              .catch((err) => console.error('[NOTIFY] env breach dispatch failed:', ev.id, err)),
+          );
         }
       }
     }
