@@ -9,6 +9,7 @@ import { bills, invoices, invoiceSequences, creditNotes, invoiceAuditLog, irpRet
 import type { Database } from '../db/client.js';
 import type { Bindings } from '../types.js';
 import { generateIrn, cancelIrn, buildGspConfig, buildPlatformSeller, mapReasonToCode } from './irp.js';
+import { dispatchNotifications } from './notifications.js';
 
 function generateId(): string {
   return crypto.randomUUID();
@@ -97,6 +98,17 @@ async function triggerIrpGeneration(
       irnGeneratedAt: now,
       updatedAt: now,
     }).where(eq(invoices.id, invoice.id));
+
+    // Dispatch irn_ready operator notification (best-effort)
+    await dispatchNotifications(db, env, invoice.tenantId, {
+      event: 'irn_ready',
+      tenantId: invoice.tenantId,
+      message: `IRN generated for invoice ${invoice.invoiceNumber}`,
+      timestamp: now,
+      invoiceNumber: invoice.invoiceNumber,
+      irn: irnResult.irn,
+      totalAmountPaisa: invoice.totalAmountPaisa,
+    }).catch((err) => console.error('[NOTIFY] irn_ready dispatch failed:', invoice.id, err));
   } catch (err: unknown) {
     const errorMessage = err instanceof Error ? err.message : String(err);
     // Enqueue for retry — next attempt in 5 minutes

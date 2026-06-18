@@ -10,6 +10,10 @@ export const VALID_EVENTS = [
   'sla_breach',
   'env_temperature_breach',
   'env_humidity_breach',
+  'invoice_generated',
+  'irn_ready',
+  'invoice_cancelled',
+  'bill_created',
 ] as const;
 
 export type AlertEvent = (typeof VALID_EVENTS)[number];
@@ -17,12 +21,17 @@ export type AlertEvent = (typeof VALID_EVENTS)[number];
 export interface NotificationPayload {
   event: AlertEvent;
   tenantId: string;
+  message: string;
+  timestamp: string;
   meterId?: string | null;
+  // alert-shaped (optional)
   metric?: string;
   currentValue?: number;
   thresholdValue?: number;
-  message: string;
-  timestamp: string;
+  // billing-shaped (optional)
+  invoiceNumber?: string;
+  irn?: string | null;
+  totalAmountPaisa?: number;
 }
 
 export async function sendEmailNotification(
@@ -89,7 +98,26 @@ export async function dispatchNotifications(
   }
 }
 
+const BILLING_EVENTS = new Set(['invoice_generated', 'irn_ready', 'invoice_cancelled', 'bill_created']);
+
 function buildEmailHtml(payload: NotificationPayload): string {
+  if (BILLING_EVENTS.has(payload.event)) {
+    const amountStr = payload.totalAmountPaisa != null
+      ? `₹${(payload.totalAmountPaisa / 100).toLocaleString('en-IN')}`
+      : '';
+    const billingBlock = [
+      payload.invoiceNumber ? `<p><strong>Invoice:</strong> ${payload.invoiceNumber}</p>` : '',
+      amountStr ? `<p><strong>Amount:</strong> ${amountStr}</p>` : '',
+      payload.irn ? `<p><strong>IRN:</strong> ${payload.irn}</p>` : '',
+    ].join('');
+    return `
+      <h2>BharatDCIM Billing: ${payload.event}</h2>
+      ${billingBlock}
+      <p><strong>Time:</strong> ${payload.timestamp}</p>
+      <p>${payload.message}</p>
+      <hr><p style="color:#888;font-size:12px">BharatDCIM — Data Center Intelligence Platform</p>
+    `;
+  }
   const metricBlock = payload.metric != null
     ? `<p><strong>Metric:</strong> ${payload.metric}</p>
     <p><strong>Current Value:</strong> ${payload.currentValue}</p>

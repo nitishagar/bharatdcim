@@ -8,6 +8,7 @@ import { requireAdmin } from '../middleware/rbac.js';
 import { parsePagination } from '../utils/pagination.js';
 import { CreateInvoiceSchema, CancelInvoiceSchema, CreateCreditNoteSchema } from '../schemas/invoices.js';
 import { validationHook } from '../utils/validationHook.js';
+import { dispatchNotifications } from '../services/notifications.js';
 
 const invoicesRouter = new Hono<AppEnv>();
 
@@ -45,6 +46,16 @@ invoicesRouter.post('/', zValidator('json', CreateInvoiceSchema, validationHook)
 
   try {
     const result = await createInvoice(body.billId, body.supplierGSTIN, body.recipientGSTIN, db, tenantId, c.env, c.get('irpCtx'));
+    c.get('irpCtx').waitUntil(
+      dispatchNotifications(db, c.env, tenantId, {
+        event: 'invoice_generated',
+        tenantId,
+        message: `Invoice ${result.invoiceNumber} generated`,
+        timestamp: result.invoice.createdAt,
+        invoiceNumber: result.invoiceNumber,
+        totalAmountPaisa: result.invoice.totalAmountPaisa,
+      }).catch((err) => console.error('[NOTIFY] invoice_generated failed:', err)),
+    );
     return c.json(result.invoice, 201);
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';
@@ -82,6 +93,16 @@ invoicesRouter.post('/:id/cancel', zValidator('json', CancelInvoiceSchema, valid
 
   try {
     const result = await cancelInvoice(id, body.reason, db, tenantId, c.env);
+    c.get('irpCtx').waitUntil(
+      dispatchNotifications(db, c.env, tenantId, {
+        event: 'invoice_cancelled',
+        tenantId,
+        message: `Invoice ${result.invoiceNumber} cancelled`,
+        timestamp: result.updatedAt,
+        invoiceNumber: result.invoiceNumber,
+        totalAmountPaisa: result.totalAmountPaisa,
+      }).catch((err) => console.error('[NOTIFY] invoice_cancelled failed:', err)),
+    );
     return c.json(result);
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';

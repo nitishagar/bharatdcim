@@ -111,4 +111,18 @@ describe('NotificationSettings page', () => {
       expect(screen.getByLabelText(/env_humidity_breach/i)).toBeInTheDocument();
     });
   });
+
+  it('events checkboxes render for billing lifecycle events', async () => {
+    renderWithProviders(<NotificationSettings />);
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: /add channel/i })).toBeInTheDocument(),
+    );
+    fireEvent.click(screen.getByRole('button', { name: /add channel/i }));
+    await waitFor(() => {
+      expect(screen.getByLabelText(/invoice_generated/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/irn_ready/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/invoice_cancelled/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/bill_created/i)).toBeInTheDocument();
+    });
+  });
 });

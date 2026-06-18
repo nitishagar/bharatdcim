@@ -17,6 +17,10 @@ const VALID_EVENTS = [
   'sla_breach',
   'env_temperature_breach',
   'env_humidity_breach',
+  'invoice_generated',
+  'irn_ready',
+  'invoice_cancelled',
+  'bill_created',
 ] as const;
 type ValidEvent = (typeof VALID_EVENTS)[number];
 

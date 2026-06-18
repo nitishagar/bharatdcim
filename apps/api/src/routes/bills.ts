@@ -10,6 +10,7 @@ import { requireAdmin } from '../middleware/rbac.js';
 import { parsePagination } from '../utils/pagination.js';
 import { CalculateBillSchema, CreateBillSchema } from '../schemas/bills.js';
 import { validationHook } from '../utils/validationHook.js';
+import { dispatchNotifications } from '../services/notifications.js';
 
 const CreateDisputeSchema = z.object({
   reason: z.string().min(1),
@@ -115,6 +116,17 @@ billsRouter.post('/', zValidator('json', CreateBillSchema, validationHook), asyn
   };
 
   await db.insert(bills).values(row);
+
+  c.get('irpCtx').waitUntil(
+    dispatchNotifications(db, c.env, tenantId, {
+      event: 'bill_created',
+      tenantId,
+      message: `Bill ${row.id} created (${row.totalBillPaisa} paisa)`,
+      timestamp: row.createdAt,
+      totalAmountPaisa: row.totalBillPaisa,
+    }).catch((err) => console.error('[NOTIFY] bill_created failed:', err)),
+  );
+
   return c.json(row, 201);
 });
 
