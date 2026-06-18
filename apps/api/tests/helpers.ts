@@ -359,6 +359,7 @@ export async function createTestDb() {
       status TEXT NOT NULL DEFAULT 'active',
       acknowledged_at TEXT,
       resolved_at TEXT,
+      notified_at TEXT,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );

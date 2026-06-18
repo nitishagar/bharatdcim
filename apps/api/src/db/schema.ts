@@ -369,6 +369,7 @@ export const alerts = sqliteTable('alerts', {
   status: text('status').notNull().default('active'),
   acknowledgedAt: text('acknowledged_at'),
   resolvedAt: text('resolved_at'),
+  notifiedAt: text('notified_at'),
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
 });

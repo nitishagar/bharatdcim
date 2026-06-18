@@ -467,6 +467,8 @@ const addColumnMigrations = [
   `ALTER TABLE bills ADD COLUMN cross_subsidy_surcharge_paisa INTEGER NOT NULL DEFAULT 0`,
   `ALTER TABLE bills ADD COLUMN additional_surcharge_paisa INTEGER NOT NULL DEFAULT 0`,
   `ALTER TABLE bills ADD COLUMN transmission_loss_charges_paisa INTEGER NOT NULL DEFAULT 0`,
+  `ALTER TABLE alerts ADD COLUMN notified_at TEXT`,
+  `UPDATE alerts SET notified_at = created_at WHERE status = 'active' AND notified_at IS NULL`,
 ];
 
 async function main() {

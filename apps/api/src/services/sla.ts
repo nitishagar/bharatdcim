@@ -1,4 +1,4 @@
-import { eq, and, gte, lt, inArray } from 'drizzle-orm';
+import { eq, and, gte, lt, inArray, isNull } from 'drizzle-orm';
 import type { Database } from '../db/client.js';
 import type { Bindings } from '../types.js';
 import { meters, powerReadings, slaConfigs, slaViolations, capacityThresholds, alerts } from '../db/schema.js';
@@ -190,6 +190,18 @@ export async function checkThresholdsForMeter(
   const alertType = isCritical ? 'capacity_critical' : 'capacity_warning';
   const severity = isCritical ? 'critical' : 'warning';
 
+  // Dedup: skip if an active alert already exists for this meter+metric
+  const existingActive = await db
+    .select({ id: alerts.id })
+    .from(alerts)
+    .where(and(
+      eq(alerts.meterId, threshold.meterId),
+      eq(alerts.metric, threshold.metric),
+      eq(alerts.status, 'active'),
+    ))
+    .all();
+  if (existingActive.length > 0) return;
+
   // Compute projected breach date
   const points = dailyAggregates.map((d, i) => ({
     x: i,
@@ -254,23 +266,28 @@ export async function runDailyChecks(
     await checkThresholdsForMeter(db, threshold);
   }
 
-  // Dispatch notifications for new active alerts
+  // Dispatch notifications for un-notified active alerts only (dispatch-once)
   const newAlerts = await db
     .select()
     .from(alerts)
-    .where(eq(alerts.status, 'active'))
+    .where(and(eq(alerts.status, 'active'), isNull(alerts.notifiedAt)))
     .all();
 
   for (const alert of newAlerts) {
-    await dispatchNotifications(db, env, alert.tenantId, {
-      event: alert.type as any,
-      tenantId: alert.tenantId,
-      meterId: alert.meterId,
-      metric: alert.metric,
-      currentValue: alert.currentValue,
-      thresholdValue: alert.thresholdValue,
-      message: `${alert.type} detected for metric ${alert.metric}`,
-      timestamp: alert.createdAt,
-    }).catch(() => { /* best-effort: don't fail cron on notification error */ });
+    try {
+      await dispatchNotifications(db, env, alert.tenantId, {
+        event: alert.type as any,
+        tenantId: alert.tenantId,
+        meterId: alert.meterId,
+        metric: alert.metric,
+        currentValue: alert.currentValue,
+        thresholdValue: alert.thresholdValue,
+        message: `${alert.type} detected for metric ${alert.metric}`,
+        timestamp: alert.createdAt,
+      });
+      await db.update(alerts).set({ notifiedAt: new Date().toISOString() }).where(eq(alerts.id, alert.id));
+    } catch (err) {
+      console.error('[NOTIFY] alert dispatch failed, will retry next run:', alert.id, err);
+    }
   }
 }
