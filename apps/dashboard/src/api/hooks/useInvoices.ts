@@ -26,6 +26,7 @@ export interface Invoice {
   signedQrCode: string | null;
   irnGeneratedAt: string | null;
   irnCancelledAt: string | null;
+  recipientEmail: string | null;
   invoiceDate: string;
   createdAt: string;
   updatedAt: string;
@@ -47,10 +48,26 @@ export function useInvoice(id: string) {
   });
 }
 
+export function useSendInvoice(id: string) {
+  return useMutation({
+    mutationFn: (to?: string) =>
+      api<{ sent: boolean; to: string }>(`/invoices/${id}/send`, {
+        method: 'POST',
+        body: JSON.stringify(to ? { to } : {}),
+      }),
+    onSuccess: (data) => {
+      toast.success(`Invoice emailed to ${data.to}`);
+    },
+    onError: (err: Error) => {
+      toast.error(err.message);
+    },
+  });
+}
+
 export function useCreateInvoice() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: { billId: string; supplierGSTIN: string; recipientGSTIN: string }) =>
+    mutationFn: (data: { billId: string; supplierGSTIN: string; recipientGSTIN: string; recipientEmail?: string }) =>
       api<Invoice>('/invoices', { method: 'POST', body: JSON.stringify(data) }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['invoices'] });

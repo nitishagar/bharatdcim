@@ -121,6 +121,7 @@ export const handlers = [
   http.post('*/bills',                 () => HttpResponse.json(mockBill, { status: 201 })),
   http.post('*/invoices',              () => HttpResponse.json(mockInvoice, { status: 201 })),
   http.post('*/invoices/:id/cancel',   () => HttpResponse.json({ ok: true })),
+  http.post('*/invoices/:id/send',     () => HttpResponse.json({ sent: true, to: 'customer@example.com' })),
   http.post('*/invoices/credit-notes', () => HttpResponse.json({ ok: true })),
   http.post('*/uploads/csv',           () => HttpResponse.json(mockUpload, { status: 201 })),
 

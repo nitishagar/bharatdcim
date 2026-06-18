@@ -12,6 +12,7 @@ export const tenants = sqliteTable('tenants', {
   address1: text('address1'),
   city: text('city'),
   pincode: text('pincode'),
+  billingEmail: text('billing_email'),
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
 });
@@ -199,6 +200,7 @@ export const invoices = sqliteTable('invoices', {
   signedQrCode: text('signed_qr_code'),
   irnGeneratedAt: text('irn_generated_at'),
   irnCancelledAt: text('irn_cancelled_at'),
+  recipientEmail: text('recipient_email'),
   invoiceDate: text('invoice_date').notNull(),
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),

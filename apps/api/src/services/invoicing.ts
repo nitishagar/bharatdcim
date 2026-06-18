@@ -9,7 +9,8 @@ import { bills, invoices, invoiceSequences, creditNotes, invoiceAuditLog, irpRet
 import type { Database } from '../db/client.js';
 import type { Bindings } from '../types.js';
 import { generateIrn, cancelIrn, buildGspConfig, buildPlatformSeller, mapReasonToCode } from './irp.js';
-import { dispatchNotifications } from './notifications.js';
+import { dispatchNotifications, sendInvoiceEmail } from './notifications.js';
+import { renderInvoicePdf } from './invoice-pdf.js';
 
 function generateId(): string {
   return crypto.randomUUID();
@@ -109,6 +110,18 @@ async function triggerIrpGeneration(
       irn: irnResult.irn,
       totalAmountPaisa: invoice.totalAmountPaisa,
     }).catch((err) => console.error('[NOTIFY] irn_ready dispatch failed:', invoice.id, err));
+
+    // Auto-deliver PDF to customer if recipient email is known
+    const invoiceWithIrn = { ...invoice, irn: irnResult.irn, signedQrCode: irnResult.signedQrCode };
+    const to = invoice.recipientEmail ?? tenant.billingEmail;
+    if (to && env.RESEND_API_KEY) {
+      try {
+        const pdf = await renderInvoicePdf(invoiceWithIrn, tenant, env);
+        await sendInvoiceEmail(env.RESEND_API_KEY, to, invoice.invoiceNumber, pdf);
+      } catch (err) {
+        console.error('[BILLING-EMAIL] auto delivery failed:', invoice.id, err);
+      }
+    }
   } catch (err: unknown) {
     const errorMessage = err instanceof Error ? err.message : String(err);
     // Enqueue for retry — next attempt in 5 minutes
@@ -141,6 +154,7 @@ export async function createInvoice(
   tenantId: string | null = null,
   env?: Bindings,
   ctx: { waitUntil(p: Promise<unknown>): void } = { waitUntil: () => {} },
+  recipientEmail?: string | null,
 ): Promise<{ invoice: typeof invoices.$inferSelect; invoiceNumber: string }> {
   // Validate GSTINs
   const supplierVal = validateGSTIN(supplierGSTIN);
@@ -202,6 +216,7 @@ export async function createInvoice(
     totalAmountPaisa: taxBreakdown.totalAmountPaisa,
     status: 'draft',
     eInvoiceStatus: 'pending_irn',
+    recipientEmail: recipientEmail ?? null,
     invoiceDate: nowStr,
     createdAt: nowStr,
     updatedAt: nowStr,

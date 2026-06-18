@@ -472,6 +472,8 @@ const addColumnMigrations = [
   `ALTER TABLE sla_violations ADD COLUMN notified_at TEXT`,
   `UPDATE sla_violations SET notified_at = created_at WHERE status = 'open' AND notified_at IS NULL`,
   `ALTER TABLE alert_events ADD COLUMN notified_at TEXT`,
+  `ALTER TABLE invoices ADD COLUMN recipient_email TEXT`,
+  `ALTER TABLE tenants ADD COLUMN billing_email TEXT`,
 ];
 
 async function main() {

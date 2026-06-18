@@ -54,6 +54,42 @@ export async function sendEmailNotification(
   }
 }
 
+export async function sendInvoiceEmail(
+  apiKey: string,
+  to: string,
+  invoiceNumber: string,
+  pdfBytes: Uint8Array,
+): Promise<void> {
+  // Use chunked btoa to avoid stack overflow on large PDFs (>~100KB spread arg limit)
+  let base64 = '';
+  const chunk = 8192;
+  for (let i = 0; i < pdfBytes.length; i += chunk) {
+    base64 += btoa(String.fromCharCode(...pdfBytes.subarray(i, i + chunk)));
+  }
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from: 'billing@bharatdcim.com',
+      to: [to],
+      subject: `Invoice ${invoiceNumber} from BharatDCIM`,
+      html: `<p>Please find attached invoice <strong>${invoiceNumber}</strong>.</p><hr><p style="color:#888;font-size:12px">BharatDCIM — Data Center Intelligence Platform</p>`,
+      attachments: [{
+        filename: `${invoiceNumber}.pdf`,
+        content: base64,
+        content_type: 'application/pdf',
+      }],
+    }),
+  });
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(`Resend attachment error ${response.status}: ${JSON.stringify(err)}`);
+  }
+}
+
 export async function sendWebhookNotification(
   url: string,
   payload: NotificationPayload,
@@ -89,7 +125,12 @@ export async function dispatchNotifications(
     if (!events.includes(payload.event)) continue;
 
     if (config.type === 'email') {
-      const subject = `[BharatDCIM Alert] ${payload.event}: ${payload.metric}`;
+      const subjectSuffix = BILLING_EVENTS.has(payload.event)
+        ? (payload.invoiceNumber ?? payload.event)
+        : (payload.metric ?? payload.event);
+      const subject = BILLING_EVENTS.has(payload.event)
+        ? `[BharatDCIM Billing] ${payload.event}: ${subjectSuffix}`
+        : `[BharatDCIM Alert] ${payload.event}: ${subjectSuffix}`;
       const html = buildEmailHtml(payload);
       await sendEmailNotification(env.RESEND_API_KEY, config.destination, subject, html);
     } else if (config.type === 'webhook') {
@@ -103,7 +144,7 @@ const BILLING_EVENTS = new Set(['invoice_generated', 'irn_ready', 'invoice_cance
 function buildEmailHtml(payload: NotificationPayload): string {
   if (BILLING_EVENTS.has(payload.event)) {
     const amountStr = payload.totalAmountPaisa != null
-      ? `₹${(payload.totalAmountPaisa / 100).toLocaleString('en-IN')}`
+      ? `INR ${(payload.totalAmountPaisa / 100).toLocaleString('en-IN')}`
       : '';
     const billingBlock = [
       payload.invoiceNumber ? `<p><strong>Invoice:</strong> ${payload.invoiceNumber}</p>` : '',

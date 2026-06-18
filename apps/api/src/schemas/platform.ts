@@ -18,4 +18,5 @@ export const UpdateTenantSchema = z.object({
   address1: z.string().max(2000).nullable().optional(),
   city: z.string().max(200).nullable().optional(),
   pincode: z.string().max(10).nullable().optional(),
+  billingEmail: z.string().email().nullable().optional(),
 });

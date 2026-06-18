@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { pdf } from '@react-pdf/renderer';
-import { useInvoice, useCancelInvoice, useCreateCreditNote } from '../api/hooks/useInvoices';
+import { useInvoice, useCancelInvoice, useCreateCreditNote, useSendInvoice } from '../api/hooks/useInvoices';
 import { useAuditLog } from '../api/hooks/useAuditLog';
 import { DetailSkeleton } from '../components/Skeleton';
 import { ErrorMessage } from '../components/ErrorMessage';
@@ -39,6 +39,7 @@ export function InvoiceDetail() {
   const { data: invoice, isLoading, error } = useInvoice(id!);
   const cancelInvoice = useCancelInvoice();
   const createCreditNote = useCreateCreditNote();
+  const sendInvoice = useSendInvoice(id!);
 
   const [showCancel, setShowCancel] = useState(false);
   const [showCreditNote, setShowCreditNote] = useState(false);
@@ -123,12 +124,21 @@ export function InvoiceDetail() {
         {invoice.eInvoiceStatus !== 'not_applicable' && (
           <IRPStatusBadge status={invoice.eInvoiceStatus} />
         )}
-        <button
-          onClick={handleDownloadPDF}
-          className="ml-auto rounded-lg border px-4 py-2 text-sm hover:bg-gray-50 print:hidden dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
-        >
-          Download PDF
-        </button>
+        <div className="ml-auto flex items-center gap-2 print:hidden">
+          <button
+            onClick={() => sendInvoice.mutate(undefined)}
+            disabled={sendInvoice.isPending}
+            className="rounded-lg border px-4 py-2 text-sm hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+          >
+            {sendInvoice.isPending ? 'Sending...' : 'Email Invoice'}
+          </button>
+          <button
+            onClick={handleDownloadPDF}
+            className="rounded-lg border px-4 py-2 text-sm hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+          >
+            Download PDF
+          </button>
+        </div>
       </div>
 
       {showIrpCancelWarning && (

@@ -6,6 +6,7 @@ export const CreateInvoiceSchema = z.object({
   billId: z.string().min(1),
   supplierGSTIN: z.string().regex(gstinRegex, 'Invalid GSTIN format (e.g., 29ABCDE1234F1Z5)'),
   recipientGSTIN: z.string().regex(gstinRegex, 'Invalid GSTIN format (e.g., 29ABCDE1234F1Z5)'),
+  recipientEmail: z.string().email().nullable().optional(),
 });
 
 export const CancelInvoiceSchema = z.object({

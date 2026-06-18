@@ -8,7 +8,9 @@ import { requireAdmin } from '../middleware/rbac.js';
 import { parsePagination } from '../utils/pagination.js';
 import { CreateInvoiceSchema, CancelInvoiceSchema, CreateCreditNoteSchema } from '../schemas/invoices.js';
 import { validationHook } from '../utils/validationHook.js';
-import { dispatchNotifications } from '../services/notifications.js';
+import { dispatchNotifications, sendInvoiceEmail } from '../services/notifications.js';
+import { renderInvoicePdf } from '../services/invoice-pdf.js';
+import { tenants } from '../db/schema.js';
 
 const invoicesRouter = new Hono<AppEnv>();
 
@@ -45,7 +47,7 @@ invoicesRouter.post('/', zValidator('json', CreateInvoiceSchema, validationHook)
   const body = c.req.valid('json');
 
   try {
-    const result = await createInvoice(body.billId, body.supplierGSTIN, body.recipientGSTIN, db, tenantId, c.env, c.get('irpCtx'));
+    const result = await createInvoice(body.billId, body.supplierGSTIN, body.recipientGSTIN, db, tenantId, c.env, c.get('irpCtx'), body.recipientEmail);
     c.get('irpCtx').waitUntil(
       dispatchNotifications(db, c.env, tenantId, {
         event: 'invoice_generated',
@@ -110,6 +112,47 @@ invoicesRouter.post('/:id/cancel', zValidator('json', CancelInvoiceSchema, valid
       return c.json({ error: { code: 'VALIDATION_ERROR', message } }, 400);
     }
     throw err;
+  }
+});
+
+// POST /invoices/:id/send — manually send invoice PDF to recipient (admin only)
+invoicesRouter.post('/:id/send', async (c) => {
+  requireAdmin(c);
+  const db = c.get('db');
+  const tenantId = c.get('tenantId');
+  if (!tenantId) {
+    return c.json({ error: { code: 'FORBIDDEN', message: 'Tenant context required' } }, 403);
+  }
+  const id = c.req.param('id');
+  const body = await c.req.json().catch(() => ({})) as { to?: string };
+
+  const conditions = [eq(invoices.id, id), eq(invoices.tenantId, tenantId)];
+  const invRows = await db.select().from(invoices).where(and(...conditions)).all();
+  if (invRows.length === 0) {
+    return c.json({ error: { code: 'NOT_FOUND', message: `Invoice ${id} not found` } }, 404);
+  }
+  const invoice = invRows[0];
+
+  const tenantRows = await db.select().from(tenants).where(eq(tenants.id, tenantId)).all();
+  const tenant = tenantRows[0];
+
+  const to = body.to ?? invoice.recipientEmail ?? tenant?.billingEmail;
+  if (!to) {
+    return c.json({ error: { code: 'VALIDATION_ERROR', message: 'No recipient email — provide to in body or set recipient/billing email' } }, 400);
+  }
+
+  const apiKey = c.env?.RESEND_API_KEY;
+  if (!apiKey) {
+    return c.json({ error: { code: 'SERVICE_UNAVAILABLE', message: 'Email service not configured' } }, 503);
+  }
+
+  try {
+    const pdf = await renderInvoicePdf(invoice, tenant, c.env);
+    await sendInvoiceEmail(apiKey, to, invoice.invoiceNumber, pdf);
+    return c.json({ sent: true, to });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Email send failed';
+    return c.json({ error: { code: 'EMAIL_SEND_FAILED', message } }, 502);
   }
 });
 

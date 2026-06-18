@@ -26,6 +26,7 @@ export async function createTestDb() {
       address1 TEXT,
       city TEXT,
       pincode TEXT,
+      billing_email TEXT,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );
@@ -196,6 +197,7 @@ export async function createTestDb() {
       signed_qr_code TEXT,
       irn_generated_at TEXT,
       irn_cancelled_at TEXT,
+      recipient_email TEXT,
       invoice_date TEXT NOT NULL,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL

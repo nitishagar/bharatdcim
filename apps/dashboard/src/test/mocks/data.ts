@@ -137,6 +137,7 @@ export const mockInvoice: Invoice = {
   signedQrCode: 'eyJhbGciOiJSUzI1NiJ9.mock.signature',
   irnGeneratedAt: '2026-03-31T14:30:00.000Z',
   irnCancelledAt: null,
+  recipientEmail: null,
   invoiceDate: '2026-02-01',
   createdAt: '2026-02-01T09:00:00Z',
   updatedAt: '2026-02-01T09:00:00Z',
